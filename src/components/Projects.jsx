@@ -53,18 +53,18 @@ const ProjectCard = ({ title, description, tags, github, demo, image }) => (
 const Projects = () => {
   const projects = [
     {
-      title: "E-commerce Platform",
-      description: "Une plateforme complète avec panier, système de paiement et interface d'administration.",
-      tags: ["React", "Laravel", "MySQL", "Tailwind"],
-      github: "https://github.com",
+      title: "Mon Site Portfolio",
+      description: "Mon site personnel vitrine réalisé avec les dernières technologies web.",
+      tags: ["React", "Tailwind", "Three.js"],
+      github: "https://github.com/Joseph-Nostra/MonSite",
       demo: "#",
       image: ""
     },
     {
-      title: "Task Management App",
-      description: "Outil de gestion de tâches avec collaboration en temps réel et notifications.",
-      tags: ["React", "Express", "MongoDB", "Socket.io"],
-      github: "https://github.com",
+      title: "Lexigam",
+      description: "Une plateforme e-commerce orientée gaming avec un design immersif.",
+      tags: ["React", "Tailwind", "Gaming UI"],
+      github: "https://github.com/Joseph-Nostra/lexigam",
       demo: "#",
       image: ""
     },

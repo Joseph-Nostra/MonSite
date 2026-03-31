@@ -11,10 +11,10 @@ const Hero = () => {
         className="z-10"
       >
         <h2 className="text-xl md:text-2xl font-orbitron tracking-[0.2em] text-accent-blue mb-4 uppercase">
-          Développeur Full Stack
+          Développeur Full Stack & Entrepreneur
         </h2>
         <h1 className="text-5xl md:text-8xl font-black mb-6 tracking-tighter">
-          VOTRE <span className="accent-text">NOM</span>
+          YOUSSEF <span className="accent-text">ZHAR</span>
         </h1>
         <p className="text-gray-400 max-w-2xl mx-auto text-lg md:text-xl font-light leading-relaxed mb-10">
           Passionné par la création d'expériences numériques immersives, performantes et élégantes. Spécialisé en React, Node.js et les technologies 3D.

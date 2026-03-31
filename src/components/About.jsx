@@ -1,5 +1,4 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import profileImg from '../assets/profile.jpg';
 
 const About = () => {
   return (
@@ -14,11 +13,11 @@ const About = () => {
         >
           <div className="absolute -inset-4 bg-gradient-to-r from-accent-blue to-accent-purple rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
           <div className="relative aspect-square rounded-3xl overflow-hidden glass border border-white/10">
-            {/* Si l'utilisateur n'a pas mis d'image, on affiche un gradient placeholder */}
-            <div className="w-full h-full bg-gradient-to-br from-gray-800 to-black flex items-center justify-center text-8xl font-black text-white/10">
-              JS
-            </div>
-            {/* L'image réelle peut être ajoutée ici */}
+            <img 
+              src={profileImg} 
+              alt="Youssef Zhar" 
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
           </div>
         </motion.div>
 
@@ -31,7 +30,7 @@ const About = () => {
           <h2 className="text-4xl font-bold mb-8">À Propos <span className="text-accent-blue">De Moi</span></h2>
           <div className="space-y-6 text-gray-400 text-lg leading-relaxed">
             <p>
-              Bonjour ! Je suis un développeur Full Stack passionné par l'innovation technique et le design d'interface. Avec une solide expertise en <span className="text-white font-semibold">Front-end</span> et <span className="text-white font-semibold">Back-end</span>, j'adore transformer des idées complexes en applications web fluides et interactives.
+              Bonjour ! Je suis <span className="text-white font-semibold">Youssef Zhar</span>, un développeur Full Stack et entrepreneur passionné par l'innovation technique et le design d'interface. Avec une solide expertise en <span className="text-white font-semibold">Front-end</span> et <span className="text-white font-semibold">Back-end</span>, j'adore transformer des idées complexes en applications web fluides et interactives.
             </p>
             <p>
               Ma curiosité me pousse sans cesse à explorer de nouvelles technologies, qu'il s'agisse de <span className="text-accent-blue">Three.js</span> pour la 3D web ou d'optimisations DevOps complexes. Mon objectif est toujours de fournir un code propre, scalable et centré sur l'utilisateur.
