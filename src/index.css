@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme {
+  --color-accent-blue: #00f2ff;
+  --color-accent-purple: #7000ff;
+  --font-orbitron: "Orbitron", sans-serif;
+  --font-inter: "Inter", sans-serif;
+  
+  @keyframes gradient-x {
+    0%, 100% {
+      background-size: 200% 200%;
+      background-position: left center;
+    }
+    50% {
+      background-size: 200% 200%;
+      background-position: right center;
+    }
+  }
+}
+
+:root {
+  --accent-blue: #00f2ff;
+  --accent-purple: #7000ff;
+}
+
+@layer base {
+  body {
+    @apply bg-[#030303] text-white font-inter selection:bg-accent-blue/30 selection:text-white;
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/5 backdrop-blur-lg border border-white/10;
+  }
+  
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 hover:border-accent-blue/50 transition-all duration-500 rounded-2xl;
+  }
+  
+  .btn-primary {
+    @apply px-8 py-3 bg-gradient-to-r from-accent-blue to-accent-purple rounded-full font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-accent-blue/20;
+  }
+
+  .accent-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-blue to-accent-purple;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1a1a1a;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2a2a2a;
+}
+
+/* Three.js Canvas Container */
+.canvas-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+}
