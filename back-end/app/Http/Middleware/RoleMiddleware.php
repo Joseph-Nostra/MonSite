@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
+
+class RoleMiddleware
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  mixed ...$roles
+     */
+    public function handle(Request $request, Closure $next, ...$roles)
+    {
+        // 🔹 récupérer l'utilisateur via la façade Auth
+        $user = Auth::user();
+
+        // 🔹 vérifier l'authentification
+        if (!$user) {
+            return response()->json(['message' => 'Non authentifié'], 401);
+        }
+
+        // 🔹 vérifier le rôle
+        if (!in_array($user->role, $roles)) {
+            return response()->json(['message' => 'Accès refusé'], 403);
+        }
+
+        return $next($request);
+    }
+}

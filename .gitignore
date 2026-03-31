@@ -1,0 +1,31 @@
+# Dependencies
+front-end/node_modules/
+back-end/vendor/
+
+# Environment
+back-end/.env
+front-end/.env
+front-end/.env.local
+front-end/.env.development.local
+front-end/.env.test.local
+front-end/.env.production.local
+
+# IDEs
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Build outputs
+front-end/dist/
+back-end/storage/*.key
+back-end/storage/framework/cache/data/*
+back-end/storage/framework/sessions/*
+back-end/storage/framework/testing/*
+back-end/storage/framework/views/*
+back-end/storage/logs/*.log
+back-end/public/storage
+back-end/public/hot
+back-end/public/build

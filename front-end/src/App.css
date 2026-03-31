@@ -1,0 +1,20 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container-fluid {
+  flex: 1; /* prend tout l'espace restant */
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1; /* pour pousser le footer en bas si contenu vide */
+}
