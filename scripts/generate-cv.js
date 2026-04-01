@@ -21,7 +21,7 @@ import puppeteer from 'puppeteer';
 
   // Save as PDF
   await page.pdf({
-    path: 'CV_Youssef_Zhar.pdf',
+    path: 'public/CV_Youssef_Zhar.pdf',
     margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' },
     printBackground: true,
     format: 'A4',

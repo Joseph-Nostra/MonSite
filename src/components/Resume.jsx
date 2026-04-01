@@ -6,12 +6,13 @@ const Resume = () => {
     <div className="min-h-screen bg-white text-gray-900 p-8 md:p-16 print:p-0 font-serif">
       {/* Print/Download Button (Hidden in Print) */}
       <div className="max-w-4xl mx-auto mb-8 flex justify-end print:hidden">
-        <button
-          onClick={() => window.print()}
-          className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-all font-sans font-bold text-sm tracking-widest uppercase"
+        <a 
+          href="/CV_Youssef_Zhar.pdf"
+          download="CV_Youssef_Zhar.pdf"
+          className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-all font-sans font-bold text-sm tracking-widest uppercase no-underline"
         >
-          Imprimer / Enregistrer en PDF
-        </button>
+          Enregistrer en PDF
+        </a>
       </div>
 
       {/* CV Container */}
