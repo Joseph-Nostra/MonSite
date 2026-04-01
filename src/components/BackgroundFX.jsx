@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 const BackgroundFX = () => {
   return (
-    <div className="fixed inset-0 z-[-5] pointer-events-none overflow-hidden">
+    <div className="fixed inset-0 z-[-5] pointer-events-none overflow-hidden print:hidden">
       {/* Noise Overlay */}
       <div className="noise-overlay" />
       

@@ -33,7 +33,7 @@ const Stars = (props) => {
 
 const CanvasBackground = () => {
   return (
-    <div className="canvas-container">
+    <div className="canvas-container print:hidden">
       <Canvas camera={{ position: [0, 0, 1] }}>
         <React.Suspense fallback={null}>
           <Stars />
