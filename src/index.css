@@ -105,3 +105,11 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-accent-blue);
 }
+
+@media print {
+  .noise-overlay, 
+  .grid-overlay, 
+  .canvas-container {
+    display: none !important;
+  }
+}
