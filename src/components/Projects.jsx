@@ -127,14 +127,6 @@ const Projects = () => {
       result: "Performance Lighthouse de 99% et une interface qui captive immédiatement l'audience cible.",
       tags: ["React", "Node.js", "MongoDB", "Gaming UI"],
       github: "https://github.com/Joseph-Nostra/lexigam"
-    },
-    {
-      title: "SaaS DashBoard",
-      problem: "La visualisation de données complexes peut être écrasante sans une interface intuitive.",
-      solution: "Création d'un tableau de bord analytique avec des graphiques interactifs et un mode sombre haute performance.",
-      result: "Une réduction de 40% du temps nécessaire pour interpréter les métriques clés.",
-      tags: ["React", "Chart.js", "Tailwind", "Firebase"],
-      github: "https://github.com/Joseph-Nostra"
     }
   ];
 
@@ -153,7 +145,7 @@ const Projects = () => {
       
       <div className="mt-32 p-12 glass-card rounded-[3rem] border border-white/5 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-accent-blue/5 blur-[100px] -z-10"></div>
-        <h3 className="text-3xl font-black mb-6 uppercase tracking-widest">3 projets stratégiques sur GitHub</h3>
+        <h3 className="text-3xl font-black mb-6 uppercase tracking-widest">2 projets stratégiques sur GitHub</h3>
         <p className="text-gray-400 mb-10 max-w-2xl mx-auto">Découvrez l'ensemble de mes contributions, expériences et expérimentations open-source.</p>
         <a 
           href="https://github.com/Joseph-Nostra" 
