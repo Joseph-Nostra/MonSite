@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -99,7 +100,7 @@ class ProductController extends Controller
         return response()->json(['message' => 'Produit mis à jour', 'product' => $product]);
     }
 
-    // 🔥 Supprimer produit
+    // 🔥 Supprimer produit (Soft Delete)
     public function destroy(Request $request, $id)
     {
         $user = $request->user();
@@ -111,9 +112,16 @@ class ProductController extends Controller
             return response()->json(['message' => 'Accès refusé'], 403);
         }
 
-        $product->delete();
+        $product->delete(); // Soft delete thanks to trait
 
-        return response()->json(['message' => 'Produit supprimé']);
+        // Notification for seller
+        Notification::create([
+            'user_id' => $user->id,
+            'type' => 'product_deleted',
+            'message' => "Le produit '{$product->title}' a été supprimé (archivé)."
+        ]);
+
+        return response()->json(['message' => 'Produit supprimé (archivé)']);
     }
 
     // 🔥 Produits du vendeur connecté

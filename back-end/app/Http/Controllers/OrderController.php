@@ -64,7 +64,8 @@ class OrderController extends Controller
             $order = Order::create([
                 'user_id' => $user->id,
                 'total' => $total,
-                'status' => 'pending'
+                'status' => $request->payment_method === 'delivery' ? 'processing' : 'pending',
+                'payment_method' => $request->payment_method ?? 'card'
             ]);
 
             // 3. créer items + stock + notification
@@ -78,17 +79,17 @@ class OrderController extends Controller
 }
 
     // ✔ 1. CHECK STOCK AVANT TOUT
-    if ($product->stock < $item->quantity) {
-        throw new \Exception("Stock insuffisant pour {$product->title}");
+    if (!$product || $product->stock < $item->quantity) {
+        throw new \Exception("Stock insuffisant pour le produit : {$item->title}. (Disponible: " . ($product->stock ?? 0) . ")");
     }
 
-    // ✔ 2. CREATE ITEM
+    // ✔ 2. CREATE ITEM (Snapshot)
     OrderItem::create([
         'order_id' => $order->id,
         'product_id' => $item->product_id,
-        'title' => $item->title,
-        'price' => $product->price,
-        'image' => $item->image,
+        'title' => $product->title, // Snapshot title from product
+        'price' => $product->price, // Snapshot price from product
+        'image' => $product->image, // Snapshot image from product
         'quantity' => $item->quantity
     ]);
 
@@ -96,14 +97,18 @@ class OrderController extends Controller
     $product->decrement('stock', $item->quantity);
 
     // ✔ 4. GROUP SELLERS
-    $sellers[$product->user_id][] = $product->title;
+    $sellers[$product->user_id][] = [
+        'title' => $product->title,
+        'quantity' => $item->quantity
+    ];
 }
-            // notification
+            // notification for sellers
             foreach ($sellers as $sellerId => $products) {
+                $productDetails = array_map(fn($p) => "{$p['title']} (x{$p['quantity']})", $products);
                 Notification::create([
                      'user_id' => $sellerId,
-                     'type' => 'order',
-                     'message' => "🛒 Nouvelle commande (#{$order->id}) contenant : ... " . implode(', ', $products)
+                     'type' => 'new_order',
+                     'message' => "🛒 Nouvelle commande (#{$order->id}) reçue pour : " . implode(', ', $productDetails)
                     ]);
                 }
 
