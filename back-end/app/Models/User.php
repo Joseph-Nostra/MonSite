@@ -29,6 +29,16 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function client()
+    {
+        return $this->hasOne(Client::class);
+    }
+
+    public function vendeur()
+    {
+        return $this->hasOne(Vendeur::class);
+    }
+
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
