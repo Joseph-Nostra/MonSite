@@ -43,36 +43,42 @@ export default function NavBar({ user, setUser, loading }) {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light px-3 fixed-top">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4 py-3 fixed-top shadow-sm">
       
       {/* 🔥 SPA navigation */}
-      <Link className="navbar-brand" to="/products">
-        MonLogo
+      <Link className="navbar-brand d-flex align-items-center gap-2" to="/products">
+        <img src="/logo.png" alt="MonSite Logo" width="40" height="40" className="rounded-circle" />
+        <span className="fw-bold text-uppercase tracking-wider">MonSite</span>
       </Link>
 
-      <ul className="navbar-nav ms-auto align-items-center gap-2">
+      <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span className="navbar-toggler-icon"></span>
+      </button>
 
-  {loading ? null : user ? (
-    <>
-      {/* USER NAME */}
-      <li className="nav-item">
-        <span className="nav-link">Bonjour, {user.name}</span>
-      </li>
+      <div className="collapse navbar-collapse" id="navbarNav">
+        <ul className="navbar-nav ms-auto align-items-center gap-3">
 
-      {/* 🔔 NOTIFICATIONS */}
-      <li className="nav-item">
-        <button
-          className="btn btn-light position-relative"
-          onClick={() => navigate("/notifications")}
-        >
-          🔔
-          {unread > 0 && (
-            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-              {unread}
-            </span>
-          )}
-        </button>
-      </li>
+    {loading ? null : user ? (
+      <>
+        {/* USER NAME */}
+        <li className="nav-item">
+          <span className="nav-link text-white-50">Bienvenue, <strong className="text-white">{user.name}</strong></span>
+        </li>
+
+        {/* 🔔 NOTIFICATIONS */}
+        <li className="nav-item">
+          <button
+            className="btn btn-outline-light position-relative border-0"
+            onClick={() => navigate("/notifications")}
+          >
+            🔔
+            {unread > 0 && (
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                {unread}
+              </span>
+            )}
+          </button>
+        </li>
 
       {/* 🛍️ ADD PRODUCT (vendeur/admin) */}
       {(user.role === "vendeur" || user.role === "admin") && (
@@ -117,7 +123,8 @@ export default function NavBar({ user, setUser, loading }) {
       </li>
     </>
   )}
-</ul>
+        </ul>
+      </div>
     </nav>
   );
 }

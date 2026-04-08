@@ -21,39 +21,38 @@ function ProductCard({ product, onAddToCart, user, handleEdit, handleDelete }) {
         <p>{product.description}</p>
         <p>${product.price}</p>
 
-        <div className="mt-auto d-flex justify-content-between">
+        <div className="mt-auto d-flex flex-wrap gap-2 justify-content-between">
 
-          {/* CLIENT */}
-          {user?.role === "client" && (
-            <>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => navigate(`/product/${product.id}`)}
-              >
-                Détails
-              </button>
+          {/* EVERYONE SEES DETAILS */}
+          <button
+            className="btn btn-outline-primary btn-sm flex-fill"
+            onClick={() => navigate(`/product/${product.id}`)}
+          >
+            Voir Détails
+          </button>
 
-              <button
-                className="btn btn-success btn-sm"
-                onClick={handleAdd}
-              >
-                Ajouter
-              </button>
-            </>
+          {/* CLIENT SEES ADD TO CART */}
+          {(!user || user.role === "client") && (
+            <button
+              className="btn btn-success btn-sm flex-fill"
+              onClick={handleAdd}
+            >
+              Ajouter
+            </button>
           )}
 
-          {/* VENDEUR / ADMIN */}
-          {(user?.role === "vendeur" || user?.role === "admin") && (
+          {/* OWNER OR ADMIN SEES EDIT/DELETE */}
+          {(user?.role === "admin" || (user?.role === "vendeur" && user.id === product.user_id)) && (
             <>
               <button
-                className="btn btn-warning btn-sm"
+                className="btn btn-warning btn-sm flex-fill"
                 onClick={() => handleEdit(product.id)}
               >
                 Modifier
               </button>
 
               <button
-                className="btn btn-danger btn-sm"
+                className="btn btn-danger btn-sm flex-fill"
                 onClick={() => handleDelete(product.id)}
               >
                 Supprimer

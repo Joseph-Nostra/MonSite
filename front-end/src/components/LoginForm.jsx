@@ -85,10 +85,25 @@ function LoginForm({ setUser }) {
         />
 
         <button
-          className="btn btn-success w-100 mt-3"
+          className="btn btn-dark w-100 mt-3 py-2 fw-bold shadow-sm"
           disabled={loading}
         >
-          {loading ? "Connexion..." : "Se aconnecter"}
+          {loading ? "Connexion..." : "Se connecter"}
+        </button>
+
+        <div className="d-flex align-items-center my-4">
+          <hr className="flex-grow-1" />
+          <span className="mx-3 text-muted">ou</span>
+          <hr className="flex-grow-1" />
+        </div>
+
+        <button
+          type="button"
+          className="btn btn-outline-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm"
+          onClick={() => window.location.href = "http://127.0.0.1:8000/api/auth/google"}
+        >
+          <img src="https://www.google.com/favicon.ico" alt="Google" width="20" height="20" />
+          Continuer avec Google
         </button>
       </form>
     </div>

@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import api from "../axios";
 import { useNavigate } from "react-router-dom";
+import Toast from "./Toast";
 
 export default function CartSidebar({ cart, setCart }) {
   const [totalPrice, setTotalPrice] = useState(0);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [notification, setNotification] = useState({ message: "", type: "" });
 
   const navigate = useNavigate();
 
@@ -70,26 +73,30 @@ export default function CartSidebar({ cart, setCart }) {
     }
 
     if (cart.length === 0) {
-      alert("Panier vide !");
+      setNotification({ message: "Panier vide !", type: "error" });
       return;
     }
 
     try {
       setLoading(true);
 
-      const res = await api.post("/orders/checkout");
+      const res = await api.post("/orders/checkout", {
+        payment_method: paymentMethod
+      });
 
-      alert(res.data.message || "Commande confirmée !");
+      setNotification({ message: res.data.message || "Commande confirmée !", type: "success" });
 
-      setCart([]);
-
-      // 🔥 redirect vers commandes
-      navigate("/orders");
+      setTimeout(() => {
+        setCart([]);
+        navigate("/orders");
+      }, 2000);
 
     } catch (err) {
       console.error(err.response?.data || err.message);
-
-      alert(err.response?.data?.message || "Erreur serveur");
+      setNotification({ 
+        message: err.response?.data?.message || err.response?.data?.error || "Erreur serveur", 
+        type: "error" 
+      });
 
     } finally {
       setLoading(false);
@@ -175,8 +182,48 @@ export default function CartSidebar({ cart, setCart }) {
 
           <h5>Total: ${totalPrice.toFixed(2)}</h5>
 
+          <div className="my-3">
+            <h6>Méthode de paiement :</h6>
+            <div className="form-check">
+              <input 
+                className="form-check-input" 
+                type="radio" 
+                name="paymentMethod" 
+                id="card" 
+                value="card" 
+                checked={paymentMethod === 'card'} 
+                onChange={(e) => setPaymentMethod(e.target.value)} 
+              />
+              <label className="form-check-label" htmlFor="card">💳 Carte Bancaire</label>
+            </div>
+            <div className="form-check">
+              <input 
+                className="form-check-input" 
+                type="radio" 
+                name="paymentMethod" 
+                id="paypal" 
+                value="paypal" 
+                checked={paymentMethod === 'paypal'} 
+                onChange={(e) => setPaymentMethod(e.target.value)} 
+              />
+              <label className="form-check-label" htmlFor="paypal">🅿️ PayPal</label>
+            </div>
+            <div className="form-check">
+              <input 
+                className="form-check-input" 
+                type="radio" 
+                name="paymentMethod" 
+                id="delivery" 
+                value="delivery" 
+                checked={paymentMethod === 'delivery'} 
+                onChange={(e) => setPaymentMethod(e.target.value)} 
+              />
+              <label className="form-check-label" htmlFor="delivery">🚚 Paiement à la livraison</label>
+            </div>
+          </div>
+
           <button
-            className="btn btn-success w-100 mt-2"
+            className="btn btn-success w-100 mt-2 py-2"
             onClick={confirmOrder}
             disabled={loading}
           >
@@ -185,6 +232,12 @@ export default function CartSidebar({ cart, setCart }) {
 
         </div>
       )}
+
+      <Toast 
+        message={notification.message} 
+        type={notification.type} 
+        onClose={() => setNotification({ message: "", type: "" })} 
+      />
     </div>
   );
 }

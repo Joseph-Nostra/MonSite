@@ -14,39 +14,30 @@ import AddProductForm from "./components/AddProductForm";
 import Notifications from "./components/Notification";
 
 import api from "./axios";
+import Toast from "./components/Toast";
 import "./App.css";
 
 function App() {
   const [cart, setCart] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState({ message: "", type: "" });
 
 
   const handleDelete = async (id) => {
     try {
       await api.delete(`/products/${id}`);
-      // update UI (optionnel mais recommandé)
-    window.location.reload(); 
-  } catch (err) {
-    console.error("Erreur delete:", err.response?.data || err.message);
-  }
-};
+      setNotification({ message: "Produit supprimé avec succès", type: "success" });
+      setTimeout(() => window.location.reload(), 1500);
+    } catch (err) {
+      console.error("Erreur delete:", err.response?.data || err.message);
+      setNotification({ message: "Erreur lors de la suppression", type: "error" });
+    }
+  };
 
-const handleEdit = async (id) => {
-  const newTitle = prompt("Nouveau titre ?");
-  if (!newTitle) return;
-
-  try {
-    const res = await api.put(`/products/${id}`, {
-      title: newTitle
-    });
-
-    console.log("Produit modifié:", res.data);
-    window.location.reload(); // simple version
-  } catch (err) {
-    console.error("Erreur edit:", err.response?.data || err.message);
-  }
-};
+  const handleEdit = (id) => {
+    navigate(`/edit-product/${id}`);
+  };
 
   // 🔥 GET USER CONNECTED
   useEffect(() => {
@@ -87,13 +78,15 @@ const handleEdit = async (id) => {
         loading={loading}
         handleDelete={handleDelete}
         handleEdit={handleEdit}
+        notification={notification}
+        setNotification={setNotification}
       />
     </Router>
   );
 }
 
 // 🔥 APP CONTENT (with navigate)
-function AppContent({ user, setUser, cart, setCart, loading , handleDelete , handleEdit}) {
+function AppContent({ user, setUser, cart, setCart, loading , handleDelete , handleEdit, notification, setNotification}) {
   const navigate = useNavigate();
 
 
@@ -197,10 +190,25 @@ function AppContent({ user, setUser, cart, setCart, loading , handleDelete , han
             }
           />
 
+          {/* EDIT PRODUCT */}
+          <Route
+            path="/edit-product/:id"
+            element={
+              user && (user.role === "vendeur" || user.role === "admin") ? (
+                <AddProductForm user={user} isEdit={true} />
+              ) : (
+                <p className="text-center mt-5 text-danger">
+                  Accès refusés
+                </p>
+              )
+            }
+          />
+
         </Routes>
       </main>
 
       <Footer />
+      <Toast message={notification.message} type={notification.type} onClose={() => setNotification({ message: "", type: "" })} />
     </div>
   );
 }

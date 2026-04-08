@@ -1,27 +1,49 @@
 // src/components/AddProductForm.jsx
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../axios";
 
-export default function AddProductForm({ user }) {
+export default function AddProductForm({ user, isEdit = false }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState(null); // fichier image
   const [stock, setStock] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ text: "", type: "" });
+  
   const navigate = useNavigate();
+  const { id } = useParams();
 
+  useEffect(() => {
+    if (isEdit && id) {
+      const fetchProduct = async () => {
+        try {
+          const res = await api.get(`/products/${id}`);
+          const p = res.data;
+          setTitle(p.title);
+          setDescription(p.description);
+          setPrice(p.price);
+          setStock(p.stock);
+        } catch (err) {
+          console.error("Erreur fetch product:", err);
+          setMessage({ text: "Erreur lors de la récupération du produit", type: "danger" });
+        }
+      };
+      fetchProduct();
+    }
+  }, [isEdit, id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if   (!user || (user.role !== "vendeur" && user.role !== "admin")) {
-      alert("Accès refusé !");
+    if (!user || (user.role !== "vendeur" && user.role !== "admin")) {
+      setMessage({ text: "Accès refusé !", type: "danger" });
       return;
     }
 
     try {
-
+      setLoading(true);
       const formData = new FormData();
       formData.append("title", title);
       formData.append("description", description);
@@ -29,63 +51,99 @@ export default function AddProductForm({ user }) {
       formData.append("stock", stock);
       if (image) formData.append("image", image);
 
-      const res = await api.post("/products", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      if (isEdit) {
+        // Pour les fichiers avec PUT dans Laravel, on utilise souvent POST avec _method=PUT
+        formData.append("_method", "PUT");
+        await api.post(`/products/${id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      } else {
+        await api.post("/products", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
 
-      navigate("/products");
-      alert(res.data.message);
-      setTitle("");
-      setDescription("");
-      setPrice("");
-      setStock("");
-      setImage(null);
+      setMessage({ text: isEdit ? "Produit mis à jour !" : "Produit créé !", type: "success" });
+      setTimeout(() => navigate("/products"), 1500);
+
     } catch (err) {
-      console.error("Erreur création produit:", err.response?.data || err.message);
-      alert(err.response?.data?.message || "Erreur lors de la création du produit");
+      console.error("Erreur save product:", err.response?.data || err.message);
+      setMessage({ text: err.response?.data?.message || "Erreur lors de l'enregistrement", type: "danger" });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-50 mx-auto mt-5">
-      <h3>Ajouter un produit</h3>
-      <input
-        type="text"
-        placeholder="Titre"
-        className="form-control my-2"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        required
-      />
-      <textarea
-        placeholder="Description"
-        className="form-control my-2"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-      <input
-        type="number"
-        placeholder="Prix"
-        className="form-control my-2"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-        required
-      />
-      <input
-        type="number"
-        placeholder="Stock"
-        className="form-control my-2"
-        value={stock}
-        onChange={(e) => setStock(e.target.value)}
-        required
-        />
-      <input
-        type="file"
-        className="form-control my-2"
-        onChange={(e) => setImage(e.target.files[0])}
-        accept="image/*"
-      />
-      <button className="btn btn-success w-100 mt-2">Ajouter le produit</button>
-    </form>
+    <div className="container mt-5 pt-5">
+      <form onSubmit={handleSubmit} className="card p-4 shadow-sm border-0 mx-auto" style={{ maxWidth: "600px" }}>
+        <h3 className="mb-4 text-center">{isEdit ? "Modifier le produit" : "Ajouter un produit"}</h3>
+        
+        {message.text && (
+          <div className={`alert alert-${message.type} py-2`} role="alert">
+            {message.text}
+          </div>
+        )}
+
+        <div className="mb-3">
+          <label className="form-label">Titre du produit</label>
+          <input
+            type="text"
+            className="form-control"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Description</label>
+          <textarea
+            className="form-control"
+            rows="3"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+
+        <div className="row">
+          <div className="col-md-6 mb-3">
+            <label className="form-label">Prix (DH)</label>
+            <input
+              type="number"
+              className="form-control"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              required
+            />
+          </div>
+          <div className="col-md-6 mb-3">
+            <label className="form-label">Stock disponible</label>
+            <input
+              type="number"
+              className="form-control"
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label className="form-label">Image du produit</label>
+          <input
+            type="file"
+            className="form-control"
+            onChange={(e) => setImage(e.target.files[0])}
+            accept="image/*"
+          />
+          {isEdit && <small className="text-muted">Laissez vide pour conserver l'image actuelle.</small>}
+        </div>
+
+        <button className="btn btn-dark w-100 py-2 fw-bold" disabled={loading}>
+          {loading ? "Chargement..." : isEdit ? "Mettre à jour" : "Ajouter le produit"}
+        </button>
+      </form>
+    </div>
   );
-}
+}
