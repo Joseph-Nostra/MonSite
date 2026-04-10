@@ -30,10 +30,14 @@ function ProductDetail({ onAddToCart }) {
   if (error) return <div className="text-danger">{error}</div>;
   if (!product) return <p>Produit introuvable</p>;
 
+  const imageUrl = product.image
+  ? `http://127.0.0.1:8000/storage/${product.image}`
+  : "https://via.placeholder.com/150";
+
   return (
     <div className="card mx-auto mt-5" style={{ maxWidth: "600px" }}>
       <img
-        src={`http://127.0.0.1:8000/storage/${product.image}`}
+        src={imageUrl}
         className="card-img-top"
         alt={product.title}
         style={{ objectFit: "contain", maxHeight: "300px" }}

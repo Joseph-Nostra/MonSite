@@ -38,7 +38,7 @@ function Contacts() {
   };
 
   return (
-    <div className="container w-50 mt-5">
+    <div className="container w-50 mt-5 pt-5">
       <h3>Contactez-nous</h3>
       {success && <div className="alert alert-success">{success}</div>}
       {error && <div className="alert alert-danger">{error}</div>}

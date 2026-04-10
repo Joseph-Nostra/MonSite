@@ -63,6 +63,7 @@ class ProductController extends Controller
         'title' => $request->title,
         'description' => $request->description,
         'price' => $request->price,
+        'stock' => $request->stock ?? 0,
         'image' => $imagePath,
         'user_id' => $user->id,
     ]);
@@ -75,30 +76,38 @@ class ProductController extends Controller
 
     // 🔥 Modifier produit
     public function update(Request $request, $id)
-    {
-        $user = $request->user();
-        $product = Product::find($id);
+{
+    $user = $request->user();
+    $product = Product::find($id);
 
-        if (!$product) return response()->json(['message' => 'Produit non trouvé'], 404);
+    if (!$product) return response()->json(['message' => 'Produit non trouvé'], 404);
 
-        if (!$user || ($user->role !== 'admin' && $product->user_id !== $user->id)) {
-            return response()->json(['message' => 'Accès refusé'], 403);
-        }
-        if ($request->hasFile('image')) {
-            $product->image = $request->file('image')->store('products', 'public');
-        }
-
-        $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'description' => 'sometimes|nullable|string',
-            'price' => 'sometimes|numeric|min:0',
-            'image' => 'sometimes|nullable|image|max:2048',
-        ]);
-
-        $product->update($request->only(['title', 'description', 'price', 'image']));
-
-        return response()->json(['message' => 'Produit mis à jour', 'product' => $product]);
+    if (!$user || ($user->role !== 'admin' && $product->user_id !== $user->id)) {
+        return response()->json(['message' => 'Accès refusé'], 403);
     }
+
+    $request->validate([
+        'title' => 'sometimes|string|max:255',
+        'description' => 'sometimes|nullable|string',
+        'price' => 'sometimes|numeric|min:0',
+        'stock' => 'sometimes|integer|min:0',
+        'image' => 'sometimes|nullable|image|max:2048',
+    ]);
+
+    $data = $request->only(['title', 'description', 'price', 'stock']);
+
+    // ✅ gérer image séparément
+    if ($request->hasFile('image')) {
+        $data['image'] = $request->file('image')->store('products', 'public');
+    }
+    
+    $product->update($data);
+
+    return response()->json([
+        'message' => 'Produit mis à jour',
+        'product' => $product
+    ]);
+}
 
     // 🔥 Supprimer produit (Soft Delete)
     public function destroy(Request $request, $id)

@@ -24,20 +24,6 @@ function App() {
   const [notification, setNotification] = useState({ message: "", type: "" });
 
 
-  const handleDelete = async (id) => {
-    try {
-      await api.delete(`/products/${id}`);
-      setNotification({ message: "Produit supprimé avec succès", type: "success" });
-      setTimeout(() => window.location.reload(), 1500);
-    } catch (err) {
-      console.error("Erreur delete:", err.response?.data || err.message);
-      setNotification({ message: "Erreur lors de la suppression", type: "error" });
-    }
-  };
-
-  const handleEdit = (id) => {
-    navigate(`/edit-product/${id}`);
-  };
 
   // 🔥 GET USER CONNECTED
   useEffect(() => {
@@ -76,8 +62,6 @@ function App() {
         cart={cart}
         setCart={setCart}
         loading={loading}
-        handleDelete={handleDelete}
-        handleEdit={handleEdit}
         notification={notification}
         setNotification={setNotification}
       />
@@ -86,8 +70,23 @@ function App() {
 }
 
 // 🔥 APP CONTENT (with navigate)
-function AppContent({ user, setUser, cart, setCart, loading , handleDelete , handleEdit, notification, setNotification}) {
+function AppContent({ user, setUser, cart, setCart, loading , notification, setNotification}) {
   const navigate = useNavigate();
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/products/${id}`);
+      setNotification({ message: "Produit supprimé avec succès", type: "success" });
+      setTimeout(() => window.location.reload(), 1500);
+    } catch (err) {
+      console.error("Erreur delete:", err.response?.data || err.message);
+      setNotification({ message: "Erreur lors de la suppression", type: "error" });
+    }
+  };
+
+  const handleEdit = (id) => {
+    navigate(`/edit-product/${id}`);
+  };
 
 
   // 🔥 ADD TO CART

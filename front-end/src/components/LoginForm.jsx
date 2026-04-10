@@ -54,7 +54,7 @@ function LoginForm({ setUser }) {
   };
 
   return (
-    <div className="d-flex justify-content-center mt-5">
+    <div className="container d-flex justify-content-center mt-5 pt-5">
       <form onSubmit={handleSubmit} className="w-50 p-4 shadow rounded bg-white">
 
         <h3 className="text-center mb-4">Connexion</h3>
