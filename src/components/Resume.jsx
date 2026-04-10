@@ -1,46 +1,56 @@
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
+import profileImg from '../assets/profile_new.jpg';
 
 const Resume = () => {
   return (
     <div className="min-h-screen bg-white text-gray-900 p-8 md:p-16 print:p-0 font-serif">
       {/* Print/Download Button (Hidden in Print) */}
       <div className="max-w-4xl mx-auto mb-8 flex justify-end print:hidden">
-        <a 
-          href="/CV_Youssef_Zhar.pdf"
-          download="CV_Youssef_Zhar.pdf"
-          className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-all font-sans font-bold text-sm tracking-widest uppercase no-underline"
+        <button 
+          onClick={() => window.print()}
+          className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-all font-sans font-bold text-sm tracking-widest uppercase shadow-lg border-none cursor-pointer"
         >
-          Enregistrer en PDF
-        </a>
+          Imprimer / Enregistrer en PDF
+        </button>
       </div>
 
       {/* CV Container */}
-      <div id="resume-container" className="max-w-4xl mx-auto bg-white shadow-2xl print:shadow-none border border-gray-100 print:border-none p-0 overflow-hidden">
-        
+      <div id="resume-container" className="max-w-4xl mx-auto bg-white shadow-2xl print:shadow-none border border-gray-100 print:border-none p-0 mt-4">
+
         {/* Header - Navbar Style */}
-        <header className="bg-gray-900 px-10 py-10 flex flex-col items-center text-center gap-6">
-          <div>
-            <h1 className="text-4xl font-black uppercase tracking-tighter mb-1 text-white">YOUSSEF ZHAR</h1>
-            <p className="text-lg font-bold text-gray-300 uppercase tracking-widest font-sans">Développeur Web Full Stack</p>
+        <header className="bg-gray-900 px-6 py-10 flex flex-row justify-between items-start gap-4">
+          <div className="space-y-8 text-center md:text-left">
+            <div>
+              <h1 className="text-4xl font-black uppercase tracking-tighter mb-1 text-white">YOUSSEF ZHAR</h1>
+              <p className="text-lg font-bold text-gray-300 uppercase tracking-widest font-sans">Développeur Web Full Stack</p>
+            </div>
+            <div className="flex flex-col items-center md:items-start space-y-2 text-xs font-sans text-gray-400">
+              <div className="flex items-center gap-3">
+                <span>Skhirate Lot Maatouka 87</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <a href="mailto:youssefzh850@gmail.com" className="hover:text-white transition-colors">youssefzh850@gmail.com</a>
+              </div>
+              <div className="flex items-center gap-3">
+                <a href="https://github.com/Joseph-Nostra" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">github.com/Joseph-Nostra</a>
+              </div>
+            </div>
           </div>
-          <div className="w-full flex flex-col items-start space-y-1 text-xs font-sans text-gray-400">
-            <div className="flex items-center gap-3">
-              <span>Skhirate Lot Maatouka 87</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <a href="mailto:youssefzh850@gmail.com" className="hover:text-white transition-colors">youssefzh850@gmail.com</a>
-            </div>
-            <div className="flex items-center gap-3">
-              <a href="https://github.com/Joseph-Nostra" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">github.com/Joseph-Nostra</a>
-            </div>
+
+          <div className="w-28 h-36 md:w-32 md:h-40 rounded-sm border-[3px] border-gray-800 overflow-hidden shadow-2xl shrink-0 mt-2 md:mt-0">
+            <img 
+              src={profileImg} 
+              alt="Youssef Zhar" 
+              className="w-full h-full object-cover"
+            />
           </div>
         </header>
 
-        <div className="p-10 grid md:grid-cols-3 gap-10">
+        <div className="p-8 flex flex-row gap-6 items-start">
           {/* Left Column (Sidebar) */}
-          <div className="space-y-8">
-            
+          <div className="w-[30%] space-y-6 shrink-0">
+
             {/* Compétences */}
             <section>
               <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 mb-6">COMPÉTENCES</h2>
@@ -104,12 +114,12 @@ const Resume = () => {
           </div>
 
           {/* Right Column (Main Content) */}
-          <div className="md:col-span-2 space-y-8 border-l border-gray-100 pl-8 md:pl-10">
-            
+          <div className="w-[70%] space-y-6 border-l border-gray-100 pl-6 shrink-0 overflow-visible">
+
             {/* Profil */}
             <section>
-              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 mb-4 flex items-center gap-3">
-                <span className="w-6 h-px bg-gray-200"></span> PROFIL
+              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-4 flex items-center gap-3">
+                <span className="w-6 h-px bg-gray-300"></span> PROFIL
               </h2>
               <p className="text-sm leading-relaxed text-gray-700 italic">
                 Étudiant en développement web Full Stack (2ème année), passionné par la création d’applications web modernes et performantes. Je maîtrise les technologies comme <span className="font-bold text-gray-900">React</span> et <span className="font-bold text-gray-900">Laravel</span> ainsi que la conception d’API REST. Curieux, motivé et rigoureux, je suis actuellement à la recherche d’un stage afin de mettre en pratique mes compétences techniques et contribuer à des projets concrets.
@@ -118,8 +128,8 @@ const Resume = () => {
 
             {/* Projets */}
             <section>
-              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 mb-4 flex items-center gap-3">
-                <span className="w-6 h-px bg-gray-200"></span> PROJETS ACADÉMIQUES
+              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-4 flex items-center gap-3">
+                <span className="w-6 h-px bg-gray-300"></span> PROJETS ACADÉMIQUES
               </h2>
               <div className="space-y-6">
                 <div className="group">
@@ -144,21 +154,21 @@ const Resume = () => {
 
             {/* Formations */}
             <section>
-              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 mb-4 flex items-center gap-3">
-                <span className="w-6 h-px bg-gray-200"></span> FORMATIONS
+              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-4 flex items-center gap-3">
+                <span className="w-6 h-px bg-gray-300"></span> FORMATIONS
               </h2>
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between items-baseline mb-1">
                     <h3 className="text-base font-bold uppercase tracking-tight">ISTA Témara</h3>
-                    <span className="text-[11px] font-sans text-gray-400 italic">2025 – Présent</span>
+                    <span className="text-[11px] font-sans text-gray-400 italic">2024 – Présent</span>
                   </div>
                   <p className="text-[13px] text-gray-700">Développement Digital – Option Full Stack</p>
                 </div>
                 <div>
                   <div className="flex justify-between items-baseline mb-1">
                     <h3 className="text-base font-bold uppercase tracking-tight">Programme PIE</h3>
-                    <span className="text-[11px] font-sans text-gray-400 italic">2025 – Présent</span>
+                    <span className="text-[11px] font-sans text-gray-400 italic">2024 – Présent</span>
                   </div>
                   <p className="text-[13px] text-gray-700">Innovation & Entrepreneuriat (Gestion de projet)</p>
                 </div>
@@ -181,15 +191,21 @@ const Resume = () => {
       </div>
 
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @media print {
-          body { background: white; color: black; }
+          body { background: white; color: black; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .bg-gray-900 { background-color: #111827 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          header { flex-direction: row !important; align-items: flex-start !important; justify-content: space-between !important; text-align: left !important; }
+          header > div:first-child { text-align: left !important; align-items: flex-start !important; }
+          header div.flex-col { align-items: flex-start !important; text-align: left !important; }
           .print\\:hidden { display: none !important; }
           .print\\:p-0 { padding: 0 !important; }
           .print\\:shadow-none { shadow: none !important; box-shadow: none !important; }
           .print\\:border-none { border: none !important; }
           @page { size: A4; margin: 0; }
-          #resume-container { height: 297mm; max-height: 297mm; border: none !important; box-shadow: none !important; }
+          #resume-container { border: none !important; box-shadow: none !important; width: 210mm; max-width: none; overflow: visible; }
+          img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
       `}} />
     </div>
