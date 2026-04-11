@@ -88,7 +88,7 @@ const About = () => {
               viewport={{ once: true }}
             >
               Je suis <span className="text-white font-bold border-b border-accent-blue/30">Youssef Zhar</span>, un développeur Full Stack et technologue créatif passionné par l'innovation technique. 
-              Spécialisé en <span className="text-white font-bold">React, Node.js et Three.js</span>, je fusionne la rigueur du développement système avec la magie de l'interactivité 3D.
+              Spécialisé en <span className="text-white font-bold text-glow">React, Javascript, Laravel, APIs REST, PHP, MySQL, MongoDB</span>, je fusionne la rigueur du développement système avec la magie de l'interactivité 3D.
             </motion.p>
             
             <motion.div 
