@@ -25,17 +25,19 @@ const Resume = () => {
               <h1 className="text-4xl font-black uppercase tracking-tighter mb-1 text-white">YOUSSEF ZHAR</h1>
               <p className="text-lg font-bold text-gray-300 uppercase tracking-widest font-sans">Développeur Web Full Stack</p>
             </div>
-            <div className="flex flex-col items-center md:items-start space-y-2 text-xs font-sans text-gray-400">
-              <div className="flex items-center gap-3">
-                <span>Skhirate Lot Maatouka 87</span>
+              <div className="flex flex-col items-center md:items-start space-y-2 text-xs font-sans text-gray-400">
+                <div className="flex items-center gap-3">
+                  <span>Skhirate Lot Maatouka 87</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <a href="mailto:youssefzh850@gmail.com" className="hover:text-white transition-colors">youssefzh850@gmail.com</a>
+                  <span>•</span>
+                  <span>06 82 96 63 18</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <a href="https://github.com/Joseph-Nostra" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">github.com/Joseph-Nostra</a>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <a href="mailto:youssefzh850@gmail.com" className="hover:text-white transition-colors">youssefzh850@gmail.com</a>
-              </div>
-              <div className="flex items-center gap-3">
-                <a href="https://github.com/Joseph-Nostra" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">github.com/Joseph-Nostra</a>
-              </div>
-            </div>
           </div>
 
           <div className="w-28 h-36 md:w-32 md:h-40 rounded-sm border-[3px] border-gray-800 overflow-hidden shadow-2xl shrink-0 mt-2 md:mt-0">
