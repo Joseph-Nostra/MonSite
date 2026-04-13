@@ -7,7 +7,7 @@ const Resume = () => {
     <div className="min-h-screen bg-white text-gray-900 p-8 md:p-16 print:p-0 font-serif">
       {/* Print/Download Button (Hidden in Print) */}
       <div className="max-w-4xl mx-auto mb-8 flex justify-end print:hidden">
-        <button 
+        <button
           onClick={() => window.print()}
           className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-all font-sans font-bold text-sm tracking-widest uppercase shadow-lg border-none cursor-pointer"
         >
@@ -25,25 +25,25 @@ const Resume = () => {
               <h1 className="text-4xl font-black uppercase tracking-tighter mb-1 text-white">YOUSSEF ZHAR</h1>
               <p className="text-lg font-bold text-gray-300 uppercase tracking-widest font-sans">Développeur Web Full Stack</p>
             </div>
-              <div className="flex flex-col items-center md:items-start space-y-2 text-xs font-sans text-gray-400">
-                <div className="flex items-center gap-3">
-                  <span>Skhirate Lot Maatouka 87</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <a href="mailto:youssefzh850@gmail.com" className="hover:text-white transition-colors">youssefzh850@gmail.com</a>
-                  <span>•</span>
-                  <span>06 82 96 63 18</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <a href="https://github.com/Joseph-Nostra" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">github.com/Joseph-Nostra</a>
-                </div>
+            <div className="flex flex-col items-center md:items-start space-y-2 text-xs font-sans text-gray-400">
+              <div className="flex items-center gap-3">
+                <span>Skhirate Lot Maatouka 87</span>
               </div>
+              <div className="flex items-center gap-3">
+                <a href="mailto:youssefzh850@gmail.com" className="hover:text-white transition-colors">youssefzh850@gmail.com</a>
+                <span>•</span>
+                <span>06 82 96 63 18</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <a href="https://github.com/Joseph-Nostra" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">github.com/Joseph-Nostra</a>
+              </div>
+            </div>
           </div>
 
           <div className="w-28 h-36 md:w-32 md:h-40 rounded-sm border-[3px] border-gray-800 overflow-hidden shadow-2xl shrink-0 mt-2 md:mt-0">
-            <img 
-              src={profileImg} 
-              alt="Youssef Zhar" 
+            <img
+              src={profileImg}
+              alt="Youssef Zhar"
               className="w-full h-full object-cover"
             />
           </div>
@@ -84,6 +84,8 @@ const Resume = () => {
                   <h4 className="text-xs font-black uppercase tracking-widest text-gray-900 mb-3 border-b border-gray-200 pb-1">Outils</h4>
                   <ul className="text-sm space-y-1 text-gray-600 font-sans">
                     <li>Git / GitHub / GitLab</li>
+                    <li>UML</li>
+                    <li>Figma</li>
                     <li>Jira (Agile Scrum)</li>
                     <li>SonarQube / SonarScanner</li>
                     <li>Canvas</li>
