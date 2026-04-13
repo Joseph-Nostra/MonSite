@@ -19,31 +19,39 @@ const Resume = () => {
       <div id="resume-container" className="max-w-4xl mx-auto bg-white shadow-2xl print:shadow-none border border-gray-100 print:border-none p-0 mt-4">
 
         {/* Header - Navbar Style */}
-        <header className="bg-gray-900 px-6 py-10 flex flex-row justify-between items-start gap-4">
-          <div className="space-y-8 text-center md:text-left">
-            <div>
-              <h1 className="text-4xl font-black uppercase tracking-tighter mb-1 text-white">YOUSSEF ZHAR</h1>
-              <p className="text-lg font-bold text-gray-300 uppercase tracking-widest font-sans">Développeur Web Full Stack</p>
+        <header className="bg-gray-900 px-8 py-10 flex flex-row justify-between items-center gap-8 print:py-8">
+          <div className="flex-1 space-y-6">
+            <div className="text-left">
+              <h1 className="text-4xl font-black uppercase tracking-tighter mb-1 text-white leading-tight">YOUSSEF ZHAR</h1>
+              <div className="inline-block px-3 py-1 bg-gray-800 rounded text-xs font-bold text-gray-300 uppercase tracking-widest font-sans">
+                Développeur Web Full Stack
+              </div>
             </div>
-            <div className="flex flex-col items-center md:items-start space-y-2 text-xs font-sans text-gray-400">
-              <div className="flex items-center gap-3">
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-[11px] font-sans text-gray-400 print:grid-cols-2">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-500">📍</span>
                 <span>Skhirate Lot Maatouka 87</span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-500">📧</span>
                 <a href="mailto:youssefzh850@gmail.com" className="hover:text-white transition-colors">youssefzh850@gmail.com</a>
-                <span>•</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-500">📞</span>
                 <span>06 82 96 63 18</span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-500">🔗</span>
                 <a href="https://github.com/Joseph-Nostra" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">github.com/Joseph-Nostra</a>
               </div>
             </div>
           </div>
 
-          <div className="w-28 h-36 md:w-32 md:h-40 rounded-sm border-[3px] border-gray-800 overflow-hidden shadow-2xl shrink-0 mt-2 md:mt-0">
-            <img
-              src={profileImg}
-              alt="Youssef Zhar"
+          <div className="w-28 h-32 md:w-32 md:h-36 rounded border-2 border-gray-800 overflow-hidden shadow-2xl shrink-0 bg-gray-800 print:w-28 print:h-32">
+            <img 
+              src={profileImg} 
+              alt="Youssef Zhar" 
               className="w-full h-full object-cover"
             />
           </div>
