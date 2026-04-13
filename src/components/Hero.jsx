@@ -11,7 +11,7 @@ const Hero = () => {
       <div className="absolute inset-0 grid-overlay opacity-10 pointer-events-none"></div>
 
       {/* Top Status Badge */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
@@ -26,7 +26,7 @@ const Hero = () => {
       {/* Massive Typography Layer */}
       <div className="container mx-auto px-6 md:px-12 relative z-10 select-none">
         <div className="flex flex-col items-center justify-center text-center">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
@@ -34,7 +34,7 @@ const Hero = () => {
           >
             YOUSSEF
           </motion.h1>
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
@@ -46,7 +46,7 @@ const Hero = () => {
 
         {/* Bottom Info & CTA */}
         <div className="mt-16 md:mt-24 flex flex-col md:flex-row justify-between items-end gap-10">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.5 }}
@@ -56,8 +56,8 @@ const Hero = () => {
               Je fusionne l'artisanat numérique et les technologies de pointe pour créer des sites web qui ne sont pas seulement beaux, mais qui redéfinissent l'interaction.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mt-8">
-              <motion.a 
-                href="#contact" 
+              <motion.a
+                href="#contact"
                 whileHover={{ scale: 1.05, backgroundColor: "#fff", color: "#000" }}
                 whileTap={{ scale: 0.95 }}
                 className="inline-block px-10 py-5 bg-[#a3ff12] text-black rounded-full text-xs font-orbitron font-black tracking-widest transition-all shadow-[0_15px_40px_rgba(163,255,18,0.3)]"
@@ -68,8 +68,8 @@ const Hero = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Link 
-                  to="/cv" 
+                <Link
+                  to="/cv"
                   className="inline-block px-10 py-5 border border-white/10 text-white rounded-full text-xs font-orbitron font-black tracking-widest hover:border-accent-blue transition-all"
                 >
                   VOIR MON CV
@@ -85,7 +85,7 @@ const Hero = () => {
             className="hidden md:flex flex-col items-center gap-4"
           >
             <span className="text-[10px] font-orbitron tracking-[0.5em] uppercase text-gray-500">Explorer</span>
-            <motion.div 
+            <motion.div
               animate={{ height: [0, 80, 0], y: [0, 20, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
               className="w-px h-24 bg-linear-to-b from-accent-blue to-transparent"
@@ -97,14 +97,14 @@ const Hero = () => {
       {/* Centered Profile Image with Gradient Fade */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full flex justify-center z-0 pointer-events-none">
         <motion.div
-           initial={{ opacity: 0, y: 150 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 1.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-           className="relative w-[90vw] md:w-[45vw] max-w-[700px] aspect-[4/5] overflow-hidden"
+          initial={{ opacity: 0, y: 150 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="relative w-[90vw] md:w-[45vw] max-w-[700px] aspect-4/5 overflow-hidden"
         >
-          <img 
-            src={profileImg} 
-            alt="Youssef Zhar" 
+          <img
+            src={profileImg}
+            alt="Youssef Zhar"
             className="w-full h-full object-cover rounded-t-[15rem] mask-gradient brightness-75 hover:brightness-100 transition-all duration-1000 grayscale hover:grayscale-0"
           />
           <div className="absolute inset-0 bg-linear-to-t from-[#0a0a0a] via-transparent to-transparent"></div>

@@ -4,7 +4,7 @@ import profileImg from '../assets/profile_new.jpg';
 
 const Resume = () => {
   return (
-    <div className="min-h-screen bg-white text-gray-900 p-8 md:p-16 print:p-0 font-serif">
+    <div className="min-h-screen print:min-h-0 print:h-auto bg-white text-gray-900 p-8 md:p-16 print:p-0 font-serif">
       {/* Print/Download Button (Hidden in Print) */}
       <div className="max-w-4xl mx-auto mb-8 flex justify-end print:hidden">
         <button
@@ -84,8 +84,7 @@ const Resume = () => {
                   <h4 className="text-xs font-black uppercase tracking-widest text-gray-900 mb-3 border-b border-gray-200 pb-1">Outils</h4>
                   <ul className="text-sm space-y-1 text-gray-600 font-sans">
                     <li>Git / GitHub / GitLab</li>
-                    <li>UML</li>
-                    <li>Jira (Agile Scrum)</li>
+                    <li>Jira (Agile Scrum) / UML</li>
                     <li>SonarQube / SonarScanner</li>
                     <li>Canvas / Figma</li>
                   </ul>
@@ -199,7 +198,14 @@ const Resume = () => {
         @media print {
           body { background: white; color: black; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .bg-gray-900 { background-color: #111827 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          header { flex-direction: row !important; align-items: flex-start !important; justify-content: space-between !important; text-align: left !important; }
+          header { 
+            flex-direction: row !important; 
+            align-items: flex-start !important; 
+            justify-content: space-between !important; 
+            text-align: left !important; 
+            padding-top: 1.5rem !important; 
+            padding-bottom: 1.5rem !important; 
+          }
           header > div:first-child { text-align: left !important; align-items: flex-start !important; }
           header div.flex-col { align-items: flex-start !important; text-align: left !important; }
           .print\\:hidden { display: none !important; }
@@ -207,7 +213,19 @@ const Resume = () => {
           .print\\:shadow-none { shadow: none !important; box-shadow: none !important; }
           .print\\:border-none { border: none !important; }
           @page { size: A4; margin: 0; }
-          #resume-container { border: none !important; box-shadow: none !important; width: 210mm; max-width: none; overflow: visible; }
+          #resume-container { 
+            border: none !important; 
+            box-shadow: none !important; 
+            width: 210mm; 
+            max-width: none; 
+            overflow: visible; 
+            margin-top: 0 !important; 
+          }
+          .p-8 { padding: 1.5rem !important; }
+          .space-y-6 > * + * { margin-top: 1rem !important; }
+          .space-y-4 > * + * { margin-top: 0.5rem !important; }
+          .mb-6 { margin-bottom: 1rem !important; }
+          .mb-4 { margin-bottom: 0.5rem !important; }
           img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
       `}} />
