@@ -204,32 +204,40 @@ const Resume = () => {
       <style dangerouslySetInnerHTML={{
         __html: `
         @media print {
-          body { background: white; color: black; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          .bg-gray-900 { background-color: #111827 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          @page { size: A4; margin: 0; }
+          html, body { 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            width: 100% !important;
+            height: auto !important;
+            -webkit-print-color-adjust: exact; 
+            print-color-adjust: exact; 
+          }
+          #resume-container { 
+            border: none !important; 
+            box-shadow: none !important; 
+            width: 100% !important; 
+            max-width: none !important; 
+            margin: 0 !important; 
+            padding: 0 !important;
+            overflow: visible; 
+          }
           header { 
+            width: 100% !important;
+            box-sizing: border-box !important;
             flex-direction: row !important; 
-            align-items: flex-start !important; 
+            align-items: center !important; 
             justify-content: space-between !important; 
             text-align: left !important; 
-            padding-top: 1.5rem !important; 
-            padding-bottom: 1.5rem !important; 
+            padding: 2rem 2.5rem !important;
+            margin: 0 !important;
           }
           header > div:first-child { text-align: left !important; align-items: flex-start !important; }
-          header div.flex-col { align-items: flex-start !important; text-align: left !important; }
           .print\\:hidden { display: none !important; }
           .print\\:p-0 { padding: 0 !important; }
           .print\\:shadow-none { shadow: none !important; box-shadow: none !important; }
           .print\\:border-none { border: none !important; }
-          @page { size: A4; margin: 0; }
-          #resume-container { 
-            border: none !important; 
-            box-shadow: none !important; 
-            width: 210mm; 
-            max-width: none; 
-            overflow: visible; 
-            margin-top: 0 !important; 
-          }
-          .p-8 { padding: 1.5rem !important; }
+          .p-8 { padding: 2.5rem !important; }
           .space-y-6 > * + * { margin-top: 1rem !important; }
           .space-y-4 > * + * { margin-top: 0.5rem !important; }
           .mb-6 { margin-bottom: 1rem !important; }
