@@ -85,10 +85,9 @@ const Resume = () => {
                   <ul className="text-sm space-y-1 text-gray-600 font-sans">
                     <li>Git / GitHub / GitLab</li>
                     <li>UML</li>
-                    <li>Figma</li>
                     <li>Jira (Agile Scrum)</li>
                     <li>SonarQube / SonarScanner</li>
-                    <li>Canvas</li>
+                    <li>Canvas / Figma</li>
                   </ul>
                 </div>
               </div>
