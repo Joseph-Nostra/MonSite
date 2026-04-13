@@ -30,19 +30,15 @@ const Resume = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-[11px] font-sans text-gray-400 print:grid-cols-2">
               <div className="flex items-center gap-2">
-                <span className="text-gray-500">📍</span>
                 <span>Skhirate Lot Maatouka 87</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-gray-500">📧</span>
                 <a href="mailto:youssefzh850@gmail.com" className="hover:text-white transition-colors">youssefzh850@gmail.com</a>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-gray-500">📞</span>
                 <span>06 82 96 63 18</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-gray-500">🔗</span>
                 <a href="https://github.com/Joseph-Nostra" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">github.com/Joseph-Nostra</a>
               </div>
             </div>
