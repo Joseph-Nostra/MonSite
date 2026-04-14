@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../axios"; // Import Axios configuré
 
-function ProductDetail({ onAddToCart }) {
+function ProductDetail({ onAddToCart, user }) {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -42,6 +42,7 @@ function ProductDetail({ onAddToCart }) {
         alt={product.title}
         style={{ objectFit: "contain", maxHeight: "300px" }}
       />
+
       <div className="card-body">
         <h3 className="card-title">{product.title}</h3>
         <p className="card-text">{product.description}</p>
@@ -56,10 +57,21 @@ function ProductDetail({ onAddToCart }) {
           >
             Ajouter au panier
           </button>
-          <button className="btn btn-secondary" onClick={() => navigate(-1)}>
+          <button className="btn btn-primary" onClick={() => navigate(-1)}>
             Retour
           </button>
         </div>
+        
+        {user && user.id !== product.user_id && (
+          <div className="mt-3">
+            <button 
+              className="btn btn-outline-dark w-100"
+              onClick={() => navigate(`/chat/${product.user_id}`)}
+            >
+              💬 Contacter le vendeur
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

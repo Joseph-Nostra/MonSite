@@ -65,6 +65,16 @@ export default function NavBar({ user, setUser, loading }) {
           <span className="nav-link text-white-50">Bienvenue, <strong className="text-white">{user.name}</strong></span>
         </li>
 
+        {/* 💬 MESSAGES */}
+        <li className="nav-item">
+          <button
+            className="btn btn-outline-light position-relative border-0"
+            onClick={() => navigate("/messages")}
+          >
+            💬
+          </button>
+        </li>
+
         {/* 🔔 NOTIFICATIONS */}
         <li className="nav-item">
           <button

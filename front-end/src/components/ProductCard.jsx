@@ -38,7 +38,7 @@ function ProductCard({ product, onAddToCart, user, handleEdit, handleDelete }) {
           {(!user || user.role === "client") && (
             <button
               className="btn btn-success btn-sm flex-fill"
-              onClick={handleAdd}
+              onClick={() => onAddToCart(product)}
             >
               Ajouter
             </button>

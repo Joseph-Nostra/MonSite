@@ -12,6 +12,8 @@ import Footer from "./components/Footer";
 import Contacts from "./components/Contacts";
 import AddProductForm from "./components/AddProductForm";
 import Notifications from "./components/Notification";
+import Messages from "./components/Messages";
+import Chat from "./components/Chat";
 
 import api from "./axios";
 import Toast from "./components/Toast";
@@ -27,12 +29,20 @@ function App() {
 
   // 🔥 GET USER CONNECTED
   useEffect(() => {
-  const token = localStorage.getItem("token");
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlToken = urlParams.get("token");
 
-  if (!token) {
-    setLoading(false);
-    return;
-  }
+    if (urlToken) {
+      localStorage.setItem("token", urlToken);
+      window.history.replaceState({}, document.title, "/products"); // Clean the URL
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
 
   const fetchUser = async () => {
@@ -149,6 +159,9 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
           }
           />
 
+          <Route path="/messages" element={<Messages user={user} />} />
+          <Route path="/chat/:otherUserId" element={<Chat user={user} />} />
+
 
           {/* ADD PRODUCT (ROLE PROTECTED) */}
           <Route
@@ -185,7 +198,7 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
           <Route
             path="/product/:id"
             element={
-              <ProductDetail onAddToCart={handleAddToCart} />
+              <ProductDetail onAddToCart={handleAddToCart} user={user} />
             }
           />
 

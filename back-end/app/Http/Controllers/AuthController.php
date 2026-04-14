@@ -87,9 +87,6 @@ class AuthController extends Controller
 
     $token = $user->createToken('api-token')->plainTextToken;
 
-    return response()->json([
-        'user' => $user,
-        'token' => $token
-    ]);
+    return redirect('http://localhost:5173/login?token=' . $token);
 }
 }

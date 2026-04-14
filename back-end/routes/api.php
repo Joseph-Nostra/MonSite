@@ -62,6 +62,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::patch('/notifications/mark-all', [NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+
+    /*
+    |---------------- MESSAGES ----------------
+    |*/
+    Route::get('/messages', [MessageController::class, 'index']);
+    Route::get('/messages/{otherUserId}', [MessageController::class, 'show']);
+    Route::post('/messages', [MessageController::class, 'store']);
 });
 
 /*
