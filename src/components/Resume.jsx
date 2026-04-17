@@ -36,7 +36,7 @@ const Resume = () => {
                 <a href="mailto:youssefzh850@gmail.com" className="hover:text-white transition-colors">youssefzh850@gmail.com</a>
               </div>
               <div className="flex items-center gap-2">
-                <span>06 82 96 63 18</span>
+                <span>07 80 84 95 72</span>
               </div>
               <div className="flex items-center gap-2">
                 <a href="https://github.com/Joseph-Nostra" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">github.com/Joseph-Nostra</a>
