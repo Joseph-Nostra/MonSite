@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\MessageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
     |---------------- MESSAGES ----------------
     |*/
     Route::get('/messages', [MessageController::class, 'index']);
+    Route::get('/messages/unread-count', [MessageController::class, 'unreadCount']);
     Route::get('/messages/{otherUserId}', [MessageController::class, 'show']);
     Route::post('/messages', [MessageController::class, 'store']);
 });

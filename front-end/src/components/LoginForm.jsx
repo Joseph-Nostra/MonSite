@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import api from "../axios";
 
 function LoginForm({ setUser }) {
@@ -9,6 +9,17 @@ function LoginForm({ setUser }) {
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const redirectPath = queryParams.get("redirect") || "/products";
+  
+  // 🔥 redirection automatique si déjà connecté
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        navigate(redirectPath);
+    }
+  }, [navigate, redirectPath]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +40,7 @@ function LoginForm({ setUser }) {
         setUser(res.data.user);
 
         // redirect
-        navigate("/products");
+        navigate(redirectPath);
       } else {
         setError(res.data.message || "Login incorrect");
       }
@@ -105,6 +116,12 @@ function LoginForm({ setUser }) {
           <img src="https://www.google.com/favicon.ico" alt="Google" width="20" height="20" />
           Continuer avec Google
         </button>
+
+        <div className="text-center mt-4">
+          <p className="text-muted">
+            Pas de compte ? <Link to="/register" className="text-dark fw-bold">Créer un compte</Link>
+          </p>
+        </div>
       </form>
     </div>
   );

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import api from "../axios";
 
 function RegisterForm({ setUser }) {
@@ -12,6 +12,11 @@ function RegisterForm({ setUser }) {
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) navigate("/products");
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -135,6 +140,12 @@ function RegisterForm({ setUser }) {
           <img src="https://www.google.com/favicon.ico" alt="Google" width="20" height="20" />
           Continuer avec Google
         </button>
+
+        <div className="text-center mt-4">
+          <p className="text-muted">
+            Déjà un compte ? <Link to="/login" className="text-dark fw-bold">Se connecter</Link>
+          </p>
+        </div>
 
       </form>
     </div>

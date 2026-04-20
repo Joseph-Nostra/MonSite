@@ -34,14 +34,22 @@ function ProductCard({ product, onAddToCart, user, handleEdit, handleDelete }) {
             Voir Détails
           </button>
 
-          {/* CLIENT SEES ADD TO CART */}
+          {/* CLIENT SEES ADD TO CART & CHAT */}
           {(!user || user.role === "client") && (
-            <button
-              className="btn btn-success btn-sm flex-fill"
-              onClick={() => onAddToCart(product)}
-            >
-              Ajouter
-            </button>
+            <>
+              <button
+                className="btn btn-success btn-sm flex-fill"
+                onClick={() => onAddToCart(product)}
+              >
+                Ajouter
+              </button>
+              <button
+                className="btn btn-info btn-sm flex-fill text-white"
+                onClick={() => navigate(`/chat/${product.user_id}`)}
+              >
+                💬 Discuter
+              </button>
+            </>
           )}
 
           {/* OWNER OR ADMIN SEES EDIT/DELETE */}

@@ -15,6 +15,8 @@ import Notifications from "./components/Notification";
 import Messages from "./components/Messages";
 import Chat from "./components/Chat";
 
+import LandingPage from "./components/LandingPage";
+
 import api from "./axios";
 import Toast from "./components/Toast";
 import "./App.css";
@@ -104,7 +106,7 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
     if (loading) return;
 
     if (!user) {
-      navigate("/login");
+      navigate("/login?redirect=/products");
       return;
     }
     try {
@@ -121,7 +123,7 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
       if (err.response?.status === 401) {
         localStorage.removeItem("token");
         setUser(null);
-        navigate("/login");
+        navigate("/login?redirect=/products");
       }
 
       console.error("Erreur cart:", err.response?.data || err.message);
@@ -142,9 +144,9 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
       
       <NavBar user={user} setUser={setUser} loading={loading} />
 
-      <main className="flex-fill container-fluid mt-3">
+      <main className="flex-fill container-fluid mt-5 pt-3">
         <Routes>
-
+          <Route path="/" element={<LandingPage />} />
           {/* AUTH */}
           <Route path="/login" element={<LoginForm setUser={setUser} />} />
           <Route path="/register" element={<RegisterForm setUser={setUser} />} />

@@ -68,6 +68,24 @@ class MessageController extends Controller
             'content' => $request->content,
         ]);
 
+        // 🔥 Créer une notification pour le destinataire
+        \App\Models\Notification::create([
+            'user_id' => $request->receiver_id,
+            'type' => 'message',
+            'message' => "Nouveau message de " . $request->user()->name,
+            'is_read' => false
+        ]);
+
         return response()->json($message, 201);
+    }
+
+    // 🔹 Nombre de messages non lus
+    public function unreadCount(Request $request)
+    {
+        $count = Message::where('receiver_id', $request->user()->id)
+            ->whereNull('read_at')
+            ->count();
+
+        return response()->json(['unread_count' => $count]);
     }
 }

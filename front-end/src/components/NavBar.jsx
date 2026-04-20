@@ -5,22 +5,27 @@ import api from "../axios";
 export default function NavBar({ user, setUser, loading }) {
   const navigate = useNavigate();
   const [unread, setUnread] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
   useEffect(() => {
   if (!user) return;
 
-  const fetchNotifications = async () => {
+  const fetchStats = async () => {
     try {
-      const res = await api.get("/notifications");
-      setUnread(res.data.unread_count);
+      const resNotif = await api.get("/notifications");
+      setUnread(resNotif.data.unread_count);
+
+      const resMsg = await api.get("/messages/unread-count");
+      setUnreadMessages(resMsg.data.unread_count);
     } catch (err) {
-      console.error("Erreur notifications:", err);
+      console.error("Erreur stats:", err);
     }
   };
 
-  fetchNotifications();
+  fetchStats();
 
   // 🔥 auto refresh toutes les 10s (optionnel mais PRO)
-  const interval = setInterval(fetchNotifications, 10000);
+  const interval = setInterval(fetchStats, 10000);
 
   return () => clearInterval(interval);
 
@@ -72,6 +77,11 @@ export default function NavBar({ user, setUser, loading }) {
             onClick={() => navigate("/messages")}
           >
             💬
+            {unreadMessages > 0 && (
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {unreadMessages}
+              </span>
+            )}
           </button>
         </li>
 
