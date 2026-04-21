@@ -45,44 +45,45 @@ export default function NavBar({ user, setUser, loading }) {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4 py-2 fixed-top shadow-lg border-bottom border-secondary">
-      <div className="container-fluid d-flex justify-content-between align-items-center">
+    <nav className="navbar fixed-top navbar-expand-lg navbar-dark bg-dark shadow-lg border-bottom border-secondary py-0" style={{ height: '70px' }}>
+      <div className="container-fluid d-flex align-items-center h-100 px-4">
         
         {/* 🧱 1. LOGO (GAUCHE) */}
-        <div className="navbar-left d-flex align-items-center" style={{ flex: '1 0 200px' }}>
+        <div className="d-flex align-items-center" style={{ flex: '1', minWidth: '150px' }}>
           <Link className="navbar-brand d-flex align-items-center gap-2 m-0" to="/products">
             <img src="/logo.png" alt="Logo" width="35" height="35" className="rounded-circle" />
-            <span className="fw-bold text-uppercase d-none d-sm-inline" style={{ letterSpacing: '1px' }}>MonSite</span>
+            <span className="fw-bold text-uppercase d-none d-md-inline" style={{ letterSpacing: '1px', fontSize: '1.1rem' }}>MonSite</span>
           </Link>
         </div>
 
         {/* 🔍 2. BARRE DE RECHERCHE (CENTRE - Conditional) */}
-        <div className="navbar-center d-none d-lg-flex justify-content-center px-3" style={{ flex: '2', minWidth: '300px' }}>
-          {showSearch && (
-            <form className="w-100" style={{ maxWidth: '450px' }} onSubmit={handleSearch}>
+        <div className="d-none d-lg-flex justify-content-center align-items-center" style={{ flex: '2' }}>
+          {showSearch ? (
+            <form className="w-100" style={{ maxWidth: '500px' }} onSubmit={handleSearch}>
               <div className="input-group input-group-sm">
                 <span className="input-group-text bg-secondary border-0 text-white-50 px-3 rounded-start-pill">
-                  <i className="bi bi-search py-1"></i>
+                  <i className="bi bi-search"></i>
                 </span>
                 <input
                   className="form-control bg-secondary border-0 text-white placeholder-light py-2"
                   type="search"
-                  placeholder="Rechercher..."
+                  placeholder="Rechercher un produit..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <button className="btn btn-primary px-3 rounded-end-pill fw-bold" type="submit">
+                <button className="btn btn-primary px-4 rounded-end-pill fw-bold" type="submit">
                   Chercher
                 </button>
               </div>
             </form>
+          ) : (
+            <div style={{ height: '38px' }}></div> // Spacer to keep layout consistent
           )}
         </div>
 
         {/* 👤 3. ACTIONS (DROITE) */}
-        <div className="navbar-right d-flex align-items-center justify-content-end gap-2" style={{ flex: '1 0 200px' }}>
-          <div className="collapse navbar-collapse d-lg-flex justify-content-end" id="navbarNav">
-            <ul className="navbar-nav align-items-center gap-2">
+        <div className="d-flex align-items-center justify-content-end gap-2" style={{ flex: '1', minWidth: '200px' }}>
+            <ul className="navbar-nav flex-row align-items-center gap-1">
               {!loading && user ? (
                 <>
                   {/* AJOUTER PRODUIT */}
@@ -115,13 +116,13 @@ export default function NavBar({ user, setUser, loading }) {
                   </li>
 
                   {/* DROPDOWN MENU */}
-                  <li className="nav-item dropdown ms-1">
-                    <button className="user-profile-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  <li className="nav-item dropdown ms-2">
+                    <button className="user-profile-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style={{ border: 'none', background: 'transparent' }}>
                       <div className="user-avatar text-white">
                         {user.name.charAt(0).toUpperCase()}
                       </div>
-                      <span className="user-name d-none d-xl-inline">{user.name}</span>
-                      <i className="bi bi-chevron-down small ms-1 opacity-50"></i>
+                      <span className="user-name d-none d-xl-inline text-white ms-2">{user.name}</span>
+                      <i className="bi bi-chevron-down small ms-1 text-white-50"></i>
                     </button>
                     <ul className="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-3 py-2 animate-dropdown" style={{ minWidth: '220px' }}>
                       <div className="px-3 py-2 mb-1">
@@ -152,21 +153,28 @@ export default function NavBar({ user, setUser, loading }) {
                 </>
               )}
             </ul>
-          </div>
         </div>
 
       </div>
       <style>{`
-        .bg-secondary { background-color: rgba(255, 255, 255, 0.08) !important; }
+        .bg-secondary { background-color: rgba(255, 255, 255, 0.1) !important; }
         .placeholder-light::placeholder { color: rgba(255, 255, 255, 0.3); }
         .btn-icon-nav { background: transparent; border: none; padding: 6px; color: rgba(255,255,255,0.7); transition: all 0.2s; }
         .btn-icon-nav:hover { transform: translateY(-2px); color: #fff; }
-        .notification-badge { font-size: 9px; padding: 3px 5px; }
-        .user-profile-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; padding: 4px 10px 4px 4px; border-radius: 50px; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .notification-badge { font-size: 9px; padding: 3px 5px; top: 5px !important; }
+        
+        .user-profile-btn { 
+            display: flex; 
+            align-items: center; 
+            padding: 4px 8px;
+            border-radius: 50px;
+            transition: background 0.2s;
+        }
         .user-profile-btn:hover { background: rgba(255, 255, 255, 0.1); }
         .user-profile-btn::after { display: none; }
-        .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(45deg, #0d6efd, #00d2ff); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; }
-        .user-name { font-size: 13px; font-weight: 500; }
+        
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(45deg, #0d6efd, #00d2ff); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
+        .user-name { font-size: 14px; font-weight: 500; }
         .dropdown-item { font-size: 13px; border-radius: 8px; margin: 0 8px; width: calc(100% - 16px); }
         .animate-dropdown { animation: slideDown 0.2s ease-out; transform-origin: top right; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
