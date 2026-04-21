@@ -153,8 +153,8 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
           <Route path="/register" element={<RegisterForm setUser={setUser} />} />
 
           {/* USER */}
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/orders/:id" element={<OrderDetails />} />
+          <Route path="/orders" element={user && user.role === 'client' ? <Orders /> : <p className="text-center mt-5 text-danger">Accès réservé aux clients</p>} />
+          <Route path="/orders/:id" element={user && user.role === 'client' ? <OrderDetails /> : <p className="text-center mt-5 text-danger">Accès réservé aux clients</p>} />
           <Route path="/contact" element={<Contacts />} />
           
           <Route path="/notifications" element={user ? (<Notifications />) : (
