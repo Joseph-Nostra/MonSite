@@ -38,9 +38,7 @@ export default function NavBar({ user, setUser, loading }) {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4 py-3 fixed-top shadow-lg border-bottom border-secondary">
       <Link className="navbar-brand d-flex align-items-center gap-2" to="/products">
-        <div className="logo-icon bg-primary rounded-circle d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
-          <span className="text-white fw-bold h4 mb-0">M</span>
-        </div>
+        <img src="/logo.png" alt="MonSite Logo" width="40" height="40" className="rounded-circle" />
         <span className="fw-bold text-uppercase tracking-wider">MonSite</span>
       </Link>
 
