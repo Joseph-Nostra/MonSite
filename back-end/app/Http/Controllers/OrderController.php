@@ -124,8 +124,15 @@ class OrderController extends Controller
                 $productDetails = array_map(fn($p) => "{$p['title']} (x{$p['quantity']})", $products);
                 Notification::create([
                     'user_id' => $sellerId,
-                    'type' => 'new_order',
-                    'message' => "🛒 Nouvelle commande (#{$order->id}) reçue pour : " . implode(', ', $productDetails)
+                    'type' => 'order',
+                    'message' => "🛒 Nouvelle commande (#{$order->id}) reçue.",
+                    'data' => [
+                        'order_id' => $order->id,
+                        'client_name' => $request->shipping_address['full_name'],
+                        'total_price' => $order->total,
+                        'city' => $request->shipping_address['city'],
+                        'items_count' => count($products)
+                    ]
                 ]);
             }
 

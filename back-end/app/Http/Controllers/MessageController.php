@@ -72,8 +72,13 @@ class MessageController extends Controller
         \App\Models\Notification::create([
             'user_id' => $request->receiver_id,
             'type' => 'message',
-            'message' => "Nouveau message de " . $request->user()->name,
-            'is_read' => false
+            'message' => "💬 Nouveau message de " . $request->user()->name,
+            'data' => [
+                'message_id' => $message->id,
+                'sender_name' => $request->user()->name,
+                'sender_id' => $request->user()->id,
+                'short_content' => \Illuminate\Support\Str::limit($request->content, 50)
+            ]
         ]);
 
         return response()->json($message, 201);

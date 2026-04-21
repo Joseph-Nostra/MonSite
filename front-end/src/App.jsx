@@ -165,6 +165,8 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
 
           <Route path="/messages" element={<Messages user={user} />} />
           <Route path="/chat/:otherUserId" element={<Chat user={user} />} />
+          <Route path="/profile" element={<div className="container mt-5"><h3>Mon Profil</h3><p>Page en cours de construction...</p></div>} />
+          <Route path="/settings" element={<div className="container mt-5"><h3>Paramètres</h3><p>Page en cours de construction...</p></div>} />
 
 
           {/* ADD PRODUCT (ROLE PROTECTED) */}
