@@ -190,7 +190,7 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
                   <ProductList onAddToCart={handleAddToCart} user={user}  handleEdit={handleEdit} handleDelete={handleDelete}/>
                 </div>
                 <div className="col-md-3">
-                  {user && (
+                  {user && user.role === 'client' && (
                     <CartSidebar cart={cart} setCart={setCart} user={user} />
                     )}
                 </div>
