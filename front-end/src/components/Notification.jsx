@@ -119,12 +119,12 @@ export default function Notifications() {
                 )}
 
                 <div className="actions d-flex gap-2">
-                    {n.type === 'order' && (
+                    {n.type === 'order' && n.data?.order_id && (
                          <button className="btn btn-sm btn-outline-primary rounded-pill px-3 py-1" onClick={(e) => { e.stopPropagation(); navigate(`/orders/${n.data.order_id}`); }}>
                             Voir la commande
                          </button>
                     )}
-                    {n.type === 'message' && (
+                    {n.type === 'message' && n.data?.sender_id && (
                          <button className="btn btn-sm btn-outline-danger rounded-pill px-3 py-1" onClick={(e) => { e.stopPropagation(); navigate(`/chat/${n.data.sender_id}`); }}>
                             Répondre
                          </button>

@@ -167,6 +167,8 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
           <Route path="/chat/:otherUserId" element={<Chat user={user} />} />
           <Route path="/profile" element={<div className="container mt-5"><h3>Mon Profil</h3><p>Page en cours de construction...</p></div>} />
           <Route path="/settings" element={<div className="container mt-5"><h3>Paramètres</h3><p>Page en cours de construction...</p></div>} />
+          <Route path="/my-products" element={<div className="container mt-5"><h3>Mes Produits</h3><p>Page en cours de construction...</p></div>} />
+          <Route path="/stats" element={<div className="container mt-5"><h3>Statistiques</h3><p>Page en cours de construction...</p></div>} />
 
 
           {/* ADD PRODUCT (ROLE PROTECTED) */}
