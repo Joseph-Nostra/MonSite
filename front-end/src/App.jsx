@@ -14,6 +14,7 @@ import AddProductForm from "./components/AddProductForm";
 import Notifications from "./components/Notification";
 import Messages from "./components/Messages";
 import Chat from "./components/Chat";
+import OrderDetails from "./components/OrderDetails";
 
 import LandingPage from "./components/LandingPage";
 
@@ -146,13 +147,14 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
 
       <main className="flex-fill container-fluid mt-5 pt-3">
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<LandingPage user={user} />} />
           {/* AUTH */}
           <Route path="/login" element={<LoginForm setUser={setUser} />} />
           <Route path="/register" element={<RegisterForm setUser={setUser} />} />
 
           {/* USER */}
           <Route path="/orders" element={<Orders />} />
+          <Route path="/orders/:id" element={<OrderDetails />} />
           <Route path="/contact" element={<Contacts />} />
           
           <Route path="/notifications" element={user ? (<Notifications />) : (
@@ -188,7 +190,7 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
                   <ProductList onAddToCart={handleAddToCart} user={user}  handleEdit={handleEdit} handleDelete={handleDelete}/>
                 </div>
                 <div className="col-md-3">
-                  {user && user.role === "client" && (
+                  {user && (
                     <CartSidebar cart={cart} setCart={setCart} user={user} />
                     )}
                 </div>

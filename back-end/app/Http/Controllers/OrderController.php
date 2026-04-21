@@ -44,6 +44,16 @@ class OrderController extends Controller
      */
     public function checkout(Request $request)
     {
+        $request->validate([
+            'payment_method' => 'required|in:card,paypal,delivery,bank_transfer',
+            'shipping_address' => 'required|array',
+            'shipping_address.full_name' => 'required|string|max:255',
+            'shipping_address.address' => 'required|string|max:255',
+            'shipping_address.city' => 'required|string|max:100',
+            'shipping_address.zip_code' => 'required|string|max:20',
+            'shipping_address.phone' => 'required|string|max:20',
+        ]);
+
         $user = $request->user();
 
         $cartItems = Cart::where('user_id', $user->id)->get();
@@ -65,61 +75,79 @@ class OrderController extends Controller
                 'user_id' => $user->id,
                 'total' => $total,
                 'status' => $request->payment_method === 'delivery' ? 'processing' : 'pending',
-                'payment_method' => $request->payment_method ?? 'card'
+                'payment_method' => $request->payment_method
             ]);
 
-            // 3. créer items + stock + notification
+            // 3. Créer shipping
+            \App\Models\Shipping::create([
+                'order_id' => $order->id,
+                'full_name' => $request->shipping_address['full_name'],
+                'address' => $request->shipping_address['address'],
+                'city' => $request->shipping_address['city'],
+                'zip_code' => $request->shipping_address['zip_code'],
+                'phone' => $request->shipping_address['phone'],
+                'status' => 'pending'
+            ]);
+
+            // 4. créer items + stock + notification
             $sellers = [];
             foreach ($cartItems as $item) {
+                $product = Product::find($item->product_id);
 
-    $product = Product::find($item->product_id);
+                if (!$product) continue;
 
-    if (!$product->user_id) {
-    continue; // ou throw exception claire
-}
+                if ($product->stock < $item->quantity) {
+                    throw new \Exception("Stock insuffisant pour le produit : {$product->title}.");
+                }
 
-    // ✔ 1. CHECK STOCK AVANT TOUT
-    if (!$product || $product->stock < $item->quantity) {
-        throw new \Exception("Stock insuffisant pour le produit : {$item->title}. (Disponible: " . ($product->stock ?? 0) . ")");
-    }
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item->product_id,
+                    'title' => $product->title,
+                    'price' => $product->price,
+                    'image' => $product->image,
+                    'quantity' => $item->quantity
+                ]);
 
-    // ✔ 2. CREATE ITEM (Snapshot)
-    OrderItem::create([
-        'order_id' => $order->id,
-        'product_id' => $item->product_id,
-        'title' => $product->title, // Snapshot title from product
-        'price' => $product->price, // Snapshot price from product
-        'image' => $product->image, // Snapshot image from product
-        'quantity' => $item->quantity
-    ]);
+                $product->decrement('stock', $item->quantity);
 
-    // ✔ 3. DECREMENT STOCK
-    $product->decrement('stock', $item->quantity);
+                if ($product->user_id) {
+                    $sellers[$product->user_id][] = [
+                        'title' => $product->title,
+                        'quantity' => $item->quantity
+                    ];
+                }
+            }
 
-    // ✔ 4. GROUP SELLERS
-    $sellers[$product->user_id][] = [
-        'title' => $product->title,
-        'quantity' => $item->quantity
-    ];
-}
-            // notification for sellers
+            // Notifications vendeurs
             foreach ($sellers as $sellerId => $products) {
                 $productDetails = array_map(fn($p) => "{$p['title']} (x{$p['quantity']})", $products);
                 Notification::create([
-                     'user_id' => $sellerId,
-                     'type' => 'new_order',
-                     'message' => "🛒 Nouvelle commande (#{$order->id}) reçue pour : " . implode(', ', $productDetails)
-                    ]);
-                }
+                    'user_id' => $sellerId,
+                    'type' => 'new_order',
+                    'message' => "🛒 Nouvelle commande (#{$order->id}) reçue pour : " . implode(', ', $productDetails)
+                ]);
+            }
 
-            // 4. vider panier
+            // 5. vider panier
             Cart::where('user_id', $user->id)->delete();
 
             DB::commit();
 
+            // 🔹 GESTION PAIEMENT EN LIGNE (STRIPE)
+            if ($request->payment_method === 'card') {
+                // Ici on devrait créer la session Stripe
+                // Pour l'instant on retourne l'order, la redirection sera faite côté front ou via un autre endpoint
+                return response()->json([
+                    'message' => 'Commande créée, redirection vers le paiement...',
+                    'order' => $order->load('items', 'shipping'),
+                    'redirect_url' => null // Bientôt implémenté avec Stripe
+                ]);
+            }
+
             return response()->json([
                 'message' => 'Commande créée avec succès',
-                'order' => $order->load('items')
+                'order' => $order->load('items', 'shipping')
             ]);
 
         } catch (\Exception $e) {

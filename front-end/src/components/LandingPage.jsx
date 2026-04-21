@@ -1,11 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function LandingPage() {
+export default function LandingPage({ user }) {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/products");
+    }
+  }, [user, navigate]);
 
   return (
     <div className="landing-page">
+
       {/* Hero Section */}
       <div 
         className="hero-section d-flex align-items-center justify-content-center text-center text-white"
@@ -60,7 +67,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .transition-hover {
           transition: transform 0.3s ease, shadow 0.3s ease;
         }
