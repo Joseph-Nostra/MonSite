@@ -14,11 +14,12 @@ class ProductController extends Controller
         $query = Product::with('user:id,name,email');
 
         // Search
-        if ($request->has('q')) {
-            $query->where(function($q) use ($request) {
-                $q->where('title', 'like', '%' . $request->q . '%')
-                  ->orWhere('description', 'like', '%' . $request->q . '%')
-                  ->orWhere('brand', 'like', '%' . $request->q . '%');
+        if ($request->filled('q')) {
+            $searchTerm = $request->q;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('description', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('brand', 'like', '%' . $searchTerm . '%');
             });
         }
 
@@ -50,7 +51,11 @@ class ProductController extends Controller
             }
         }
 
-        return $query->latest()->get();
+        if ($request->has('seller_id')) {
+            $query->where('user_id', $request->seller_id);
+        }
+
+        return $query->latest()->paginate(35);
     }
 
     // 🔹 Recherche
@@ -90,10 +95,18 @@ class ProductController extends Controller
         'price' => 'required|numeric|min:0',
         'stock' => 'nullable|integer|min:0',
         'image' => 'nullable|image|max:2048',
+        'brand' => 'nullable|string',
+        'usage' => 'nullable|string',
+        'performance_level' => 'nullable|string',
+        'discount_rate' => 'nullable|numeric|min:0|max:100',
+        'cpu' => 'nullable|string',
+        'ram' => 'nullable|string',
+        'storage' => 'nullable|string',
+        'gpu' => 'nullable|string',
+        'screen_size' => 'nullable|string',
     ]);
 
     $imagePath = null;
-
     if ($request->hasFile('image')) {
         $imagePath = $request->file('image')->store('products', 'public');
     }
@@ -105,6 +118,15 @@ class ProductController extends Controller
         'stock' => $request->stock ?? 0,
         'image' => $imagePath,
         'user_id' => $user->id,
+        'brand' => $request->brand,
+        'usage' => $request->usage,
+        'performance_level' => $request->performance_level,
+        'discount_rate' => $request->discount_rate ?? 0,
+        'cpu' => $request->cpu,
+        'ram' => $request->ram,
+        'storage' => $request->storage,
+        'gpu' => $request->gpu,
+        'screen_size' => $request->screen_size,
     ]);
 
     return response()->json([
@@ -131,11 +153,20 @@ class ProductController extends Controller
         'price' => 'sometimes|numeric|min:0',
         'stock' => 'sometimes|integer|min:0',
         'image' => 'sometimes|nullable|image|max:2048',
+        'brand' => 'sometimes|nullable|string',
+        'usage' => 'sometimes|nullable|string',
+        'performance_level' => 'sometimes|nullable|string',
+        'discount_rate' => 'sometimes|nullable|numeric|min:0|max:100',
+        'cpu' => 'sometimes|nullable|string',
+        'ram' => 'sometimes|nullable|string',
+        'storage' => 'sometimes|nullable|string',
+        'gpu' => 'sometimes|nullable|string',
+        'screen_size' => 'sometimes|nullable|string',
+        'is_active' => 'sometimes|boolean',
     ]);
 
-    $data = $request->only(['title', 'description', 'price', 'stock']);
+    $data = $request->all();
 
-    // ✅ gérer image séparément
     if ($request->hasFile('image')) {
         $data['image'] = $request->file('image')->store('products', 'public');
     }

@@ -116,6 +116,8 @@ Route::middleware(['auth:sanctum', 'role:admin,vendeur'])->group(function () {
     Route::get('/my-products', [ProductController::class, 'myProducts']);
 
     // Orders management
+    Route::get('/seller/orders', [OrderController::class, 'sellerOrders']);
+    Route::get('/seller/customers', [OrderController::class, 'sellerCustomers']);
     Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus']);
 });
 

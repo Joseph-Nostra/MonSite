@@ -22,10 +22,19 @@ class SettingsController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'avatar_deleted' => 'nullable|string', // multipart often sends strings
         ]);
 
         $user->name = $request->name;
         $user->phone = $request->phone;
+
+        // logic for deletion
+        if ($request->avatar_deleted === 'true') {
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+                $user->avatar = null;
+            }
+        }
 
         if ($request->hasFile('avatar')) {
             // Supprimer l'ancien avatar si existe
@@ -160,7 +169,7 @@ class SettingsController extends Controller
         // Toutes les commandes contenant des produits de ce vendeur
         $orderItems = \App\Models\OrderItem::whereHas('product', function($q) use ($user) {
             $q->where('user_id', $user->id);
-        })->with(['order.payment', 'product'])->get();
+        })->with(['order', 'product'])->get();
 
         $totalRevenue = 0;
         $salesCount = 0;

@@ -15,14 +15,23 @@ use Illuminate\Support\Facades\Log;
 class OrderController extends Controller
 {
     /**
-     * 🔹 Liste commandes user
+     * 🏪 Liste commandes VENDEUR
      */
-    public function index(Request $request)
+    public function sellerOrders(Request $request)
     {
         $user = $request->user();
 
-        $orders = $user->orders()
-            ->with('items')
+        // Trouver les IDs des commandes qui contiennent au moins un produit de ce vendeur
+        $orderIds = OrderItem::whereHas('product', function($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->pluck('order_id')->unique();
+
+        $orders = Order::whereIn('id', $orderIds)
+            ->with(['items' => function($q) use ($user) {
+                $q->whereHas('product', function($sq) use ($user) {
+                    $sq->where('user_id', $user->id);
+                });
+            }, 'user'])
             ->latest()
             ->get();
 
@@ -30,16 +39,27 @@ class OrderController extends Controller
             'orders' => $orders
         ]);
     }
-    public function show(Request $request, $id)
-{
-    $order = Order::where('user_id', $request->user()->id)
-        ->with('items')
-        ->findOrFail($id);
 
-    return response()->json([
-        'order' => $order
-    ]);
-}
+    /**
+     * 👥 Liste clients du VENDEUR
+     */
+    public function sellerCustomers(Request $request)
+    {
+        $user = $request->user();
+
+        // Trouver les IDs des utilisateurs ayant commandé au moins un produit de ce vendeur
+        $customers = \App\Models\User::whereHas('orders', function($q) use ($user) {
+            $q->whereHas('items', function($sq) use ($user) {
+                $sq->whereHas('product', function($ssq) use ($user) {
+                    $ssq->where('user_id', $user->id);
+                });
+            });
+        })->get(['id', 'name', 'email', 'phone', 'avatar']);
+
+        return response()->json([
+            'customers' => $customers
+        ]);
+    }
 
     /**
      * 🔥 CHECKOUT / CRÉER COMMANDE
@@ -54,6 +74,7 @@ class OrderController extends Controller
             'shipping_address.city' => 'required|string|max:100',
             'shipping_address.zip_code' => 'required|string|max:20',
             'shipping_address.phone' => 'required|string|max:20',
+            'notes' => 'nullable|string',
         ]);
 
         $user = $request->user();
@@ -75,13 +96,19 @@ class OrderController extends Controller
             // 2. créer order
             $order = Order::create([
                 'user_id' => $user->id,
+                'full_name' => $request->shipping_address['full_name'],
+                'address' => $request->shipping_address['address'],
+                'city' => $request->shipping_address['city'],
+                'zip_code' => $request->shipping_address['zip_code'],
+                'phone' => $request->shipping_address['phone'],
+                'notes' => $request->notes,
                 'total' => $total,
-                'status' => 'pending', // Toujours pending au début selon les nouveaux besoins
+                'status' => 'pending', 
                 'payment_method' => $request->payment_method,
                 'payment_status' => 'pending'
             ]);
 
-            // 3. Créer shipping
+            // 3. Créer shipping (compatibilité ancienne structure si nécessaire)
             \App\Models\Shipping::create([
                 'order_id' => $order->id,
                 'full_name' => $request->shipping_address['full_name'],
@@ -92,7 +119,7 @@ class OrderController extends Controller
                 'status' => 'pending'
             ]);
 
-            // 4. créer items (SANS décrémenter stock immédiatement pour les paiements en ligne)
+            // 4. créer items
             foreach ($cartItems as $item) {
                 $product = Product::find($item->product_id);
                 if (!$product) continue;
@@ -111,9 +138,8 @@ class OrderController extends Controller
                 ]);
             }
 
-            // 5. Cas Paiement à la livraison -> Déjà en statut "pending", on valide juste les détails
+            // 5. Cas Paiement à la livraison
             if ($request->payment_method === 'delivery') {
-                // Créer l'enregistrement du paiement
                 \App\Models\Payment::create([
                     'order_id' => $order->id,
                     'user_id' => $user->id,
@@ -136,15 +162,18 @@ class OrderController extends Controller
                     Notification::create([
                         'user_id' => $sellerId,
                         'type' => 'order',
-                        'message' => "🛒 Nouvelle commande (#{$order->id}) à la livraison.",
-                        'data' => ['order_id' => $order->id, 'total_price' => $order->total]
+                        'message' => "🛒 Nouvelle commande (#{$order->id}) reçue !",
+                        'data' => [
+                            'order_id' => $order->id, 
+                            'total_price' => $order->total,
+                            'customer_name' => $order->full_name
+                        ]
                     ]);
                 }
             }
 
             // 6. vider panier
             Cart::where('user_id', $user->id)->delete();
-
 
             // 🔹 STRIPE
             if ($request->payment_method === 'card') {
@@ -166,10 +195,8 @@ class OrderController extends Controller
                 ]);
             }
 
-            // 🔹 PAYPAL (Simulé ou via SDK si installé)
+            // 🔹 PAYPAL
             if ($request->payment_method === 'paypal') {
-                // Ici on devrait créer l'ordre PayPal via API
-                // Pour l'instant on retourne l'ID de la commande pour que le front gère avec le script PayPal
                 DB::commit();
                 return response()->json([
                     'message' => 'Commande PayPal créée',
@@ -180,15 +207,12 @@ class OrderController extends Controller
             DB::commit();
             return response()->json([
                 'message' => 'Commande créée avec succès',
-                'order' => $order->load('items', 'shipping')
+                'order' => $order->load('items')
             ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Erreur Checkout: " . $e->getMessage(), [
-                'exception' => $e,
-                'request' => $request->all()
-            ]);
+            Log::error("Erreur Checkout: " . $e->getMessage());
             return response()->json(['message' => 'Erreur lors de la commande', 'error' => $e->getMessage()], 500);
         }
     }
@@ -199,22 +223,40 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:pending,processing,out_for_delivery,delivered,cancelled',
+            'status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled',
         ]);
 
         $order = Order::findOrFail($id);
-        
-        // Sécurité supplémentaire : vérifier si le vendeur possède les produits ? 
-        // Pour l'instant on fait simple (Role check dans la route)
-
+        $oldStatus = $order->status;
         $order->status = $request->status;
 
         // Si livré pour COD, marquer comme payé
         if ($request->status === 'delivered' && $order->payment_method === 'delivery') {
             $order->payment_status = 'paid';
+            // Mettre à jour la transaction de paiement correspondante
+            \App\Models\Payment::where('order_id', $order->id)->update(['status' => 'paid']);
         }
 
         $order->save();
+
+        // Notifier le client du changement de statut
+        if ($oldStatus !== $request->status) {
+            $statusLabels = [
+                'pending' => 'En attente',
+                'confirmed' => 'Confirmée',
+                'processing' => 'En préparation',
+                'shipped' => 'Expédiée',
+                'delivered' => 'Livrée',
+                'cancelled' => 'Annulée'
+            ];
+
+            Notification::create([
+                'user_id' => $order->user_id,
+                'type' => 'order_update',
+                'message' => "📦 Votre commande #{$order->id} est maintenant : " . ($statusLabels[$request->status] ?? $request->status),
+                'data' => ['order_id' => $order->id, 'status' => $request->status]
+            ]);
+        }
 
         return response()->json([
             'message' => 'Statut mis à jour',
