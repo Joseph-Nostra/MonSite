@@ -25,6 +25,7 @@ class User extends Authenticatable
         'google_id',
         'avatar',
         'phone',
+        'notification_preferences',
     ];
 
     protected $hidden = [
@@ -45,6 +46,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'notification_preferences' => 'array',
     ];
 
     // Relation commandes

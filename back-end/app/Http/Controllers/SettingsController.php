@@ -189,4 +189,50 @@ class SettingsController extends Controller
             'transactions' => $transactions
         ]);
     }
+
+    /**
+     * 🔔 RÉCUPÉRER LES PRÉFÉRENCES DE NOTIFICATION
+     */
+    public function getNotificationPreferences(Request $request)
+    {
+        $user = $request->user();
+        $prefs = $user->notification_preferences;
+
+        if (!$prefs) {
+            // Valeurs par défaut selon le rôle
+            if ($user->role === 'vendeur' || $user->role === 'admin') {
+                $prefs = [
+                    'new_order' => true,
+                    'payment_received' => true,
+                    'low_stock' => true,
+                    'product_sold' => true,
+                    'disputes' => true,
+                    'channels' => ['email' => true, 'dashboard' => true, 'sms' => false]
+                ];
+            } else {
+                $prefs = [
+                    'orders' => ['confirmed' => true, 'shipping' => true, 'delivered' => true, 'canceled' => true],
+                    'payments' => ['success' => true, 'failed' => true, 'refund' => true],
+                    'promotions' => ['discounts' => true, 'promo_codes' => true, 'new_products' => true],
+                    'delivery' => ['shipped' => true, 'out_for_delivery' => true, 'delivered' => true],
+                    'channels' => ['email' => true, 'sms' => false, 'in_app' => true]
+                ];
+            }
+        }
+
+        return response()->json($prefs);
+    }
+
+    /**
+     * 🔔 METTRE À JOUR LES PRÉFÉRENCES
+     */
+    public function updateNotificationPreferences(Request $request)
+    {
+        $user = $request->user();
+        $user->update([
+            'notification_preferences' => $request->all()
+        ]);
+
+        return response()->json(['message' => 'Préférences mises à jour', 'preferences' => $user->notification_preferences]);
+    }
 }

@@ -90,6 +90,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/settings/addresses/{id}', [SettingsController::class, 'destroyAddress']);
     Route::get('/settings/payments', [SettingsController::class, 'paymentHistory']);
     Route::get('/settings/revenue', [SettingsController::class, 'sellerRevenue']);
+    Route::get('/settings/notifications/preferences', [SettingsController::class, 'getNotificationPreferences']);
+    Route::post('/settings/notifications/preferences', [SettingsController::class, 'updateNotificationPreferences']);
 });
 
 // Public payment routes (Webhooks)
