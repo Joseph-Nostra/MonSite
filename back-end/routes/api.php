@@ -10,6 +10,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\InformationController;
 
 /*
 |--------------------------------------------------------------------------
