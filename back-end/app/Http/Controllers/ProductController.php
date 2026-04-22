@@ -9,9 +9,48 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
     // 🔹 Liste tous les produits
-    public function index()
+    public function index(Request $request)
     {
-        return Product::with('user:id,name,email')->latest()->get();
+        $query = Product::with('user:id,name,email');
+
+        // Search
+        if ($request->has('q')) {
+            $query->where(function($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->q . '%')
+                  ->orWhere('description', 'like', '%' . $request->q . '%')
+                  ->orWhere('brand', 'like', '%' . $request->q . '%');
+            });
+        }
+
+        // Filters
+        if ($request->has('usage')) {
+            $query->where('usage', $request->usage);
+        }
+        if ($request->has('brand')) {
+            $query->where('brand', $request->brand);
+        }
+        if ($request->has('performance')) {
+            $query->where('performance_level', $request->performance);
+        }
+        if ($request->has('new')) {
+            $query->where('is_new', $request->new === 'true');
+        }
+        if ($request->has('promo')) {
+            $query->where('discount_rate', '>', 0);
+        }
+        if ($request->has('budget')) {
+            // Logic for budget ranges like "budget=5000-8000"
+            $range = explode('-', $request->budget);
+            if (count($range) === 2) {
+                $query->whereBetween('price', [(float)$range[0], (float)$range[1]]);
+            } elseif (str_contains($request->budget, '+')) {
+                $query->where('price', '>=', (float)$request->budget);
+            } else {
+                $query->where('price', '<=', (float)$request->budget);
+            }
+        }
+
+        return $query->latest()->get();
     }
 
     // 🔹 Recherche

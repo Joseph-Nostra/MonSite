@@ -52,9 +52,9 @@ export default function Footer() {
             <h6 className="text-white fw-bold mb-4 text-uppercase small tracking-wider" style={{ letterSpacing: '1.5px' }}>Boutique</h6>
             <ul className="list-unstyled d-flex flex-column gap-3 small">
               <li><Link to="/products" className="footer-link">Tous les produits</Link></li>
-              <li><Link to="/info/new" className="footer-link">Nouveautés</Link></li>
-              <li><Link to="/info/promotions" className="footer-link">Promotions</Link></li>
-              <li><Link to="/info/collections" className="footer-link">Collections</Link></li>
+              <li><Link to="/products?new=true" className="footer-link">Nouveautés</Link></li>
+              <li><Link to="/products?promo=true" className="footer-link">Promotions</Link></li>
+              <li><Link to="/products?usage=gaming" className="footer-link">Collections</Link></li>
             </ul>
           </div>
 

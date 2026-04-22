@@ -23,8 +23,11 @@ import Notifications from "./components/Notification";
 import Messages from "./components/Messages";
 import Chat from "./components/Chat";
 import OrderDetails from "./components/OrderDetails";
+import InfoPage from "./components/InfoPage";
+import CookieBanner from "./components/Common/CookieBanner";
 
 import LandingPage from "./components/LandingPage";
+import NotFound from "./components/NotFound";
 
 import api from "./axios";
 import Toast from "./components/Toast";
@@ -228,7 +231,7 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
               )
             }
           />
-
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 

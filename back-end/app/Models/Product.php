@@ -15,7 +15,18 @@ class Product extends Model
         'image',
         'stock',
         'user_id',
+        'brand',
+        'usage',
+        'performance_level',
+        'discount_rate',
+        'is_new',
         'deleted_at'
+    ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
+        'discount_rate' => 'decimal:2',
+        'is_new' => 'boolean',
     ];
     public function user()
     {
