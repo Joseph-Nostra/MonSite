@@ -2,8 +2,11 @@ import { useState, useEffect } from "react"
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import api from "../axios";
 import Logo from "./Common/Logo";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
-export default function NavBar({ user, setUser, loading }) {
+export default function NavBar({ user, setUser, loading, theme, setTheme }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [unread, setUnread] = useState(0);
@@ -46,7 +49,7 @@ export default function NavBar({ user, setUser, loading }) {
   };
 
   return (
-    <header className="fixed-top bg-dark border-bottom border-secondary shadow-lg" style={{ height: '70px', zIndex: 1050 }}>
+    <header className="fixed-top border-bottom shadow-lg navbar-custom" style={{ height: '70px', zIndex: 1050 }}>
       <div className="h-100 px-4 d-grid align-items-center" style={{ gridTemplateColumns: '1fr auto 1fr', gap: '20px' }}>
         
         {/* 🧱 1. LOGO (GAUCHE) */}
@@ -81,6 +84,23 @@ export default function NavBar({ user, setUser, loading }) {
 
         {/* 👤 3. ACTIONS (DROITE) */}
         <div className="d-flex align-items-center justify-content-end gap-3 text-nowrap">
+          
+          {/* THEME TOGGLE */}
+          <button className="btn-icon-nav" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} title={t('dark_mode')}>
+            {theme === 'light' ? <i className="bi bi-moon-stars fs-5"></i> : <i className="bi bi-sun fs-5 text-warning"></i>}
+          </button>
+
+          {/* LANGUAGE DROPDOWN */}
+          <div className="dropdown">
+            <button className="btn-icon-nav dropdown-toggle border-0" data-bs-toggle="dropdown">
+              <i className="bi bi-translate fs-5"></i>
+            </button>
+            <ul className="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
+               <li><button className="dropdown-item py-1" onClick={() => i18n.changeLanguage('fr')}>🇫🇷 Français</button></li>
+               <li><button className="dropdown-item py-1" onClick={() => i18n.changeLanguage('en')}>🇺🇸 English</button></li>
+               <li><button className="dropdown-item py-1" onClick={() => i18n.changeLanguage('ar')}>🇲🇦 العربية</button></li>
+            </ul>
+          </div>
           {!loading && user ? (
             <>
               {/* AJOUTER PRODUIT */}
@@ -122,13 +142,18 @@ export default function NavBar({ user, setUser, loading }) {
                   
                   {/* REQUIS: Mes commandes */}
                   <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/orders")}>
-                    <i className="bi bi-bag-check text-primary"></i> Mes commandes
+                    <i className="bi bi-bag-check text-primary"></i> {t('my_orders')}
+                  </button></li>
+
+                  {/* Favoris */}
+                  <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/settings", { state: { tab: 'favorites' } })}>
+                    <i className="bi bi-heart text-danger"></i> {t('favorites')}
                   </button></li>
 
                   {/* REQUIS: Mes produits (if vendor) */}
                   {(user.role === 'vendeur' || user.role === 'admin') && (
                     <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/my-products")}>
-                      <i className="bi bi-box-seam text-primary"></i> Mes produits
+                      <i className="bi bi-box-seam text-primary"></i> mes produits
                     </button></li>
                   )}
 
@@ -165,9 +190,16 @@ export default function NavBar({ user, setUser, loading }) {
 
       </div>
       <style>{`
-        .bg-secondary { background-color: rgba(255, 255, 255, 0.1) !important; }
-        .placeholder-light::placeholder { color: rgba(255, 255, 255, 0.3); }
-        .btn-icon-nav { background: transparent; border: none; padding: 8px; color: rgba(255,255,255,0.7); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .navbar-custom {
+            background-color: var(--card-bg);
+            border-color: var(--border-color) !important;
+            color: var(--text-color);
+        }
+        .bg-secondary { background-color: rgba(128, 128, 128, 0.1) !important; }
+        .form-control { color: var(--text-color) !important; }
+        .dropdown-menu { background-color: var(--card-bg); border: 1px solid var(--border-color); }
+        .dropdown-item { color: var(--text-color) !important; }
+        .btn-icon-nav { background: transparent; border: none; padding: 8px; color: var(--text-color); opacity: 0.7; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .btn-icon-nav:hover { transform: translateY(-2px); color: #fff; }
         .notification-badge { font-size: 10px; padding: 4.5px 6.5px; top: 8px !important; right: 0px !important; }
         

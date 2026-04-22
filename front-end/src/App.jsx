@@ -31,6 +31,8 @@ import NotFound from "./components/NotFound";
 
 import api from "./axios";
 import Toast from "./components/Toast";
+import { useTranslation } from 'react-i18next';
+import i18n from './i18n';
 import "./App.css";
 
 function App() {
@@ -38,6 +40,17 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState({ message: "", type: "" });
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+  }, [i18n.language]);
 
 
 
@@ -89,13 +102,15 @@ function App() {
         loading={loading}
         notification={notification}
         setNotification={setNotification}
+        theme={theme}
+        setTheme={setTheme}
       />
     </Router>
   );
 }
 
 // 🔥 APP CONTENT (with navigate)
-function AppContent({ user, setUser, cart, setCart, loading , notification, setNotification}) {
+function AppContent({ user, setUser, cart, setCart, loading , notification, setNotification, theme, setTheme}) {
   const navigate = useNavigate();
 
   const handleDelete = async (id) => {
@@ -155,7 +170,7 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
   return (
     <div className="d-flex flex-column min-vh-100">
       
-      <NavBar user={user} setUser={setUser} loading={loading} />
+      <NavBar user={user} setUser={setUser} loading={loading} theme={theme} setTheme={setTheme} />
 
       <main className="flex-fill container-fluid mt-5 pt-3">
         <Routes>
