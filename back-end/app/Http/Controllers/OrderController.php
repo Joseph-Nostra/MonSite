@@ -10,6 +10,8 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Support\Facades\Log;
+
 class OrderController extends Controller
 {
     /**
@@ -74,8 +76,9 @@ class OrderController extends Controller
             $order = Order::create([
                 'user_id' => $user->id,
                 'total' => $total,
-                'status' => $request->payment_method === 'delivery' ? 'processing' : 'pending',
-                'payment_method' => $request->payment_method
+                'status' => 'pending', // Toujours pending au début selon les nouveaux besoins
+                'payment_method' => $request->payment_method,
+                'payment_status' => 'pending'
             ]);
 
             // 3. Créer shipping
@@ -108,9 +111,16 @@ class OrderController extends Controller
                 ]);
             }
 
-            // 5. Cas Paiement à la livraison -> Finalisation immédiate
+            // 5. Cas Paiement à la livraison -> Déjà en statut "pending", on valide juste les détails
             if ($request->payment_method === 'delivery') {
-                $order->update(['status' => 'processing']);
+                // Créer l'enregistrement du paiement
+                \App\Models\Payment::create([
+                    'order_id' => $order->id,
+                    'user_id' => $user->id,
+                    'amount' => $order->total,
+                    'method' => 'cod',
+                    'status' => 'pending',
+                ]);
                 
                 // Décrémenter stock et notifier vendeurs
                 $sellers = [];
@@ -135,7 +145,6 @@ class OrderController extends Controller
             // 6. vider panier
             Cart::where('user_id', $user->id)->delete();
 
-            DB::commit();
 
             // 🔹 STRIPE
             if ($request->payment_method === 'card') {
@@ -149,6 +158,7 @@ class OrderController extends Controller
 
                 $order->update(['payment_intent_id' => $intent->id]);
 
+                DB::commit();
                 return response()->json([
                     'message' => 'Intention de paiement créée',
                     'order_id' => $order->id,
@@ -160,12 +170,14 @@ class OrderController extends Controller
             if ($request->payment_method === 'paypal') {
                 // Ici on devrait créer l'ordre PayPal via API
                 // Pour l'instant on retourne l'ID de la commande pour que le front gère avec le script PayPal
+                DB::commit();
                 return response()->json([
                     'message' => 'Commande PayPal créée',
                     'order_id' => $order->id
                 ]);
             }
 
+            DB::commit();
             return response()->json([
                 'message' => 'Commande créée avec succès',
                 'order' => $order->load('items', 'shipping')
@@ -173,7 +185,40 @@ class OrderController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error("Erreur Checkout: " . $e->getMessage(), [
+                'exception' => $e,
+                'request' => $request->all()
+            ]);
             return response()->json(['message' => 'Erreur lors de la commande', 'error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * 🚀 MISE À JOUR STATUT (Vendeur/Admin)
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,processing,out_for_delivery,delivered,cancelled',
+        ]);
+
+        $order = Order::findOrFail($id);
+        
+        // Sécurité supplémentaire : vérifier si le vendeur possède les produits ? 
+        // Pour l'instant on fait simple (Role check dans la route)
+
+        $order->status = $request->status;
+
+        // Si livré pour COD, marquer comme payé
+        if ($request->status === 'delivered' && $order->payment_method === 'delivery') {
+            $order->payment_status = 'paid';
+        }
+
+        $order->save();
+
+        return response()->json([
+            'message' => 'Statut mis à jour',
+            'order' => $order
+        ]);
     }
 }

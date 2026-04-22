@@ -34,7 +34,7 @@ class PaymentController extends Controller
 
         if ($event->type === 'payment_intent.succeeded') {
             $paymentIntent = $event->data->object;
-            $this->finalizeOrder($paymentIntent->metadata->order_id, $paymentIntent->id);
+            $this->finalizeOrder($paymentIntent->metadata->order_id, $paymentIntent->id, 'card');
         }
 
         return response()->json(['status' => 'success']);
@@ -55,7 +55,7 @@ class PaymentController extends Controller
         // Ici on devrait appeler l'API PayPal pour capturer le paiement
         // Pour simplifier on simule la réussite si on reçoit l'ID (à sécuriser en prod)
         
-        $this->finalizeOrder($order->id, $request->paypal_order_id);
+        $this->finalizeOrder($order->id, $request->paypal_order_id, 'paypal');
 
         return response()->json([
             'message' => 'Paiement PayPal réussi',
@@ -64,18 +64,26 @@ class PaymentController extends Controller
     }
 
     /**
-     * 🔹 Finaliser la commande (Status, Stock, Notifications)
+     * 🔹 Finaliser la commande (Status, Stock, Notifications, Transaction)
      */
-    private function finalizeOrder($orderId, $paymentId)
+    private function finalizeOrder($orderId, $transactionId, $method = 'card')
     {
         $order = Order::with('items')->find($orderId);
         if (!$order || $order->payment_status === 'paid') return;
 
         $order->update([
             'status' => 'processing',
-            'payment_status' => 'paid',
-            // On ne sait pas si c'est Stripe ou PayPal ici sans vérifier le préfixe ou passer un type
-            // Mais on peut stocker dans le champ approprié si on le passe
+            'payment_status' => ($method === 'cod' ? 'pending' : 'paid'),
+        ]);
+
+        // Créer l'enregistrement du paiement
+        \App\Models\Payment::create([
+            'order_id' => $order->id,
+            'user_id' => $order->user_id,
+            'amount' => $order->total_price,
+            'method' => $method,
+            'status' => ($method === 'cod' ? 'pending' : 'paid'),
+            'transaction_id' => $transactionId,
         ]);
 
         // Décrémenter stock et notifier vendeurs
@@ -98,10 +106,10 @@ class PaymentController extends Controller
             Notification::create([
                 'user_id' => $sellerId,
                 'type' => 'order',
-                'message' => "💰 Paiement reçu pour la commande (#{$order->id}).",
+                'message' => "💰 Nouveau paiement reçu pour la commande (#{$order->id}).",
                 'data' => [
                     'order_id' => $order->id,
-                    'total_price' => $order->total,
+                    'total_price' => $order->total_price,
                 ]
             ]);
         }

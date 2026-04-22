@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         
 
+        // 🔹 Eviter redirection vers login si non-authentifié (API)
+        $middleware->redirectGuestsTo(fn () => null);
+
         // 🔹 Ajouter ton middleware de rôle
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,

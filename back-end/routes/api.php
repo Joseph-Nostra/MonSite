@@ -9,6 +9,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +24,7 @@ Route::get('/products/{id}', [ProductController::class, 'show']);
 
 // Auth
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
@@ -77,6 +78,18 @@ Route::middleware('auth:sanctum')->group(function () {
     |---------------- PAYMENTS ----------------
     */
     Route::post('/payments/paypal/capture', [PaymentController::class, 'capturePayPalOrder']);
+
+    /*
+    |---------------- SETTINGS ----------------
+    */
+    Route::post('/settings/profile', [SettingsController::class, 'updateProfile']);
+    Route::post('/settings/password', [SettingsController::class, 'changePassword']);
+    Route::get('/settings/addresses', [SettingsController::class, 'indexAddresses']);
+    Route::post('/settings/addresses', [SettingsController::class, 'storeAddress']);
+    Route::put('/settings/addresses/{id}', [SettingsController::class, 'updateAddress']);
+    Route::delete('/settings/addresses/{id}', [SettingsController::class, 'destroyAddress']);
+    Route::get('/settings/payments', [SettingsController::class, 'paymentHistory']);
+    Route::get('/settings/revenue', [SettingsController::class, 'sellerRevenue']);
 });
 
 // Public payment routes (Webhooks)
@@ -95,6 +108,9 @@ Route::middleware(['auth:sanctum', 'role:admin,vendeur'])->group(function () {
     Route::put('/products/{id}', [ProductController::class, 'update']);
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
     Route::get('/my-products', [ProductController::class, 'myProducts']);
+
+    // Orders management
+    Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus']);
 });
 
 /*
