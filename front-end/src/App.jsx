@@ -77,6 +77,7 @@ function App() {
     
     
     <Router>
+      <CookieBanner />
       <AppContent
         user={user}
         setUser={setUser}
@@ -168,6 +169,7 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
           <Route path="/notifications" element={<Navigate to="/settings" state={{ tab: 'notifications' }} replace />} />
           <Route path="/messages" element={<Messages user={user} />} />
           <Route path="/chat/:otherUserId" element={<Chat user={user} />} />
+          <Route path="/info/:slug" element={<InfoPage />} />
           <Route path="/profile" element={<ProtectedRoute user={user} loading={loading}><SettingsLayout setUser={setUser} user={user} /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute user={user} loading={loading}><SettingsLayout setUser={setUser} user={user} /></ProtectedRoute>} />
           <Route path="/my-products" element={<div className="container mt-5"><h3>Mes Produits</h3><p>Page en cours de construction...</p></div>} />

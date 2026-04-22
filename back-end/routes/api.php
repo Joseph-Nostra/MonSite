@@ -95,7 +95,10 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // Public payment routes (Webhooks)
-Route::post('/payments/webhook/stripe', [PaymentController::class, 'handleStripeWebhook']);
+Route::post('/stripe/webhook', [PaymentController::class, 'handleStripeWebhook']);
+
+// Informational pages
+Route::get('/info/{slug}', [InformationController::class, 'show']);
 
 /*
 |--------------------------------------------------------------------------

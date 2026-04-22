@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import api from "../axios";
+import Logo from "./Common/Logo";
 
 export default function NavBar({ user, setUser, loading }) {
   const navigate = useNavigate();
@@ -50,10 +51,7 @@ export default function NavBar({ user, setUser, loading }) {
         
         {/* 🧱 1. LOGO (GAUCHE) */}
         <div className="d-flex align-items-center justify-content-start">
-          <Link className="navbar-brand d-flex align-items-center gap-2 m-0" to="/products">
-            <img src="/logo.png" alt="Logo" width="40" height="40" className="rounded-circle border border-secondary" />
-            <span className="fw-bold text-white text-uppercase d-none d-md-inline" style={{ letterSpacing: '1px', fontSize: '1.2rem' }}>MonSite</span>
-          </Link>
+          <Logo />
         </div>
 
         {/* 🔍 2. BARRE DE RECHERCHE (CENTRE - Conditional) */}

@@ -1,5 +1,6 @@
+import React, { useState, useEffect } from "react";
 import api from "../../axios";
-import { Bell, CheckCircle, Trash2, Clock, BagCheck, MessageSquare, Settings, History } from "lucide-react";
+import { Bell, CheckCircle, Trash2, Clock, PackageCheck, MessageSquare, Settings, History } from "lucide-react";
 import NotificationPreferences from "./NotificationPreferences";
 
 const NotificationsSettings = ({ user }) => {
@@ -102,7 +103,7 @@ const NotificationsSettings = ({ user }) => {
                     >
                     <div className={`rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm`} 
                         style={{ width: '48px', height: '48px', backgroundColor: n.type === 'order' ? '#e7f3ff' : '#fef2f2', color: n.type === 'order' ? '#0d6efd' : '#dc3545' }}>
-                        {n.type === 'order' ? <BagCheck size={20} /> : <MessageSquare size={20} />}
+                        {n.type === 'order' ? <PackageCheck size={20} /> : <MessageSquare size={20} />}
                     </div>
 
                     <div className="flex-grow-1">
