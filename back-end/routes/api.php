@@ -11,6 +11,9 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\InformationController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\SimulatorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +25,10 @@ use App\Http\Controllers\InformationController;
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/search', [ProductController::class, 'search']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::get('/products/{id}/reviews', [ReviewController::class, 'index']);
+
+// Simulator
+Route::post('/simulator/recommend', [SimulatorController::class, 'recommend']);
 
 // Auth
 Route::post('/register', [AuthController::class, 'register']);
@@ -93,6 +100,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/settings/revenue', [SettingsController::class, 'sellerRevenue']);
     Route::get('/settings/notifications/preferences', [SettingsController::class, 'getNotificationPreferences']);
     Route::post('/settings/notifications/preferences', [SettingsController::class, 'updateNotificationPreferences']);
+
+    /*
+    |---------------- REVIEWS & WISHLIST ----------------
+    */
+    Route::post('/reviews', [ReviewController::class, 'store']);
+    Route::get('/wishlist', [WishlistController::class, 'index']);
+    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle']);
 });
 
 // Public payment routes (Webhooks)
