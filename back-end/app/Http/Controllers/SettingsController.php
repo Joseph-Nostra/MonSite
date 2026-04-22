@@ -33,6 +33,7 @@ class SettingsController extends Controller
             if ($user->avatar) {
                 Storage::disk('public')->delete($user->avatar);
                 $user->avatar = null;
+                $user->save();
             }
         }
 
