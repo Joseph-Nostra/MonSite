@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import ProductCard from "./ProductCard";
 import api from "../axios";
 
 function ProductList({ onAddToCart , user , handleEdit , handleDelete}) {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,22 +72,27 @@ function ProductList({ onAddToCart , user , handleEdit , handleDelete}) {
         </div>
       ) : (
         <>
-            <div className="row g-4 row-cols-7-custom">
+            <div className="custom-product-grid">
                 <style>{`
-                    .row-cols-7-custom {
+                    .custom-product-grid {
                         display: grid;
-                        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-                        gap: 1.5rem;
+                        gap: 20px;
+                        grid-template-columns: repeat(1, 1fr);
+                        width: 100%;
                     }
-                    @media (min-width: 1400px) {
-                        .row-cols-7-custom {
-                            grid-template-columns: repeat(7, 1fr);
-                        }
+                    @media (min-width: 576px) { .custom-product-grid { grid-template-columns: repeat(2, 1fr); } }
+                    @media (min-width: 768px) { .custom-product-grid { grid-template-columns: repeat(3, 1fr); } }
+                    @media (min-width: 992px) { .custom-product-grid { grid-template-columns: repeat(4, 1fr); } }
+                    @media (min-width: 1200px) { .custom-product-grid { grid-template-columns: repeat(5, 1fr); } }
+                    @media (min-width: 1400px) { .custom-product-grid { grid-template-columns: repeat(7, 1fr); } }
+                    
+                    .product-grid-item {
+                        min-width: 0; /* important for grid items with text-truncate */
                     }
                 `}</style>
             {products.map((product) => (
-                <div className="col" key={product.id}>
-                <ProductCard product={product} onAddToCart={onAddToCart} user={user} handleEdit={handleEdit} handleDelete={handleDelete}/>
+                <div className="product-grid-item" key={product.id}>
+                    <ProductCard product={product} onAddToCart={onAddToCart} user={user} handleEdit={handleEdit} handleDelete={handleDelete}/>
                 </div>
             ))}
             </div>
