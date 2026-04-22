@@ -47,22 +47,24 @@ function ProductDetail({ onAddToCart, user }) {
         <h3 className="card-title">{product.title}</h3>
         <p className="card-text">{product.description}</p>
         <p className="card-text fw-bold">${product.price}</p>
-        <div className="d-flex justify-content-between">
-          <button
-            className="btn btn-success"
-            onClick={() => {
-              onAddToCart(product);
-              alert("Produit ajouté au panier !");
-            }}
-          >
-            Ajouter au panier
-          </button>
+        <div className={`d-flex ${user && user.role === 'client' ? 'justify-content-between' : 'justify-content-end'}`}>
+          {(!user || user.role === "client") && user?.id !== product.user_id && (
+            <button
+              className="btn btn-success"
+              onClick={() => {
+                onAddToCart(product);
+                alert("Produit ajouté au panier !");
+              }}
+            >
+              Ajouter au panier
+            </button>
+          )}
           <button className="btn btn-primary" onClick={() => navigate(-1)}>
             Retour
           </button>
         </div>
         
-        {user && user.id !== product.user_id && (
+        {user && user.role === 'client' && user.id !== product.user_id && (
           <div className="mt-3">
             <button 
               className="btn btn-outline-dark w-100"

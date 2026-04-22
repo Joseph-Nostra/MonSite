@@ -11,6 +11,9 @@ class Order extends Model
     'total',
     'status',
     'payment_method',
+    'payment_intent_id',
+    'paypal_order_id',
+    'payment_status',
 ];
 
     // 🔥 relation user

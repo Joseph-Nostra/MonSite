@@ -82,67 +82,87 @@ export default function NavBar({ user, setUser, loading }) {
         </div>
 
         {/* 👤 3. ACTIONS (DROITE) */}
-        <div className="d-flex align-items-center justify-content-end gap-3">
+        <div className="d-flex align-items-center justify-content-end gap-3 text-nowrap">
           {!loading && user ? (
             <>
               {/* AJOUTER PRODUIT */}
               {(user.role === "vendeur" || user.role === "admin") && (
                 <button 
-                  className="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2 btn-main-action"
+                  className="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2 btn-main-action border-0"
                   onClick={() => navigate("/add-product")}
-                  style={{ fontSize: '14px' }}
+                  style={{ fontSize: '14px', background: 'linear-gradient(45deg, #0d6efd, #00d2ff)' }}
                 >
-                  <span className="h5 mb-0">+</span> Vendre
+                  <i className="bi bi-plus-circle-fill"></i> Vendre
                 </button>
               )}
 
               {/* MESSAGES */}
               <button className="btn-icon-nav position-relative" onClick={() => navigate("/messages")} title="Messages">
-                <span className="fs-4">💬</span>
+                <i className="bi bi-chat-dots fs-5"></i>
                 {unreadMessages > 0 && <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-dark border-2 notification-badge">{unreadMessages}</span>}
               </button>
 
               {/* NOTIFICATIONS */}
               <button className="btn-icon-nav position-relative" onClick={() => navigate("/notifications")} title="Notifications">
-                <span className="fs-4">🔔</span>
+                <i className="bi bi-bell fs-5"></i>
                 {unread > 0 && <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark border border-dark border-2 notification-badge">{unread}</span>}
               </button>
 
               {/* DROPDOWN MENU */}
-              <div className="dropdown">
-                <button className="user-profile-btn dropdown-toggle border-0 bg-transparent" data-bs-toggle="dropdown" aria-expanded="false">
+              <div className="dropdown ms-1">
+                <button className="user-profile-btn dropdown-toggle border-0" data-bs-toggle="dropdown" aria-expanded="false" style={{ background: 'rgba(255,255,255,0.05)' }}>
                   <div className="user-avatar text-white">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
                   <span className="user-name d-none d-xl-inline text-white ms-2 fw-semibold">{user.name}</span>
                   <i className="bi bi-chevron-down small ms-1 text-white-50"></i>
                 </button>
-                <ul className="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-3 py-2 animate-dropdown" style={{ minWidth: '220px' }}>
-                  <div className="px-3 py-2 mb-1">
-                      <p className="mb-0 fw-bold small text-dark">{user.name}</p>
-                      <p className="mb-0 text-muted small" style={{ fontSize: '11px' }}>{user.role.toUpperCase()}</p>
+                <ul className="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-3 py-2 animate-dropdown" style={{ minWidth: '240px' }}>
+                  <div className="px-4 py-3 mb-1">
+                      <p className="mb-0 fw-bold text-dark">{user.name}</p>
+                      <p className="mb-0 text-muted" style={{ fontSize: '11px' }}>Compte {user.role.toUpperCase()}</p>
                   </div>
-                  <li><hr className="dropdown-divider opacity-50" /></li>
-                  {user.role === 'vendeur' && (
-                      <>
-                          <li><button className="dropdown-item py-1 px-3" onClick={() => navigate("/my-products")}>📦 Mes Produits</button></li>
-                          <li><button className="dropdown-item py-1 px-3" onClick={() => navigate("/stats")}>📊 Statistiques</button></li>
-                      </>
+                  <li><hr className="dropdown-divider opacity-50 mx-2" /></li>
+                  
+                  {/* REQUIS: Mes commandes */}
+                  <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/orders")}>
+                    <i className="bi bi-bag-check text-primary"></i> Mes commandes
+                  </button></li>
+
+                  {/* REQUIS: Mes produits (if vendor) */}
+                  {(user.role === 'vendeur' || user.role === 'admin') && (
+                    <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/my-products")}>
+                      <i className="bi bi-box-seam text-primary"></i> Mes produits
+                    </button></li>
                   )}
-                  {user.role === 'client' && (
-                    <li><button className="dropdown-item py-1 px-3" onClick={() => navigate("/orders")}>📦 Mes Commandes</button></li>
+
+                  {/* REQUIS: Statistiques (if vendor) */}
+                  {(user.role === 'vendeur' || user.role === 'admin') && (
+                    <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/stats")}>
+                      <i className="bi bi-graph-up-arrow text-primary"></i> Statistiques
+                    </button></li>
                   )}
-                  <li><button className="dropdown-item py-1 px-3" onClick={() => navigate("/profile")}>👤 Mon Profil</button></li>
-                  <li><button className="dropdown-item py-1 px-3" onClick={() => navigate("/settings")}>⚙️ Paramètres</button></li>
-                  <li><hr className="dropdown-divider opacity-50" /></li>
-                  <li><button className="dropdown-item py-1 px-3 text-danger fw-bold" onClick={handleLogout}>🚪 Déconnexion</button></li>
+
+                  <div className="dropdown-divider opacity-50 mx-2"></div>
+
+                  {/* REQUIS: Paramètres */}
+                  <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/settings")}>
+                    <i className="bi bi-gear text-secondary"></i> Paramètres
+                  </button></li>
+
+                  <li><hr className="dropdown-divider opacity-50 mx-2" /></li>
+
+                  {/* REQUIS: Déconnexion */}
+                  <li><button className="dropdown-item py-2 px-3 text-danger fw-bold d-flex align-items-center gap-3" onClick={handleLogout}>
+                    <i className="bi bi-box-arrow-right"></i> Déconnexion
+                  </button></li>
                 </ul>
               </div>
             </>
           ) : !loading && (
             <div className="d-flex gap-2">
               <Link className="btn text-white fw-semibold" to="/login">Connexion</Link>
-              <Link className="btn btn-outline-primary rounded-pill px-4 fw-bold" to="/register">S'inscrire</Link>
+              <Link className="btn btn-primary rounded-pill px-4 fw-bold" to="/register">S'inscrire</Link>
             </div>
           )}
         </div>

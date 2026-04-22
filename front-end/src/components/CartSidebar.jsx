@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import api from "../axios";
 import { useNavigate } from "react-router-dom";
 import Toast from "./Toast";
+import StripePayment from "./StripePayment";
+import { PayPalButtons } from "@paypal/react-paypal-js";
 
 export default function CartSidebar({ cart, setCart, user }) {
   const [totalPrice, setTotalPrice] = useState(0);
@@ -16,6 +18,8 @@ export default function CartSidebar({ cart, setCart, user }) {
     phone: "",
   });
   const [notification, setNotification] = useState({ message: "", type: "" });
+  const [clientSecret, setClientSecret] = useState(null);
+  const [orderInProgress, setOrderInProgress] = useState(null);
 
   const navigate = useNavigate();
 
@@ -71,11 +75,16 @@ export default function CartSidebar({ cart, setCart, user }) {
         shipping_address: shippingAddress,
       });
 
-      setNotification({ message: res.data.message || "Commande réussie !", type: "success" });
+      setOrderInProgress(res.data.order_id);
 
-      if (res.data.redirect_url) {
-        window.location.href = res.data.redirect_url;
+      if (paymentMethod === "card" && res.data.clientSecret) {
+        setClientSecret(res.data.clientSecret);
+        // On reste à l'étape 3 mais on va afficher StripePayment
+      } else if (paymentMethod === "paypal") {
+        // Le bouton PayPal est déjà affiché ou on attend l'action
+        setNotification({ message: "Veuillez finaliser via le bouton PayPal", type: "info" });
       } else {
+        setNotification({ message: res.data.message || "Commande réussie !", type: "success" });
         setTimeout(() => {
           setCart([]);
           navigate("/orders");
@@ -89,6 +98,20 @@ export default function CartSidebar({ cart, setCart, user }) {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePayPalCapture = async (data) => {
+    try {
+      await api.post("/payments/paypal/capture", {
+        order_id: orderInProgress,
+        paypal_order_id: data.orderID
+      });
+      setNotification({ message: "Paiement PayPal réussi !", type: "success" });
+      setCart([]);
+      setTimeout(() => navigate("/orders"), 2000);
+    } catch (err) {
+      setNotification({ message: "Erreur lors de la capture PayPal", type: "error" });
     }
   };
 
@@ -223,6 +246,36 @@ export default function CartSidebar({ cart, setCart, user }) {
                 </div>
               </div>
             </div>
+
+            {/* STRIPE ELEMENT IF CARD SELECTED & CHECKOUT DONE */}
+            {paymentMethod === 'card' && clientSecret && (
+              <div className="mt-4 animate-in">
+                <StripePayment 
+                  clientSecret={clientSecret} 
+                  orderId={orderInProgress}
+                  onPaymentSuccess={() => {
+                    setNotification({ message: "Paiement réussi !", type: "success" });
+                    setCart([]);
+                    setTimeout(() => navigate("/orders"), 2000);
+                  }}
+                  onPaymentError={(msg) => setNotification({ message: msg, type: "error" })}
+                />
+              </div>
+            )}
+
+            {/* PAYPAL BUTTON IF PAYPAL SELECTED & CHECKOUT DONE */}
+            {paymentMethod === 'paypal' && orderInProgress && (
+              <div className="mt-4 animate-in">
+                <PayPalButtons 
+                  createOrder={(data, actions) => {
+                    return actions.order.create({
+                      purchase_units: [{ amount: { value: totalPrice.toFixed(2) } }]
+                    });
+                  }}
+                  onApprove={(data, actions) => handlePayPalCapture(data)}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -258,7 +311,7 @@ export default function CartSidebar({ cart, setCart, user }) {
             Choisir le paiement →
           </button>
         )}
-        {step === 3 && (
+        {step === 3 && !clientSecret && !orderInProgress && (
           <button 
             className="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow" 
             onClick={confirmOrder}

@@ -89,11 +89,9 @@ class OrderController extends Controller
                 'status' => 'pending'
             ]);
 
-            // 4. créer items + stock + notification
-            $sellers = [];
+            // 4. créer items (SANS décrémenter stock immédiatement pour les paiements en ligne)
             foreach ($cartItems as $item) {
                 $product = Product::find($item->product_id);
-
                 if (!$product) continue;
 
                 if ($product->stock < $item->quantity) {
@@ -108,47 +106,63 @@ class OrderController extends Controller
                     'image' => $product->image,
                     'quantity' => $item->quantity
                 ]);
+            }
 
-                $product->decrement('stock', $item->quantity);
+            // 5. Cas Paiement à la livraison -> Finalisation immédiate
+            if ($request->payment_method === 'delivery') {
+                $order->update(['status' => 'processing']);
+                
+                // Décrémenter stock et notifier vendeurs
+                $sellers = [];
+                foreach ($cartItems as $item) {
+                    $product = Product::find($item->product_id);
+                    $product->decrement('stock', $item->quantity);
+                    if ($product->user_id) {
+                        $sellers[$product->user_id][] = ['title' => $product->title, 'quantity' => $item->quantity];
+                    }
+                }
 
-                if ($product->user_id) {
-                    $sellers[$product->user_id][] = [
-                        'title' => $product->title,
-                        'quantity' => $item->quantity
-                    ];
+                foreach ($sellers as $sellerId => $products) {
+                    Notification::create([
+                        'user_id' => $sellerId,
+                        'type' => 'order',
+                        'message' => "🛒 Nouvelle commande (#{$order->id}) à la livraison.",
+                        'data' => ['order_id' => $order->id, 'total_price' => $order->total]
+                    ]);
                 }
             }
 
-            // Notifications vendeurs
-            foreach ($sellers as $sellerId => $products) {
-                $productDetails = array_map(fn($p) => "{$p['title']} (x{$p['quantity']})", $products);
-                Notification::create([
-                    'user_id' => $sellerId,
-                    'type' => 'order',
-                    'message' => "🛒 Nouvelle commande (#{$order->id}) reçue.",
-                    'data' => [
-                        'order_id' => $order->id,
-                        'client_name' => $request->shipping_address['full_name'],
-                        'total_price' => $order->total,
-                        'city' => $request->shipping_address['city'],
-                        'items_count' => count($products)
-                    ]
-                ]);
-            }
-
-            // 5. vider panier
+            // 6. vider panier
             Cart::where('user_id', $user->id)->delete();
 
             DB::commit();
 
-            // 🔹 GESTION PAIEMENT EN LIGNE (STRIPE)
+            // 🔹 STRIPE
             if ($request->payment_method === 'card') {
-                // Ici on devrait créer la session Stripe
-                // Pour l'instant on retourne l'order, la redirection sera faite côté front ou via un autre endpoint
+                \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+                
+                $intent = \Stripe\PaymentIntent::create([
+                    'amount' => $order->total * 100, // Cents
+                    'currency' => 'usd',
+                    'metadata' => ['order_id' => $order->id],
+                ]);
+
+                $order->update(['payment_intent_id' => $intent->id]);
+
                 return response()->json([
-                    'message' => 'Commande créée, redirection vers le paiement...',
-                    'order' => $order->load('items', 'shipping'),
-                    'redirect_url' => null // Bientôt implémenté avec Stripe
+                    'message' => 'Intention de paiement créée',
+                    'order_id' => $order->id,
+                    'clientSecret' => $intent->client_secret
+                ]);
+            }
+
+            // 🔹 PAYPAL (Simulé ou via SDK si installé)
+            if ($request->payment_method === 'paypal') {
+                // Ici on devrait créer l'ordre PayPal via API
+                // Pour l'instant on retourne l'ID de la commande pour que le front gère avec le script PayPal
+                return response()->json([
+                    'message' => 'Commande PayPal créée',
+                    'order_id' => $order->id
                 ]);
             }
 
@@ -159,11 +173,7 @@ class OrderController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return response()->json([
-                'message' => 'Erreur lors de la commande',
-                'error' => $e->getMessage()
-            ], 500);
+            return response()->json(['message' => 'Erreur lors de la commande', 'error' => $e->getMessage()], 500);
         }
     }
 }

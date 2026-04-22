@@ -8,6 +8,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,7 +72,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/messages/unread-count', [MessageController::class, 'unreadCount']);
     Route::get('/messages/{otherUserId}', [MessageController::class, 'show']);
     Route::post('/messages', [MessageController::class, 'store']);
+
+    /*
+    |---------------- PAYMENTS ----------------
+    */
+    Route::post('/payments/paypal/capture', [PaymentController::class, 'capturePayPalOrder']);
 });
+
+// Public payment routes (Webhooks)
+Route::post('/payments/webhook/stripe', [PaymentController::class, 'handleStripeWebhook']);
 
 /*
 |--------------------------------------------------------------------------
