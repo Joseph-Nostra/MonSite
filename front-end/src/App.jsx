@@ -209,15 +209,22 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
             path="/products"
             element={
               <div className="row g-0">
-                <div className="col-12">
-                  <ProductList onAddToCart={handleAddToCart} user={user}  handleEdit={handleEdit} handleDelete={handleDelete}/>
-                </div>
-                {user && user.role === 'client' && (
-                  <div className="col-12 mt-4 px-4">
-                     <hr />
-                     <h5 className="fw-bold mb-3">🛒 Votre Panier</h5>
-                     <CartSidebar cart={cart} setCart={setCart} user={user} />
+                {user && (user.role === 'vendeur' || user.role === 'admin') ? (
+                  /* Layout Full screen pour Vendeurs/Admin */
+                  <div className="col-12">
+                    <ProductList onAddToCart={handleAddToCart} user={user} handleEdit={handleEdit} handleDelete={handleDelete} isFullWidth={true} />
                   </div>
+                ) : (
+                  /* Layout Classique avec Sidebar pour Clients & Visiteurs */
+                  <>
+                    <div className="col-md-9 pe-md-4 border-end">
+                      <ProductList onAddToCart={handleAddToCart} user={user} handleEdit={handleEdit} handleDelete={handleDelete} isFullWidth={false} />
+                    </div>
+                    <div className="col-md-3 bg-light p-4 sticky-top" style={{ top: '70px', height: 'calc(100vh - 70px)', overflowY: 'auto' }}>
+                       <h5 className="fw-bold mb-4 border-bottom pb-2 mt-2">🛒 Votre Panier</h5>
+                       <CartSidebar cart={cart} setCart={setCart} user={user} />
+                    </div>
+                  </>
                 )}
               </div>
             }

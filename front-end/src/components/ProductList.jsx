@@ -4,7 +4,7 @@ import ProductCard from "./ProductCard";
 import api from "../axios";
 import useDocTitle from "../hooks/useDocTitle";
 
-function ProductList({ onAddToCart , user , handleEdit , handleDelete}) {
+function ProductList({ onAddToCart , user , handleEdit , handleDelete, isFullWidth = false}) {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -85,9 +85,9 @@ function ProductList({ onAddToCart , user , handleEdit , handleDelete}) {
                     }
                     @media (min-width: 576px) { .custom-product-grid { grid-template-columns: repeat(2, 1fr); } }
                     @media (min-width: 768px) { .custom-product-grid { grid-template-columns: repeat(3, 1fr); } }
-                    @media (min-width: 992px) { .custom-product-grid { grid-template-columns: repeat(4, 1fr); } }
-                    @media (min-width: 1200px) { .custom-product-grid { grid-template-columns: repeat(5, 1fr); } }
-                    @media (min-width: 1400px) { .custom-product-grid { grid-template-columns: repeat(7, 1fr); } }
+                    @media (min-width: 992px) { .custom-product-grid { grid-template-columns: repeat(${isFullWidth ? 4 : 3}, 1fr); } }
+                    @media (min-width: 1200px) { .custom-product-grid { grid-template-columns: repeat(${isFullWidth ? 5 : 4}, 1fr); } }
+                    @media (min-width: 1400px) { .custom-product-grid { grid-template-columns: repeat(${isFullWidth ? 7 : 5}, 1fr); } }
                     
                     .product-grid-item {
                         min-width: 0; /* important for grid items with text-truncate */
