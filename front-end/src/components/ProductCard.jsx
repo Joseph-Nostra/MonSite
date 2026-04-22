@@ -65,7 +65,7 @@ function ProductCard({ product, onAddToCart, user, handleEdit, handleDelete }) {
         </div>
 
         {/* ⭐ Stars */}
-        <div className="d-flex align-items-center gap-1 mb-2">
+        <div className="d-flex align-items-center gap-1 mb-2" style={{ cursor: 'pointer' }} onClick={() => navigate(`/product/${product.id}#reviews-section`)}>
             {[1,2,3,4,5].map(i => (
                 <i key={i} className={`bi bi-star${i <= Math.round(product.average_rating || 0) ? '-fill text-warning' : ''} small`}></i>
             ))}
