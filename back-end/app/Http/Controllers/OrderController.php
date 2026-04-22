@@ -15,6 +15,33 @@ use Illuminate\Support\Facades\Log;
 class OrderController extends Controller
 {
     /**
+     * 👥 Liste commandes CLIENT
+     */
+    public function index(Request $request)
+    {
+        $orders = Order::where('user_id', $request->user()->id)
+            ->with(['items', 'shipping'])
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'orders' => $orders
+        ]);
+    }
+
+    /**
+     * 📄 Détails commande CLIENT
+     */
+    public function show($id, Request $request)
+    {
+        $order = Order::with(['items', 'shipping'])
+            ->where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->firstOrFail();
+
+        return response()->json($order);
+    }
+    /**
      * 🏪 Liste commandes VENDEUR
      */
     public function sellerOrders(Request $request)
