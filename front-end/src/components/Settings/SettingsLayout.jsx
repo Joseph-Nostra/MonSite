@@ -11,8 +11,10 @@ import SellerOrders from './SellerOrders';
 import SellerProducts from './SellerProducts';
 import SellerCustomers from './SellerCustomers';
 import { LayoutDashboard, ShoppingBag, Package, Users } from 'lucide-react';
+import useDocTitle from '../../hooks/useDocTitle';
 
 const SettingsLayout = ({ setUser, user }) => {
+    useDocTitle('Tableau de bord');
     const location = useLocation();
     const isSeller = user?.role === 'vendeur' || user?.role === 'admin';
     const [activeTab, setActiveTab] = useState(location.state?.tab || (isSeller ? 'dash' : 'profile'));

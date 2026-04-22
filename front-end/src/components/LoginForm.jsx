@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import api from "../axios";
+import useDocTitle from "../hooks/useDocTitle";
 
 function LoginForm({ setUser }) {
+  useDocTitle("Connexion");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);

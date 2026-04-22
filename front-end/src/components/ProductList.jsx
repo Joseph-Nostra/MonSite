@@ -2,14 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import ProductCard from "./ProductCard";
 import api from "../axios";
+import useDocTitle from "../hooks/useDocTitle";
 
 function ProductList({ onAddToCart , user , handleEdit , handleDelete}) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const queryLabel = searchParams.get("q") || searchParams.get("usage") || searchParams.get("brand") || (searchParams.get("promo") ? "Promotions" : "");
+  
+  useDocTitle(queryLabel || "Nos Produits");
   const [products, setProducts] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const location = useLocation();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -45,9 +50,6 @@ function ProductList({ onAddToCart , user , handleEdit , handleDelete}) {
     window.scrollTo(0, 0);
     navigate(`/products?${params.toString()}`);
   };
-
-  const searchParams = new URLSearchParams(location.search);
-  const queryLabel = searchParams.get("q") || searchParams.get("usage") || searchParams.get("brand") || (searchParams.get("promo") ? "Promotions" : "");
 
   if (loading) return <div className="text-center py-5 mt-5"><div className="spinner-border text-primary"></div></div>;
   if (error) return <p className="mt-5 text-center text-danger">{error}</p>;

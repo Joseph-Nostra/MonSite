@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import useDocTitle from "../hooks/useDocTitle";
 
 export default function LandingPage({ user }) {
+  useDocTitle("Accueil");
   const navigate = useNavigate();
 
   useEffect(() => {

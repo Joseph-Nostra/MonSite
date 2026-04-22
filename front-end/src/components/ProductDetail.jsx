@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../axios"; // Import Axios configuré
+import useDocTitle from "../hooks/useDocTitle";
 
 function ProductDetail({ onAddToCart, user }) {
   const { id } = useParams();
@@ -9,6 +10,8 @@ function ProductDetail({ onAddToCart, user }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  useDocTitle(product ? product.title : "Chargement...");
 
   useEffect(() => {
     const fetchProduct = async () => {
