@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../axios';
-import { Camera, Save, CheckCircle } from 'lucide-react';
+import { Camera, Save, CheckCircle, Trash2 } from 'lucide-react';
 
 const ProfileSettings = ({ setUser }) => {
     const [user, setUserData] = useState(null);
@@ -10,6 +10,7 @@ const ProfileSettings = ({ setUser }) => {
     });
     const [avatarFile, setAvatarFile] = useState(null);
     const [avatarPreview, setAvatarPreview] = useState(null);
+    const [avatarDeleted, setAvatarDeleted] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState(null);
@@ -41,7 +42,14 @@ const ProfileSettings = ({ setUser }) => {
         if (file) {
             setAvatarFile(file);
             setAvatarPreview(URL.createObjectURL(file));
+            setAvatarDeleted(false);
         }
+    };
+
+    const handleRemoveAvatar = () => {
+        setAvatarFile(null);
+        setAvatarPreview(null);
+        setAvatarDeleted(true);
     };
 
     const handleSubmit = async (e) => {
@@ -52,6 +60,7 @@ const ProfileSettings = ({ setUser }) => {
         const data = new FormData();
         data.append('name', formData.name);
         data.append('phone', formData.phone);
+        data.append('avatar_deleted', avatarDeleted ? 'true' : 'false');
         if (avatarFile) {
             data.append('avatar', avatarFile);
         }
@@ -62,6 +71,8 @@ const ProfileSettings = ({ setUser }) => {
             setMessage({ type: 'success', text: res.data.message });
             setUserData(res.data.user);
             setUser(res.data.user);
+            setAvatarDeleted(false);
+            setAvatarFile(null);
         } catch (err) {
             setMessage({ type: 'error', text: err.response?.data?.message || 'Erreur lors de la sauvegarde' });
         } finally {
@@ -94,12 +105,23 @@ const ProfileSettings = ({ setUser }) => {
                                 </div>
                             )}
                         </div>
-                        <label htmlFor="avatar" className="position-absolute bottom-0 end-0 bg-primary text-white p-2 rounded-circle shadow-sm cursor-pointer" style={{ cursor: 'pointer' }}>
+                        <label htmlFor="avatar" className="position-absolute bottom-0 end-0 bg-primary text-white p-2 rounded-circle shadow-sm cursor-pointer" style={{ cursor: 'pointer', transform: 'translate(25%, 25%)' }}>
                             <Camera size={18} />
                             <input type="file" id="avatar" className="d-none" accept="image/*" onChange={handleAvatarChange} />
                         </label>
+                        {avatarPreview && (
+                            <button 
+                                type="button" 
+                                onClick={handleRemoveAvatar}
+                                className="position-absolute top-0 end-0 bg-danger text-white p-2 rounded-circle shadow-sm border-0" 
+                                style={{ transform: 'translate(25%, -25%)' }}
+                                title="Supprimer la photo"
+                            >
+                                <Trash2 size={18} />
+                            </button>
+                        )}
                     </div>
-                    <p className="mt-3 text-muted small">Cliquez sur l'icône pour changer votre photo</p>
+                    <p className="mt-4 text-muted small">Cliquez sur l'icône pour changer ou supprimer votre photo</p>
                 </div>
 
                 <div className="row g-4">

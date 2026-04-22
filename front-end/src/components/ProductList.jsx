@@ -72,7 +72,19 @@ function ProductList({ onAddToCart , user , handleEdit , handleDelete}) {
         </div>
       ) : (
         <>
-            <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+            <div className="row g-4 row-cols-7-custom">
+                <style>{`
+                    .row-cols-7-custom {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                        gap: 1.5rem;
+                    }
+                    @media (min-width: 1400px) {
+                        .row-cols-7-custom {
+                            grid-template-columns: repeat(7, 1fr);
+                        }
+                    }
+                `}</style>
             {products.map((product) => (
                 <div className="col" key={product.id}>
                 <ProductCard product={product} onAddToCart={onAddToCart} user={user} handleEdit={handleEdit} handleDelete={handleDelete}/>
