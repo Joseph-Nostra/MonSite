@@ -11,47 +11,57 @@ class ProductController extends Controller
     // 🔹 Liste tous les produits
     public function index(Request $request)
     {
-        $query = Product::with('user:id,name,email');
+        $query = Product::with('user:id,name,email')->where('is_active', true);
 
-        // Search
+        // Search engine (covers title, description, brand, specs)
         if ($request->filled('q')) {
             $searchTerm = $request->q;
             $query->where(function($q) use ($searchTerm) {
                 $q->where('title', 'like', '%' . $searchTerm . '%')
                   ->orWhere('description', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('brand', 'like', '%' . $searchTerm . '%');
+                  ->orWhere('brand', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('cpu', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('gpu', 'like', '%' . $searchTerm . '%');
             });
         }
 
-        // Filters
-        if ($request->has('usage')) {
-            $query->where('usage', $request->usage);
-        }
-        if ($request->has('brand')) {
+        // Technical Filters
+        if ($request->filled('brand')) {
             $query->where('brand', $request->brand);
         }
-        if ($request->has('performance')) {
+        if ($request->filled('usage')) {
+            $query->where('usage', $request->usage);
+        }
+        if ($request->filled('performance')) {
             $query->where('performance_level', $request->performance);
+        }
+        if ($request->filled('ram')) {
+            $query->where('ram', 'like', '%' . $request->ram . '%');
+        }
+        if ($request->filled('cpu_type')) { // e.g. i7, Ryzen
+            $query->where('cpu', 'like', '%' . $request->cpu_type . '%');
+        }
+        if ($request->filled('gpu_type')) {
+            $query->where('gpu', 'like', '%' . $request->gpu_type . '%');
+        }
+        
+        // Pricing Filters
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', (float)$request->min_price);
+        }
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', (float)$request->max_price);
+        }
+
+        // Legacy/Special Filters
+        if ($request->has('promo')) {
+            $query->where('discount_rate', '>', 0);
         }
         if ($request->has('new')) {
             $query->where('is_new', $request->new === 'true');
         }
-        if ($request->has('promo')) {
-            $query->where('discount_rate', '>', 0);
-        }
-        if ($request->has('budget')) {
-            // Logic for budget ranges like "budget=5000-8000"
-            $range = explode('-', $request->budget);
-            if (count($range) === 2) {
-                $query->whereBetween('price', [(float)$range[0], (float)$range[1]]);
-            } elseif (str_contains($request->budget, '+')) {
-                $query->where('price', '>=', (float)$request->budget);
-            } else {
-                $query->where('price', '<=', (float)$request->budget);
-            }
-        }
 
-        if ($request->has('seller_id')) {
+        if ($request->filled('seller_id')) {
             $query->where('user_id', $request->seller_id);
         }
 
@@ -101,7 +111,8 @@ class ProductController extends Controller
         'discount_rate' => 'nullable|numeric|min:0|max:100',
         'cpu' => 'nullable|string',
         'ram' => 'nullable|string',
-        'storage' => 'nullable|string',
+        'storage_type' => 'nullable|string',
+        'storage_capacity' => 'nullable|string',
         'gpu' => 'nullable|string',
         'screen_size' => 'nullable|string',
     ]);
@@ -124,7 +135,8 @@ class ProductController extends Controller
         'discount_rate' => $request->discount_rate ?? 0,
         'cpu' => $request->cpu,
         'ram' => $request->ram,
-        'storage' => $request->storage,
+        'storage_type' => $request->storage_type,
+        'storage_capacity' => $request->storage_capacity,
         'gpu' => $request->gpu,
         'screen_size' => $request->screen_size,
     ]);
@@ -159,7 +171,8 @@ class ProductController extends Controller
         'discount_rate' => 'sometimes|nullable|numeric|min:0|max:100',
         'cpu' => 'sometimes|nullable|string',
         'ram' => 'sometimes|nullable|string',
-        'storage' => 'sometimes|nullable|string',
+        'storage_type' => 'sometimes|nullable|string',
+        'storage_capacity' => 'sometimes|nullable|string',
         'gpu' => 'sometimes|nullable|string',
         'screen_size' => 'sometimes|nullable|string',
         'is_active' => 'sometimes|boolean',
