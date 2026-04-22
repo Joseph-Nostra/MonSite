@@ -63,7 +63,7 @@ export default function CartSidebar({ cart, setCart, user }) {
     }
 
     // Validation basique shipping
-    if (!shippingAddress.address || !shippingAddress.city || !shippingAddress.phone) {
+    if (!shippingAddress.full_name || !shippingAddress.address || !shippingAddress.city || !shippingAddress.zip_code || !shippingAddress.phone) {
       setNotification({ message: "Veuillez remplir toutes les informations de livraison", type: "error" });
       return;
     }
@@ -84,11 +84,15 @@ export default function CartSidebar({ cart, setCart, user }) {
         // Le bouton PayPal est déjà affiché ou on attend l'action
         setNotification({ message: "Veuillez finaliser via le bouton PayPal", type: "info" });
       } else {
-        setNotification({ message: res.data.message || "Commande réussie !", type: "success" });
+        const successMsg = paymentMethod === 'delivery' 
+          ? "Commande enregistrée ! Vous payerez à la livraison."
+          : (res.data.message || "Commande réussie !");
+          
+        setNotification({ message: successMsg, type: "success" });
         setTimeout(() => {
           setCart([]);
           navigate("/orders");
-        }, 2000);
+        }, 3000);
       }
     } catch (err) {
       console.error(err);
@@ -267,6 +271,7 @@ export default function CartSidebar({ cart, setCart, user }) {
             {paymentMethod === 'paypal' && orderInProgress && (
               <div className="mt-4 animate-in">
                 <PayPalButtons 
+                  fundingSource="paypal" // Uniquement PayPal ici
                   createOrder={(data, actions) => {
                     return actions.order.create({
                       purchase_units: [{ amount: { value: totalPrice.toFixed(2) } }]

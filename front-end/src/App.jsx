@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
+
+const ProtectedRoute = ({ user, loading, children }) => {
+  if (loading) return <div className="text-center mt-5"><div className="spinner-border text-primary"></div></div>;
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+};
 
 import ProductList from "./components/ProductList";
 import CartSidebar from "./components/CartSidebar";
@@ -11,6 +17,8 @@ import Orders from "./components/Orders";
 import Footer from "./components/Footer";
 import Contacts from "./components/Contacts";
 import AddProductForm from "./components/AddProductForm";
+import StripePayment from './components/StripePayment';
+import SettingsLayout from './components/Settings/SettingsLayout';
 import Notifications from "./components/Notification";
 import Messages from "./components/Messages";
 import Chat from "./components/Chat";
@@ -157,16 +165,11 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
           <Route path="/orders/:id" element={user && user.role === 'client' ? <OrderDetails /> : <p className="text-center mt-5 text-danger">Accès réservé aux clients</p>} />
           <Route path="/contact" element={<Contacts />} />
           
-          <Route path="/notifications" element={user ? (<Notifications />) : (
-            <p className="text-center mt-5">Veuillez vous connecter</p>
-          )
-          }
-          />
-
+          <Route path="/notifications" element={<Navigate to="/settings" state={{ tab: 'notifications' }} replace />} />
           <Route path="/messages" element={<Messages user={user} />} />
           <Route path="/chat/:otherUserId" element={<Chat user={user} />} />
-          <Route path="/profile" element={<div className="container mt-5"><h3>Mon Profil</h3><p>Page en cours de construction...</p></div>} />
-          <Route path="/settings" element={<div className="container mt-5"><h3>Paramètres</h3><p>Page en cours de construction...</p></div>} />
+          <Route path="/profile" element={<ProtectedRoute user={user} loading={loading}><SettingsLayout setUser={setUser} user={user} /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute user={user} loading={loading}><SettingsLayout setUser={setUser} user={user} /></ProtectedRoute>} />
           <Route path="/my-products" element={<div className="container mt-5"><h3>Mes Produits</h3><p>Page en cours de construction...</p></div>} />
           <Route path="/stats" element={<div className="container mt-5"><h3>Statistiques</h3><p>Page en cours de construction...</p></div>} />
 

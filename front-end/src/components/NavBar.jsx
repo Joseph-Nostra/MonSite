@@ -9,7 +9,7 @@ export default function NavBar({ user, setUser, loading }) {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const showSearch = location.pathname === "/products" || location.pathname === "/";
+  const showSearch = location.pathname === "/products";
 
   useEffect(() => {
     if (!user) return;
@@ -102,17 +102,15 @@ export default function NavBar({ user, setUser, loading }) {
                 {unreadMessages > 0 && <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-dark border-2 notification-badge">{unreadMessages}</span>}
               </button>
 
-              {/* NOTIFICATIONS */}
-              <button className="btn-icon-nav position-relative" onClick={() => navigate("/notifications")} title="Notifications">
-                <i className="bi bi-bell fs-5"></i>
-                {unread > 0 && <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark border border-dark border-2 notification-badge">{unread}</span>}
-              </button>
-
               {/* DROPDOWN MENU */}
               <div className="dropdown ms-1">
                 <button className="user-profile-btn dropdown-toggle border-0" data-bs-toggle="dropdown" aria-expanded="false" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                  <div className="user-avatar text-white">
-                    {user.name.charAt(0).toUpperCase()}
+                  <div className="user-avatar text-white overflow-hidden">
+                    {user.avatar ? (
+                      <img src={`http://127.0.0.1:8000/storage/${user.avatar}`} alt="" className="w-100 h-100 object-fit-cover" />
+                    ) : (
+                      user.name.charAt(0).toUpperCase()
+                    )}
                   </div>
                   <span className="user-name d-none d-xl-inline text-white ms-2 fw-semibold">{user.name}</span>
                   <i className="bi bi-chevron-down small ms-1 text-white-50"></i>
