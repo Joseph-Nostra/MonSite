@@ -5,6 +5,7 @@ import api from "../axios";
 
 function ProductList({ onAddToCart , user , handleEdit , handleDelete}) {
   const [products, setProducts] = useState([]);
+  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const location = useLocation();
@@ -14,7 +15,13 @@ function ProductList({ onAddToCart , user , handleEdit , handleDelete}) {
       setLoading(true);
       try {
         const res = await api.get(`/products${location.search}`);
-        setProducts(res.data);
+        if (res.data.data) {
+            setProducts(res.data.data);
+            setPagination(res.data);
+        } else {
+            setProducts(res.data);
+            setPagination(null);
+        }
         setError(null);
       } catch (err) {
         console.error(err);
@@ -25,6 +32,18 @@ function ProductList({ onAddToCart , user , handleEdit , handleDelete}) {
     };
     fetchProducts();
   }, [location.search]);
+
+  const handlePageChange = (url) => {
+    if (!url) return;
+    const urlObj = new URL(url);
+    const page = urlObj.searchParams.get('page');
+    
+    const params = new URLSearchParams(location.search);
+    params.set('page', page);
+    
+    window.scrollTo(0, 0);
+    navigate(`/products?${params.toString()}`);
+  };
 
   const searchParams = new URLSearchParams(location.search);
   const queryLabel = searchParams.get("q") || searchParams.get("usage") || searchParams.get("brand") || (searchParams.get("promo") ? "Promotions" : "");
@@ -39,8 +58,10 @@ function ProductList({ onAddToCart , user , handleEdit , handleDelete}) {
             {queryLabel ? `🔍 Résultats pour "${queryLabel}"` : "🛍️ Nos Produits"}
         </h4>
         <div className="d-flex align-items-center gap-3">
-            {location.search && <Link to="/products" className="btn btn-sm btn-outline-secondary rounded-pill">Effacer les filtres</Link>}
-            <span className="badge bg-light text-dark border p-2 px-3 rounded-pill" style={{ fontSize: '14px' }}>{products.length} produits</span>
+            {location.search && !location.search.startsWith('?page') && <Link to="/products" className="btn btn-sm btn-outline-secondary rounded-pill">Effacer les filtres</Link>}
+            <span className="badge bg-light text-dark border p-2 px-3 rounded-pill" style={{ fontSize: '14px' }}>
+                {pagination ? pagination.total : products.length} produits
+            </span>
         </div>
       </div>
 
@@ -50,13 +71,32 @@ function ProductList({ onAddToCart , user , handleEdit , handleDelete}) {
             <p className="small text-secondary mt-2">Essayez d'autres termes ou effacez les filtres.</p>
         </div>
       ) : (
-        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
-          {products.map((product) => (
-            <div className="col" key={product.id}>
-              <ProductCard product={product} onAddToCart={onAddToCart} user={user} handleEdit={handleEdit} handleDelete={handleDelete}/>
+        <>
+            <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+            {products.map((product) => (
+                <div className="col" key={product.id}>
+                <ProductCard product={product} onAddToCart={onAddToCart} user={user} handleEdit={handleEdit} handleDelete={handleDelete}/>
+                </div>
+            ))}
             </div>
-          ))}
-        </div>
+
+            {/* Pagination Controls */}
+            {pagination && pagination.last_page > 1 && (
+                <nav className="mt-5 mb-4 d-flex justify-content-center">
+                    <ul className="pagination mb-0">
+                        {pagination.links.map((link, idx) => (
+                            <li key={idx} className={`page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}`}>
+                                <button 
+                                    className="page-link rounded-pill mx-1 border-0 shadow-sm"
+                                    onClick={() => handlePageChange(link.url)}
+                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                />
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+            )}
+        </>
       )}
     </div>
   );

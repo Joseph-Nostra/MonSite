@@ -7,27 +7,43 @@ import AddressSettings from './AddressSettings';
 import PaymentSettings from './PaymentSettings';
 import SellerPaymentSettings from './SellerPaymentSettings';
 import NotificationsSettings from './NotificationsSettings';
+import SellerOrders from './SellerOrders';
+import SellerProducts from './SellerProducts';
+import SellerCustomers from './SellerCustomers';
+import { LayoutDashboard, ShoppingBag, Package, Users } from 'lucide-react';
 
 const SettingsLayout = ({ setUser, user }) => {
     const location = useLocation();
-    const [activeTab, setActiveTab] = useState(location.state?.tab || 'profile');
-
     const isSeller = user?.role === 'vendeur' || user?.role === 'admin';
+    const [activeTab, setActiveTab] = useState(location.state?.tab || (isSeller ? 'dash' : 'profile'));
 
-    const menuItems = [
+    const menuItems = isSeller ? [
+        { id: 'dash', label: 'Dashboard', icon: <LayoutDashboard size={20} />, color: '#4f46e5' },
+        { id: 'orders-seller', label: 'Mes Commandes', icon: <ShoppingBag size={20} />, color: '#10b981' },
+        { id: 'products-seller', label: 'Mes Produits', icon: <Package size={20} />, color: '#f59e0b' },
+        { id: 'customers', label: 'Mes Clients', icon: <Users size={20} />, color: '#8b5cf6' },
+        { id: 'profile', label: 'Profil', icon: <User size={20} />, color: '#6366f1' },
+        { id: 'addresses', label: 'Adresses', icon: <MapPin size={20} />, color: '#10b981' },
+        { id: 'notifications', label: 'Notifications', icon: <Bell size={20} />, color: '#3b82f6' },
+        { id: 'security', label: 'Sécurité', icon: <Shield size={20} />, color: '#ef4444' },
+    ] : [
         { id: 'profile', label: 'Profil', icon: <User size={20} />, color: '#4f46e5' },
         { id: 'security', label: 'Sécurité', icon: <Shield size={20} />, color: '#ef4444' },
         { id: 'addresses', label: 'Adresses', icon: <MapPin size={20} />, color: '#10b981' },
-        { id: 'payments', label: isSeller ? 'Revenus' : 'Paiements', icon: <CreditCard size={20} />, color: '#f59e0b' },
+        { id: 'payments', label: 'Paiements', icon: <CreditCard size={20} />, color: '#f59e0b' },
         { id: 'notifications', label: 'Notifications', icon: <Bell size={20} />, color: '#3b82f6' },
     ];
 
     const renderContent = () => {
         switch (activeTab) {
+            case 'dash': return <SellerPaymentSettings />;
+            case 'orders-seller': return <SellerOrders />;
+            case 'products-seller': return <SellerProducts />;
+            case 'customers': return <SellerCustomers />;
             case 'profile': return <ProfileSettings setUser={setUser} />;
             case 'security': return <SecuritySettings />;
             case 'addresses': return <AddressSettings />;
-            case 'payments': return isSeller ? <SellerPaymentSettings /> : <PaymentSettings />;
+            case 'payments': return <PaymentSettings />;
             case 'notifications': return <NotificationsSettings user={user} />;
             default: return <div className="p-5 text-center text-muted">Bientôt disponible...</div>;
         }

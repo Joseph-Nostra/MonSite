@@ -118,7 +118,7 @@ const ProfileSettings = ({ setUser }) => {
                         <input
                             type="email"
                             className="form-control form-control-lg bg-light border-0 py-3 rounded-3"
-                            value={user?.email}
+                            value={user?.email || ''}
                             disabled
                         />
                         <p className="small text-muted mt-1">L'email ne peut pas être modifié</p>

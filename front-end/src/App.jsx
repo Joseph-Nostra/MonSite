@@ -175,20 +175,31 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
           <Route path="/info/:slug" element={<InfoPage />} />
           <Route path="/profile" element={<ProtectedRoute user={user} loading={loading}><SettingsLayout setUser={setUser} user={user} /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute user={user} loading={loading}><SettingsLayout setUser={setUser} user={user} /></ProtectedRoute>} />
-          <Route path="/my-products" element={<div className="container mt-5"><h3>Mes Produits</h3><p>Page en cours de construction...</p></div>} />
-          <Route path="/stats" element={<div className="container mt-5"><h3>Statistiques</h3><p>Page en cours de construction...</p></div>} />
+          <Route path="/dashboard" element={<ProtectedRoute user={user} loading={loading}><SettingsLayout setUser={setUser} user={user} /></ProtectedRoute>} />
+          
+          {/* Redirects for seller modules using state */}
+          <Route path="/my-products" element={<Navigate to="/settings" state={{ tab: 'products-seller' }} replace />} />
+          <Route path="/stats" element={<Navigate to="/settings" state={{ tab: 'dash' }} replace />} />
+          <Route path="/seller/orders" element={<Navigate to="/settings" state={{ tab: 'orders-seller' }} replace />} />
 
-
-          {/* ADD PRODUCT (ROLE PROTECTED) */}
+          {/* ADD / EDIT PRODUCT (ROLE PROTECTED) */}
           <Route
             path="/add-product"
             element={
               user && (user.role === "vendeur" || user.role === "admin") ? (
                 <AddProductForm user={user} />
               ) : (
-                <p className="text-center mt-5 text-danger">
-                  Accès refusé
-                </p>
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/edit-product/:id"
+            element={
+              user && (user.role === "vendeur" || user.role === "admin") ? (
+                <AddProductForm user={user} isEdit={true} />
+              ) : (
+                <Navigate to="/login" />
               )
             }
           />

@@ -45,6 +45,14 @@ function ProductDetail({ onAddToCart, user }) {
 
       <div className="card-body">
         <h3 className="card-title">{product.title}</h3>
+        {product.user && (
+          <div className="mb-2 d-flex align-items-center gap-2">
+            <span className="badge bg-light text-dark border">Vendeur: {product.user.name}</span>
+            <Link to={`/products?seller_id=${product.user_id}`} className="small text-decoration-none">
+              Voir tous ses produits
+            </Link>
+          </div>
+        )}
         <p className="card-text">{product.description}</p>
         <p className="card-text fw-bold">${product.price}</p>
         <div className={`d-flex ${user && user.role === 'client' ? 'justify-content-between' : 'justify-content-end'}`}>

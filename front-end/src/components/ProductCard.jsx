@@ -20,7 +20,15 @@ function ProductCard({ product, onAddToCart, user, handleEdit, handleDelete }) {
       </div>
 
       <div className="card-body d-flex flex-column p-3">
-        <h5 className="card-title text-truncate">{product.title}</h5>
+        <h5 className="card-title text-truncate mb-1">{product.title}</h5>
+        {product.user && (
+          <p className="mb-2" style={{ fontSize: '11px' }}>
+            <span className="text-muted">Par </span>
+            <Link to={`/products?seller_id=${product.user_id}`} className="fw-bold text-decoration-none">
+              {product.user.name}
+            </Link>
+          </p>
+        )}
         <p className="card-text text-muted small" style={{ height: "3em", overflow: "hidden" }}>{product.description}</p>
         <p className="fw-bold fs-5 text-primary mb-3">${product.price}</p>
 
