@@ -208,15 +208,17 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
           <Route
             path="/products"
             element={
-              <div className="row">
-                <div className="col-md-9">
+              <div className="row g-0">
+                <div className="col-12">
                   <ProductList onAddToCart={handleAddToCart} user={user}  handleEdit={handleEdit} handleDelete={handleDelete}/>
                 </div>
-                <div className="col-md-3">
-                  {user && user.role === 'client' && (
-                    <CartSidebar cart={cart} setCart={setCart} user={user} />
-                    )}
-                </div>
+                {user && user.role === 'client' && (
+                  <div className="col-12 mt-4 px-4">
+                     <hr />
+                     <h5 className="fw-bold mb-3">🛒 Votre Panier</h5>
+                     <CartSidebar cart={cart} setCart={setCart} user={user} />
+                  </div>
+                )}
               </div>
             }
           />

@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import ProductCard from "./ProductCard";
 import api from "../axios";
@@ -52,7 +53,7 @@ function ProductList({ onAddToCart , user , handleEdit , handleDelete}) {
   if (error) return <p className="mt-5 text-center text-danger">{error}</p>;
 
   return (
-    <div className="container-fluid px-4">
+    <div className="container-fluid px-2 overflow-hidden">
       <div className="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h4 className="fw-bold m-0 text-dark">
             {queryLabel ? `🔍 Résultats pour "${queryLabel}"` : "🛍️ Nos Produits"}
