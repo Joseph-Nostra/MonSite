@@ -1,6 +1,6 @@
 // src/components/ProductDetail.jsx
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../axios"; // Import Axios configuré
 
 function ProductDetail({ onAddToCart, user }) {
