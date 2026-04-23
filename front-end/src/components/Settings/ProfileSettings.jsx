@@ -70,8 +70,12 @@ const ProfileSettings = ({ setUser }) => {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             setMessage({ type: 'success', text: res.data.message });
-            setUserData(res.data.user);
-            setUser(res.data.user);
+            
+            // 🔥 Update both local and global state
+            const updatedUser = res.data.user;
+            setUserData(updatedUser);
+            setUser(updatedUser);
+            
             setAvatarDeleted(false);
             setAvatarFile(null);
         } catch (err) {

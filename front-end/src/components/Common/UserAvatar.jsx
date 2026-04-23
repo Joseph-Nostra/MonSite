@@ -1,7 +1,8 @@
 import React from 'react';
 
-const UserAvatar = ({ name = "User", size = 40, className = "" }) => {
+const UserAvatar = ({ name = "User", src = null, size = 40, className = "" }) => {
     const getInitials = (name) => {
+        if (!name) return "U";
         return name
             .split(' ')
             .map(word => word[0])
@@ -16,6 +17,7 @@ const UserAvatar = ({ name = "User", size = 40, className = "" }) => {
     ];
 
     const getColorIndex = (name) => {
+        if (!name) return 0;
         let hash = 0;
         for (let i = 0; i < name.length; i++) {
             hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -24,6 +26,19 @@ const UserAvatar = ({ name = "User", size = 40, className = "" }) => {
     };
 
     const backgroundColor = colors[getColorIndex(name)];
+
+    // Si on a un src (avatar), on affiche l'image
+    if (src) {
+        const fullSrc = src.startsWith('http') ? src : `http://127.0.0.1:8000/storage/${src}`;
+        return (
+            <div 
+                className={`rounded-circle shadow-sm overflow-hidden border-2 border-white border-opacity-25 ${className}`}
+                style={{ width: `${size}px`, height: `${size}px` }}
+            >
+                <img src={fullSrc} alt={name} className="w-100 h-100 object-fit-cover" />
+            </div>
+        );
+    }
 
     return (
         <div 

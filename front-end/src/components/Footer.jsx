@@ -19,7 +19,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-slate-900 pt-5 pb-4 border-top border-secondary border-opacity-10" style={{ backgroundColor: '#0f172a', color: '#94a3b8' }}>
+    <footer className="pt-5 pb-4 border-top" style={{ backgroundColor: '#0f172a', color: '#94a3b8', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
       <div className="container">
         <div className="row gy-5 mb-5 align-items-start">
           {/* Brand Column */}

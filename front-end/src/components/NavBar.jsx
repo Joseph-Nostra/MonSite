@@ -50,7 +50,7 @@ export default function NavBar({ user, setUser, loading, theme, setTheme }) {
   };
 
   return (
-    <header className="fixed-top border-bottom shadow-lg navbar-custom" style={{ height: '70px', zIndex: 1050 }}>
+    <header className="fixed-top shadow-lg navbar-custom" style={{ height: '70px', zIndex: 1050, backgroundColor: '#0f172a', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
       <div className="h-100 px-4 d-grid align-items-center" style={{ gridTemplateColumns: '1fr auto 1fr', gap: '20px' }}>
         
         {/* 🧱 1. LOGO (GAUCHE) */}
@@ -125,22 +125,22 @@ export default function NavBar({ user, setUser, loading, theme, setTheme }) {
               <div className="dropdown ms-1">
                 <button className="user-profile-btn dropdown-toggle border-0" data-bs-toggle="dropdown" aria-expanded="false" style={{ background: 'rgba(255,255,255,0.05)' }}>
                   <div className="d-flex align-items-center gap-2">
-                    <UserAvatar name={user.name} size={34} />
-                    <div className="flex-grow-1 overflow-hidden d-none d-xl-block">
+                    <UserAvatar name={user.name} src={user.avatar} size={34} />
+                    <div className="flex-grow-1 overflow-hidden d-none d-xl-block text-start">
                         <div className="fw-bold text-truncate text-white" style={{ fontSize: '14px' }}>{user.name}</div>
-                        <div className="small text-white-50 d-flex align-items-center gap-1" style={{ fontSize: '11px' }}>
+                        <div className="small text-muted d-flex align-items-center gap-1" style={{ fontSize: '11px' }}>
                             <span className="dot bg-success rounded-circle" style={{ width: '6px', height: '6px' }}></span> {t('online')}
                         </div>
                     </div>
-                    <i className="bi bi-chevron-down small ms-1 text-white-50"></i>
+                    <i className="bi bi-chevron-down small ms-1 text-muted"></i>
                   </div>
                 </button>
                 <ul className="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-3 py-2 animate-dropdown" style={{ minWidth: '240px' }}>
                   <div className="px-4 py-3 mb-1 bg-light rounded-top-4 mx-2 mt-2">
                       <div className="d-flex align-items-center gap-3">
-                        <UserAvatar name={user.name} size={45} />
+                        <UserAvatar name={user.name} src={user.avatar} size={45} />
                         <div className="overflow-hidden">
-                            <p className="mb-0 fw-bold text-dark text-truncate">{user.name}</p>
+                            <p className="mb-0 fw-bold text-white text-truncate">{user.name}</p>
                             <p className="mb-0 text-muted" style={{ fontSize: '11px' }}>{t('account')} {user.role.toUpperCase()}</p>
                         </div>
                       </div>

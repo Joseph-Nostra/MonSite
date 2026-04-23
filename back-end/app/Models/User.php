@@ -49,6 +49,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'notification_preferences' => 'array',
+        'last_seen_at' => 'datetime',
+        'is_online' => 'boolean',
     ];
 
     // Relation commandes

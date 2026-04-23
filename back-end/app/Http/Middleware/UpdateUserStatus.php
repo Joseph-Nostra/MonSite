@@ -19,7 +19,8 @@ class UpdateUserStatus
             $user = auth()->user();
             
             // Only update if it's been more than a minute to avoid excessive DB writes
-            if (!$user->is_online || ( $user->last_seen_at && $user->last_seen_at->diffInMinutes(now()) >= 1)) {
+            $lastSeen = $user->last_seen_at;
+            if (!$user->is_online || !$lastSeen || $lastSeen->diffInMinutes(now()) >= 1) {
                 $user->update([
                     'last_seen_at' => now(),
                     'is_online' => true
