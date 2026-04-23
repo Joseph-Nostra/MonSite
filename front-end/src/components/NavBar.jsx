@@ -46,7 +46,7 @@ export default function NavBar({ user, setUser, loading, theme, setTheme }) {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    navigate(`/products?search=${searchTerm}`);
+    navigate(`/products?q=${searchTerm}`);
   };
 
   return (
