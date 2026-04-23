@@ -47,7 +47,16 @@ const resources = {
       "products": "produits",
       "empty_wishlist_title": "Votre liste est vide",
       "empty_wishlist_desc": "Vous n'avez pas encore ajouté de produits à vos favoris.",
-      "soon_available": "Bientôt disponible..."
+      "soon_available": "Bientôt disponible...",
+      "my_messages_title": "Mes Messages",
+      "search_conversation": "Rechercher une conversation...",
+      "no_conversations": "Aucune conversation pour le moment.",
+      "write_message": "Écrivez votre message...",
+      "results_for": "Résultats pour",
+      "shipping": "Livraison",
+      "payment": "Paiement",
+      "discussion": "Discussion",
+      "online": "En ligne"
     }
   },
   en: {
@@ -94,7 +103,16 @@ const resources = {
       "products": "products",
       "empty_wishlist_title": "Your list is empty",
       "empty_wishlist_desc": "You haven't added any products to your favorites yet.",
-      "soon_available": "Soon available..."
+      "soon_available": "Soon available...",
+      "my_messages_title": "My Messages",
+      "search_conversation": "Search conversation...",
+      "no_conversations": "No conversations yet.",
+      "write_message": "Write your message...",
+      "results_for": "Results for",
+      "shipping": "Shipping",
+      "payment": "Payment",
+      "discussion": "Discussion",
+      "online": "Online"
     }
   },
   ar: {
@@ -141,7 +159,16 @@ const resources = {
       "products": "منتجات",
       "empty_wishlist_title": "قائمتك فارغة",
       "empty_wishlist_desc": "لم تضف أي منتجات إلى مفضلاتك بعد.",
-      "soon_available": "قريباً..."
+      "soon_available": "قريباً...",
+      "my_messages_title": "رسائلي",
+      "search_conversation": "البحث عن محادثة...",
+      "no_conversations": "لا توجد محادثات بعد.",
+      "write_message": "اكتب رسالتك...",
+      "results_for": "نتائج البحث عن",
+      "shipping": "الشحن",
+      "payment": "الدفع",
+      "discussion": "مناقشة",
+      "online": "متصل"
     }
   }
 };

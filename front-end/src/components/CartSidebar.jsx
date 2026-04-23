@@ -31,6 +31,8 @@ export default function CartSidebar({ cart, setCart, user }) {
     setTotalPrice(total);
   }, [cart]);
 
+  const { t } = useTranslation();
+
   const updateQuantity = async (id, delta) => {
     const item = cart.find((i) => i.id === id);
     if (!item) return;
@@ -123,9 +125,9 @@ export default function CartSidebar({ cart, setCart, user }) {
     <div className="cart-sidebar-premium card border-0 shadow-lg overflow-hidden" style={{ borderRadius: '20px', background: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(10px)' }}>
       <div className="card-header bg-dark text-white p-4 border-0 d-flex justify-content-between align-items-center">
         <h5 className="mb-0 fw-bold">
-          {step === 1 && "🛒 Votre Panier"}
-          {step === 2 && "🚚 Livraison"}
-          {step === 3 && "💳 Paiement"}
+          {step === 1 && ""}
+          {step === 2 && t('shipping')}
+          {step === 3 && t('payment')}
         </h5>
         {step > 1 && (
           <button className="btn btn-sm btn-outline-light border-0" onClick={() => setStep(step - 1)}>

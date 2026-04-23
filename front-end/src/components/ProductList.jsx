@@ -58,12 +58,12 @@ function ProductList({ onAddToCart , user , handleEdit , handleDelete, isFullWid
     <div className="container-fluid px-2 overflow-hidden">
       <div className="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h4 className="fw-bold m-0 text-dark">
-            {queryLabel ? `🔍 Résultats pour "${queryLabel}"` : "🛍️ Nos Produits"}
+            {queryLabel ? `🔍 ${t('results_for')} "${queryLabel}"` : ""}
         </h4>
         <div className="d-flex align-items-center gap-3">
             {location.search && !location.search.startsWith('?page') && <Link to="/products" className="btn btn-sm btn-outline-secondary rounded-pill">Effacer les filtres</Link>}
             <span className="badge bg-light text-dark border p-2 px-3 rounded-pill" style={{ fontSize: '14px' }}>
-                {pagination ? pagination.total : products.length} produits
+                {pagination ? pagination.total : products.length} {t('products')}
             </span>
         </div>
       </div>

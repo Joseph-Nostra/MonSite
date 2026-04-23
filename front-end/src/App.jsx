@@ -172,7 +172,7 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
       
       <NavBar user={user} setUser={setUser} loading={loading} theme={theme} setTheme={setTheme} />
 
-      <main className="flex-fill container-fluid mt-5 pt-3">
+      <main className="flex-grow-1 container-fluid mt-5 pt-3">
         <Routes>
           <Route path="/" element={<LandingPage user={user} />} />
           {/* AUTH */}
@@ -236,7 +236,7 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
                       <ProductList onAddToCart={handleAddToCart} user={user} handleEdit={handleEdit} handleDelete={handleDelete} isFullWidth={false} />
                     </div>
                     <div className="col-md-3 bg-light p-4 sticky-top" style={{ top: '70px', height: 'calc(100vh - 70px)', overflowY: 'auto' }}>
-                       <h5 className="fw-bold mb-4 border-bottom pb-2 mt-2">🛒 Votre Panier</h5>
+                       {/* <h5 className="fw-bold mb-4 border-bottom pb-2 mt-2">🛒 Votre Panier</h5> */}
                        <CartSidebar cart={cart} setCart={setCart} user={user} />
                     </div>
                   </>

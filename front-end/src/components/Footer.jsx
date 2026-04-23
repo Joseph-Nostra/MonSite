@@ -32,10 +32,10 @@ export default function Footer() {
             </p>
             <div className="d-flex gap-2">
               {[
-                { icon: FaFacebookF, color: '#1877F2', link: '#' },
-                { icon: FaInstagram, color: '#E4405F', link: '#' },
-                { icon: FaTwitter, color: '#1DA1F2', link: '#' },
-                { icon: FaYoutube, color: '#FF0000', link: '#' }
+                { icon: FaFacebookF, color: '#1877F2', link: 'https://facebook.com' },
+                { icon: FaInstagram, color: '#E4405F', link: 'https://instagram.com' },
+                { icon: FaTwitter, color: '#1DA1F2', link: 'https://twitter.com' },
+                { icon: FaYoutube, color: '#FF0000', link: 'https://youtube.com' }
               ].map((social, idx) => (
                 <a 
                     key={idx} 
