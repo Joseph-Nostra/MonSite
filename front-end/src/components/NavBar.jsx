@@ -3,10 +3,9 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import api from "../axios";
 import Logo from "./Common/Logo";
 import { useTranslation } from "react-i18next";
-import i18n from "../i18n";
 
 export default function NavBar({ user, setUser, loading, theme, setTheme }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [unread, setUnread] = useState(0);

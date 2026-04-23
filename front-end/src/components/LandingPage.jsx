@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useDocTitle from "../hooks/useDocTitle";
+import { useTranslation } from "react-i18next";
 
 export default function LandingPage({ user }) {
-  useDocTitle("Accueil");
+  const { t } = useTranslation();
+  useDocTitle(t('welcome'));
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,16 +30,16 @@ export default function LandingPage({ user }) {
       >
         <div className="container">
           <h1 className="display-2 fw-bold mb-4 animate__animated animate__fadeInDown">
-            Bienvenue sur <span className="text-warning">MonSite</span>
+            {t('hero_title')} <span className="text-warning">MonSite</span>
           </h1>
           <p className="lead mb-5 fs-4 animate__animated animate__fadeInUp">
-            Découvrez une collection unique de produits exceptionnels sélectionnés pour vous.
+            {t('hero_subtitle')}
           </p>
           <button 
             className="btn btn-warning btn-lg px-5 py-3 fw-bold shadow-lg animate__animated animate__pulse animate__infinite"
             onClick={() => navigate("/products")}
           >
-            Voir les produits
+            {t('shop_now')}
           </button>
         </div>
       </div>
@@ -48,22 +50,22 @@ export default function LandingPage({ user }) {
           <div className="col-md-4">
             <div className="p-4 shadow-sm rounded bg-white h-100 transition-hover">
               <div className="fs-1 mb-3">🚚</div>
-              <h3>Livraison Rapide</h3>
-              <p className="text-muted">Recevez vos commandes en un temps record directement chez vous.</p>
+              <h3>{t('fast_shipping')}</h3>
+              <p className="text-muted">{t('fast_shipping_desc')}</p>
             </div>
           </div>
           <div className="col-md-4">
             <div className="p-4 shadow-sm rounded bg-white h-100 transition-hover">
               <div className="fs-1 mb-3">🛡️</div>
-              <h3>Paiement Sécurisé</h3>
-              <p className="text-muted">Vos transactions sont protégées par les meilleurs protocoles de sécurité.</p>
+              <h3>{t('secure_payment')}</h3>
+              <p className="text-muted">{t('secure_payment_desc')}</p>
             </div>
           </div>
           <div className="col-md-4">
             <div className="p-4 shadow-sm rounded bg-white h-100 transition-hover">
               <div className="fs-1 mb-3">⭐</div>
-              <h3>Qualité Garantie</h3>
-              <p className="text-muted">Nous ne proposons que des produits testés et approuvés par nos experts.</p>
+              <h3>{t('quality_guarantee')}</h3>
+              <p className="text-muted">{t('quality_guarantee_desc')}</p>
             </div>
           </div>
         </div>

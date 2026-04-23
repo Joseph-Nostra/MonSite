@@ -41,7 +41,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState({ message: "", type: "" });
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
-  const { t } = useTranslation();
+  const { t, i18n: i18nInstance } = useTranslation();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -49,8 +49,8 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
-    document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
-  }, [i18n.language]);
+    document.documentElement.dir = i18nInstance.language === 'ar' ? 'rtl' : 'ltr';
+  }, [i18nInstance.language]);
 
 
 
