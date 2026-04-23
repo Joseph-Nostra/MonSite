@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../axios";
 import { useTranslation } from "react-i18next";
-import { Send, ArrowLeft, MoreVertical, CheckCheck } from "lucide-react";
-import Logo from "./Common/Logo";
+import { Send, ArrowLeft, MoreVertical, CheckCheck, Check } from "lucide-react";
+import echo from "../echo";
+import UserAvatar from "./Common/UserAvatar";
+import LoadingSpinner from "./Common/LoadingSpinner";
 
 export default function Chat({ user }) {
   const { t } = useTranslation();
@@ -12,6 +14,7 @@ export default function Chat({ user }) {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
   const [otherUser, setOtherUser] = useState(null);
+  const [isOtherOnline, setIsOtherOnline] = useState(false);
   const messageEndRef = useRef(null);
   const navigate = useNavigate();
 
@@ -29,13 +32,6 @@ export default function Chat({ user }) {
       try {
         const res = await api.get(`/messages/${otherUserId}`);
         setMessages(res.data);
-        if (res.data.length > 0 && !otherUser) {
-            const firstMsg = res.data.find(m => m.sender_id !== user.id) || res.data.find(m => m.receiver_id !== user.id);
-            if (firstMsg) {
-                // We could fetch other user details properly if we had an endpoint
-                // For now we might just have the name in the first message if included
-            }
-        }
       } catch (err) {
         console.error("Erreur fetch messages:", err);
       } finally {
@@ -44,9 +40,34 @@ export default function Chat({ user }) {
     };
 
     fetchMessages();
-    const interval = setInterval(fetchMessages, 5000); // Poll every 5s
 
-    return () => clearInterval(interval);
+    // 🔥 Real-time Listeners
+    const channel = echo.private(`messages.${user.id}`)
+      .listen('MessageSent', (e) => {
+        if (e.message.sender_id == otherUserId) {
+            setMessages(prev => [...prev, e.message]);
+            // Notify backend that we've seen this message if we are in the chat
+            api.post(`/messages/${e.message.id}/read`);
+        }
+      })
+      .listen('MessageStatusUpdated', (e) => {
+        setMessages(prev => prev.map(m => 
+            m.id === e.messageId ? { ...m, status: e.status, read_at: e.status === 'seen' ? new Date() : m.read_at } : m
+        ));
+      });
+
+    // Presence listener
+    const presenceChannel = echo.channel('presence-status')
+        .listen('UserStatusUpdated', (e) => {
+            if (e.userId == otherUserId) {
+                setIsOtherOnline(e.isOnline);
+            }
+        });
+
+    return () => {
+        echo.leave(`messages.${user.id}`);
+        echo.leave('presence-status');
+    };
   }, [user, otherUserId, navigate]);
 
   useEffect(scrollToBottom, [messages]);
@@ -60,14 +81,18 @@ export default function Chat({ user }) {
         receiver_id: otherUserId,
         content: content
       });
-      setMessages([...messages, res.data]);
+      setMessages(prev => [...prev, res.data]);
       setContent("");
     } catch (err) {
       console.error("Erreur send message:", err);
     }
   };
 
-  if (loading) return <div className="container mt-5 pt-5 text-center">Chargement du chat...</div>;
+  if (loading) return (
+    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+      <LoadingSpinner size="lg" />
+    </div>
+  );
 
   return (
     <div className="container mt-5 pt-4 mb-5">
@@ -79,13 +104,12 @@ export default function Chat({ user }) {
                 <ArrowLeft size={20} />
             </button>
             <div className="d-flex align-items-center gap-2">
-                <div className="chat-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style={{ width: '40px', height: '40px' }}>
-                    {otherUserId.charAt(0).toUpperCase()}
-                </div>
+                <UserAvatar name={otherUser?.name || "User"} size={40} />
                 <div>
-                    <h6 className="mb-0 fw-bold text-dark">{t('discussion') || 'Discussion'}</h6>
-                    <small className="text-success d-flex align-items-center gap-1">
-                        <span className="dot bg-success rounded-circle" style={{ width: '6px', height: '6px' }}></span> {t('online') || 'En ligne'}
+                    <h6 className="mb-0 fw-bold text-dark">{otherUser?.name || t('discussion')}</h6>
+                    <small className={`${isOtherOnline ? 'text-success' : 'text-muted'} d-flex align-items-center gap-1`}>
+                        <span className={`dot ${isOtherOnline ? 'bg-success' : 'bg-secondary'} rounded-circle`} style={{ width: '6px', height: '6px' }}></span> 
+                        {isOtherOnline ? t('online') : t('offline') || 'Hors ligne'}
                     </small>
                 </div>
             </div>
@@ -100,15 +124,24 @@ export default function Chat({ user }) {
           {messages.map((m) => {
             const isMe = m.sender_id === user.id;
             const fullDate = new Date(m.created_at).toLocaleString([], { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            
+            // Checkmark logic
+            let checkIcon = <Check size={12} />;
+            let checkColor = "text-white-50";
+            if (m.status === 'delivered') {
+                checkIcon = <CheckCheck size={12} />;
+            } else if (m.status === 'seen' || m.read_at) {
+                checkIcon = <CheckCheck size={12} />;
+                checkColor = isMe ? "text-info" : "text-primary"; // Light blue for dark bg, primary for light bg
+            }
+
             return (
               <div 
                 key={m.id} 
                 className={`d-flex mb-4 ${isMe ? "justify-content-end" : "justify-content-start"}`}
               >
                 {!isMe && (
-                     <div className="chat-avatar-sm bg-secondary text-white rounded-circle d-none d-sm-flex align-items-center justify-content-center me-2 mt-auto" style={{ width: '28px', height: '28px', fontSize: '10px' }}>
-                        {otherUserId.charAt(0).toUpperCase()}
-                     </div>
+                     <UserAvatar name={otherUser?.name || "User"} size={28} className="me-2 mt-auto d-none d-sm-flex" />
                 )}
                 <div 
                   className={`chat-bubble p-3 shadow-sm ${isMe ? "bg-primary text-white bubble-me" : "bg-white text-dark bubble-other"}`}
@@ -121,7 +154,7 @@ export default function Chat({ user }) {
                         </div>
                         <div className="flex-grow-1 overflow-hidden">
                             <strong className="d-block text-truncate" style={{ fontSize: '11px' }}>{m.product.title}</strong>
-                            <span className="fw-bold" style={{ fontSize: '10px' }}>${m.product.price}</span>
+                            <span className="fw-bold" style={{ fontSize: '10px' }}>{m.product.price}€</span>
                         </div>
                     </div>
                   )}
@@ -130,7 +163,7 @@ export default function Chat({ user }) {
                     <span title={fullDate} style={{ cursor: 'help' }}>
                         {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
-                    {isMe && <CheckCheck size={12} />}
+                    {isMe && <span className={checkColor}>{checkIcon}</span>}
                   </div>
                 </div>
               </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../axios";
+import LoadingSpinner from "./Common/LoadingSpinner";
 import useDocTitle from "../hooks/useDocTitle";
 
 function ProductDetail({ onAddToCart, user }) {
@@ -57,7 +58,7 @@ function ProductDetail({ onAddToCart, user }) {
     }
   };
 
-  if (loading) return <div className="text-center py-5"><div className="spinner-border"></div></div>;
+  if (loading) return <div className="container mt-5 pt-5 text-center"><LoadingSpinner size="lg" /></div>;
   if (error) return <div className="container mt-5 text-center text-danger">{error}</div>;
   if (!product) return <div className="container mt-5 text-center">Produit introuvable</div>;
 

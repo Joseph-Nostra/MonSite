@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../axios";
+import LoadingSpinner from "./Common/LoadingSpinner";
 
 export default function AddProductForm({ user, isEdit = false }) {
   const [title, setTitle] = useState("");

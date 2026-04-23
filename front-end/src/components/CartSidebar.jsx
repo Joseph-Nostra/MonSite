@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import api from "../axios";
 import { useNavigate } from "react-router-dom";
 import Toast from "./Toast";
 import StripePayment from "./StripePayment";
 import { PayPalButtons } from "@paypal/react-paypal-js";
+import LoadingSpinner from "./Common/LoadingSpinner";
 
 export default function CartSidebar({ cart, setCart, user }) {
   const [totalPrice, setTotalPrice] = useState(0);
@@ -219,10 +221,13 @@ export default function CartSidebar({ cart, setCart, user }) {
             <div className={`card mb-3 cursor-pointer select-card ${paymentMethod === 'card' ? 'border-primary' : ''}`} onClick={() => setPaymentMethod('card')}>
               <div className="card-body d-flex align-items-center">
                 <div className="h3 mb-0 me-3">💳</div>
-                <div>
-                  <h6 className="mb-0">Carte Bancaire</h6>
-                  <small className="text-muted">Stripe Sécurisé</small>
+                {loading ? (
+                <div className="text-center py-2">
+                  <LoadingSpinner size="sm" color="white" />
                 </div>
+              ) : (
+                t('confirm_payment') || "Confirmer le paiement"
+              )}
                 <div className="ms-auto">
                     <input type="radio" checked={paymentMethod === 'card'} readOnly />
                 </div>

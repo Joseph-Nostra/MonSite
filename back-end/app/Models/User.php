@@ -26,6 +26,8 @@ class User extends Authenticatable
         'avatar',
         'phone',
         'notification_preferences',
+        'last_seen_at',
+        'is_online',
     ];
 
     protected $hidden = [

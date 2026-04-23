@@ -44,10 +44,21 @@ class MessageController extends Controller
         ->get();
 
         // Marquer comme lu
-        Message::where('sender_id', $otherUserId)
+        $unreadMessages = Message::where('sender_id', $otherUserId)
             ->where('receiver_id', $userId)
             ->whereNull('read_at')
-            ->update(['read_at' => now()]);
+            ->get();
+
+        if ($unreadMessages->count() > 0) {
+            Message::whereIn('id', $unreadMessages->pluck('id'))->update([
+                'read_at' => now(),
+                'status' => 'seen'
+            ]);
+
+            foreach ($unreadMessages as $msg) {
+                broadcast(new \App\Events\MessageStatusUpdated($msg->id, 'seen', $otherUserId))->toOthers();
+            }
+        }
 
         return response()->json($messages);
     }
@@ -66,7 +77,11 @@ class MessageController extends Controller
             'receiver_id' => $request->receiver_id,
             'product_id' => $request->product_id,
             'content' => $request->content,
+            'status' => 'sent',
         ]);
+
+        // 🔥 Diffuser l'événement en temps réel
+        broadcast(new \App\Events\MessageSent($message))->toOthers();
 
         // 🔥 Créer une notification pour le destinataire
         \App\Models\Notification::create([
@@ -92,5 +107,24 @@ class MessageController extends Controller
             ->count();
 
         return response()->json(['unread_count' => $count]);
+    }
+
+    // 🔹 Marquer un message spécifique comme lu
+    public function markAsRead(Request $request, Message $message)
+    {
+        if ($message->receiver_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        if ($message->status !== 'seen') {
+            $message->update([
+                'read_at' => now(),
+                'status' => 'seen'
+            ]);
+
+            broadcast(new \App\Events\MessageStatusUpdated($message->id, 'seen', $message->sender_id))->toOthers();
+        }
+
+        return response()->json(['success' => true]);
     }
 }

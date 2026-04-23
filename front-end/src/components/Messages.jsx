@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../axios";
+import LoadingSpinner from "./Common/LoadingSpinner";
 import { useTranslation } from "react-i18next";
 import { MessageCircle, Search, ChevronRight, MessageSquareDashed } from "lucide-react";
+import echo from "../echo";
+import UserAvatar from "./Common/UserAvatar";
 
 export default function Messages({ user }) {
   const { t } = useTranslation();
@@ -29,9 +32,27 @@ export default function Messages({ user }) {
     };
 
     fetchConversations();
+
+    // 🔥 Real-time Listeners
+    const channel = echo.channel('presence-status')
+        .listen('UserStatusUpdated', (e) => {
+            setConversations(prev => prev.map(c => 
+                c.id === e.userId ? { ...c, is_online: e.isOnline, last_seen_at: e.lastSeen } : c
+            ));
+        });
+
+    const msgChannel = echo.private(`messages.${user.id}`)
+        .listen('MessageSent', (e) => {
+            fetchConversations(); // Simpler to refetch for complexity here
+        });
+
+    return () => {
+        echo.leave('presence-status');
+        echo.leave(`messages.${user.id}`);
+    };
   }, [user, navigate]);
 
-  if (loading) return <div className="container mt-5 pt-5 text-center"><div className="spinner-border text-primary"></div></div>;
+  if (loading) return <div className="container mt-5 pt-5 text-center"><LoadingSpinner size="lg" /></div>;
 
   const filteredConversations = conversations.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -76,13 +97,13 @@ export default function Messages({ user }) {
                 className="list-group-item list-group-item-action d-flex align-items-center gap-3 p-4 border-bottom transition-all"
                 onClick={() => navigate(`/chat/${conv.id}`)}
               >
-                <div className="avatar bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style={{ width: '56px', height: '56px', fontSize: '20px' }}>
-                    {conv.name.charAt(0).toUpperCase()}
-                </div>
+                <UserAvatar name={conv.name} size={56} />
                 <div className="flex-grow-1 overflow-hidden">
                     <div className="d-flex justify-content-between align-items-start mb-1">
                         <h6 className="mb-0 fw-bold text-dark">{conv.name}</h6>
-                        <small className="text-muted" style={{ fontSize: '11px' }}>En ligne</small>
+                        <small className={`${conv.is_online ? 'text-success' : 'text-muted'}`} style={{ fontSize: '11px' }}>
+                            {conv.is_online ? t('online') : t('offline') || "Hors ligne"}
+                        </small>
                     </div>
                     <p className="mb-0 text-muted small text-truncate pe-4">Cliquez pour voir les messages...</p>
                 </div>

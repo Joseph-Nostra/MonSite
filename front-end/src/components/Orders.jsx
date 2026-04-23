@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../axios"; 
+import LoadingSpinner from "./Common/LoadingSpinner";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -24,7 +25,7 @@ export default function Orders() {
     fetchOrders();
   }, []);
 
-  if (loading) return <div className="text-center py-5 mt-5"><div className="spinner-border text-primary"></div></div>;
+  if (loading) return <div className="container mt-5 pt-5 text-center"><LoadingSpinner size="lg" /></div>;
   if (error) return <div className="text-danger text-center mt-5 py-5">{error}</div>;
 
   return (

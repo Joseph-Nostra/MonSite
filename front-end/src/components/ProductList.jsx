@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import ProductCard from "./ProductCard";
 import api from "../axios";
+import LoadingSpinner from "./Common/LoadingSpinner";
 import useDocTitle from "../hooks/useDocTitle";
 
 function ProductList({ onAddToCart , user , handleEdit , handleDelete, isFullWidth = false}) {
@@ -51,19 +52,23 @@ function ProductList({ onAddToCart , user , handleEdit , handleDelete, isFullWid
     navigate(`/products?${params.toString()}`);
   };
 
-  if (loading) return <div className="text-center py-5 mt-5"><div className="spinner-border text-primary"></div></div>;
+  if (loading) return (
+    <div className="d-flex justify-content-center align-items-center vh-50">
+      <LoadingSpinner size="lg" />
+    </div>
+  );
   if (error) return <p className="mt-5 text-center text-danger">{error}</p>;
 
   return (
     <div className="container-fluid px-2 overflow-hidden">
       <div className="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h4 className="fw-bold m-0 text-dark">
-            {queryLabel ? `🔍 ${t('results_for')} "${queryLabel}"` : ""}
+            {queryLabel ? `🔍 Résultats pour "${queryLabel}"` : ""}
         </h4>
         <div className="d-flex align-items-center gap-3">
             {location.search && !location.search.startsWith('?page') && <Link to="/products" className="btn btn-sm btn-outline-secondary rounded-pill">Effacer les filtres</Link>}
             <span className="badge bg-light text-dark border p-2 px-3 rounded-pill" style={{ fontSize: '14px' }}>
-                {pagination ? pagination.total : products.length} {t('products')}
+                {pagination ? pagination.total : products.length} produits
             </span>
         </div>
       </div>

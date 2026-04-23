@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../axios';
+import LoadingSpinner from '../Common/LoadingSpinner';
 import { Camera, Save, CheckCircle, Trash2 } from 'lucide-react';
 
 const ProfileSettings = ({ setUser }) => {
@@ -80,7 +81,11 @@ const ProfileSettings = ({ setUser }) => {
         }
     };
 
-    if (loading) return <div className="text-center py-5"><div className="spinner-border text-primary"></div></div>;
+    if (loading) return (
+        <div className="d-flex justify-content-center align-items-center vh-50">
+            <LoadingSpinner size="lg" />
+        </div>
+    );
 
     return (
         <div>

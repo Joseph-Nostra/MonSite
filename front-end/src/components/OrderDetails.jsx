@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../axios";
+import LoadingSpinner from "./Common/LoadingSpinner";
 import Toast from "./Toast";
 
 export default function OrderDetails() {
@@ -25,7 +26,7 @@ export default function OrderDetails() {
     fetchOrder();
   }, [id]);
 
-  if (loading) return <div className="text-center mt-5 py-5"><div className="spinner-border text-primary"></div></div>;
+  if (loading || !order) return <div className="container mt-5 pt-5 text-center"><LoadingSpinner size="lg" /></div>;
   if (!order) return <div className="text-center mt-5 py-5"><h3>Commande non trouvée</h3><button className="btn btn-primary mt-3" onClick={() => navigate("/orders")}>Retour aux commandes</button></div>;
 
   return (

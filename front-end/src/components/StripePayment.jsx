@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import api from "../axios";
+import LoadingSpinner from "./Common/LoadingSpinner";
 
 const StripePayment = ({ clientSecret, orderId, onPaymentSuccess, onPaymentError }) => {
   const stripe = useStripe();
@@ -55,11 +56,13 @@ const StripePayment = ({ clientSecret, orderId, onPaymentSuccess, onPaymentError
         disabled={!stripe || loading}
       >
         {loading ? (
-          <span className="spinner-border spinner-border-sm me-2"></span>
+          <LoadingSpinner size="sm" color="white" />
         ) : (
-          <i className="bi bi-shield-check me-2"></i>
+          <>
+            <i className="bi bi-shield-check me-2"></i>
+            Payer Sécurisé
+          </>
         )}
-        Payer Sécurisé
       </button>
     </form>
   );

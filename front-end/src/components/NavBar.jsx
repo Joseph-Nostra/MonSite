@@ -2,7 +2,9 @@ import { useState, useEffect } from "react"
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import api from "../axios";
 import Logo from "./Common/Logo";
+import LoadingSpinner from "./Common/LoadingSpinner";
 import { useTranslation } from "react-i18next";
+import UserAvatar from "./Common/UserAvatar";
 
 export default function NavBar({ user, setUser, loading, theme, setTheme }) {
   const { t, i18n } = useTranslation();
@@ -122,24 +124,30 @@ export default function NavBar({ user, setUser, loading, theme, setTheme }) {
               {/* DROPDOWN MENU */}
               <div className="dropdown ms-1">
                 <button className="user-profile-btn dropdown-toggle border-0" data-bs-toggle="dropdown" aria-expanded="false" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                  <div className="user-avatar text-white overflow-hidden">
-                    {user.avatar ? (
-                      <img src={`http://127.0.0.1:8000/storage/${user.avatar}`} alt="" className="w-100 h-100 object-fit-cover" />
-                    ) : (
-                      user.name.charAt(0).toUpperCase()
-                    )}
+                  <div className="d-flex align-items-center gap-2">
+                    <UserAvatar name={user.name} size={34} />
+                    <div className="flex-grow-1 overflow-hidden d-none d-xl-block">
+                        <div className="fw-bold text-truncate text-white" style={{ fontSize: '14px' }}>{user.name}</div>
+                        <div className="small text-white-50 d-flex align-items-center gap-1" style={{ fontSize: '11px' }}>
+                            <span className="dot bg-success rounded-circle" style={{ width: '6px', height: '6px' }}></span> {t('online')}
+                        </div>
+                    </div>
+                    <i className="bi bi-chevron-down small ms-1 text-white-50"></i>
                   </div>
-                  <span className="user-name d-none d-xl-inline text-white ms-2 fw-semibold">{user.name}</span>
-                  <i className="bi bi-chevron-down small ms-1 text-white-50"></i>
                 </button>
                 <ul className="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-3 py-2 animate-dropdown" style={{ minWidth: '240px' }}>
-                  <div className="px-4 py-3 mb-1">
-                      <p className="mb-0 fw-bold text-dark">{user.name}</p>
-                      <p className="mb-0 text-muted" style={{ fontSize: '11px' }}>Compte {user.role.toUpperCase()}</p>
+                  <div className="px-4 py-3 mb-1 bg-light rounded-top-4 mx-2 mt-2">
+                      <div className="d-flex align-items-center gap-3">
+                        <UserAvatar name={user.name} size={45} />
+                        <div className="overflow-hidden">
+                            <p className="mb-0 fw-bold text-dark text-truncate">{user.name}</p>
+                            <p className="mb-0 text-muted" style={{ fontSize: '11px' }}>{t('account')} {user.role.toUpperCase()}</p>
+                        </div>
+                      </div>
                   </div>
                   <li><hr className="dropdown-divider opacity-50 mx-2" /></li>
                   
-                  {/* REQUIS: Mes commandes */}
+                  {/* Mes commandes */}
                   <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/orders")}>
                     <i className="bi bi-bag-check text-primary"></i> {t('my_orders')}
                   </button></li>
@@ -149,14 +157,14 @@ export default function NavBar({ user, setUser, loading, theme, setTheme }) {
                     <i className="bi bi-heart text-danger"></i> {t('favorites')}
                   </button></li>
 
-                  {/* REQUIS: Mes produits (if vendor) */}
+                  {/* Mes produits (if vendor) */}
                   {(user.role === 'vendeur' || user.role === 'admin') && (
                     <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/my-products")}>
-                      <i className="bi bi-box-seam text-primary"></i> mes produits
+                      <i className="bi bi-box-seam text-primary"></i> {t('my_products')}
                     </button></li>
                   )}
 
-                  {/* REQUIS: Statistiques (if vendor) */}
+                  {/* Statistiques (if vendor) */}
                   {(user.role === 'vendeur' || user.role === 'admin') && (
                     <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/stats")}>
                       <i className="bi bi-graph-up-arrow text-primary"></i> Statistiques
@@ -165,14 +173,14 @@ export default function NavBar({ user, setUser, loading, theme, setTheme }) {
 
                   <div className="dropdown-divider opacity-50 mx-2"></div>
 
-                  {/* REQUIS: Paramètres */}
+                  {/* Paramètres */}
                   <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/settings")}>
                     <i className="bi bi-gear text-secondary"></i> Paramètres
                   </button></li>
 
                   <li><hr className="dropdown-divider opacity-50 mx-2" /></li>
 
-                  {/* REQUIS: Déconnexion */}
+                  {/* Déconnexion */}
                   <li><button className="dropdown-item py-2 px-3 text-danger fw-bold d-flex align-items-center gap-3" onClick={handleLogout}>
                     <i className="bi bi-box-arrow-right"></i> Déconnexion
                   </button></li>

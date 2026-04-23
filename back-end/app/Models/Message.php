@@ -15,6 +15,7 @@ class Message extends Model
         'product_id',
         'content',
         'read_at',
+        'status',
     ];
 
     public function sender()

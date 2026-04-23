@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../axios';
+import LoadingSpinner from './Common/LoadingSpinner';
 
 const InfoPage = () => {
     const { slug } = useParams();
@@ -25,7 +26,7 @@ const InfoPage = () => {
         fetchPage();
     }, [slug]);
 
-    if (loading) return <div className="container py-5 text-center"><div className="spinner-border text-primary"></div></div>;
+    if (loading) return <div className="container mt-5 pt-5 text-center"><LoadingSpinner size="lg" /></div>;
     if (error) return <div className="container py-5 text-center text-danger"><h3>{error}</h3></div>;
 
     return (

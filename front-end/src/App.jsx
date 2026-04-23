@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ user, loading, children }) => {
-  if (loading) return <div className="text-center mt-5"><div className="spinner-border text-primary"></div></div>;
+  if (loading) return <div className="text-center mt-5"><LoadingSpinner size="lg" /></div>;
   if (!user) return <Navigate to="/login" replace />;
   return children;
 };
@@ -28,6 +28,7 @@ import CookieBanner from "./components/Common/CookieBanner";
 
 import LandingPage from "./components/LandingPage";
 import NotFound from "./components/NotFound";
+import LoadingSpinner from "./components/Common/LoadingSpinner";
 
 import api from "./axios";
 import Toast from "./components/Toast";

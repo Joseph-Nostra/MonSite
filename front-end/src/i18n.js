@@ -56,7 +56,15 @@ const resources = {
       "shipping": "Livraison",
       "payment": "Paiement",
       "discussion": "Discussion",
-      "online": "En ligne"
+      "online": "En ligne",
+      "settings": "Paramètres",
+      "logout": "Déconnexion",
+      "find_discussions": "Retrouvez toutes vos discussions avec les vendeurs et acheteurs.",
+      "click_messages": "Cliquez pour voir les messages",
+      "client_account": "Compte CLIENT",
+      "seller_account": "Compte VENDEUR",
+      "admin_account": "Compte ADMIN",
+      "empty_cart": "Votre panier est vide"
     }
   },
   en: {
@@ -112,7 +120,15 @@ const resources = {
       "shipping": "Shipping",
       "payment": "Payment",
       "discussion": "Discussion",
-      "online": "Online"
+      "online": "Online",
+      "settings": "Settings",
+      "logout": "Logout",
+      "find_discussions": "Find all your discussions with sellers and buyers.",
+      "click_messages": "Click to see messages",
+      "client_account": "CLIENT Account",
+      "seller_account": "SELLER Account",
+      "admin_account": "ADMIN Account",
+      "empty_cart": "Your cart is empty"
     }
   },
   ar: {
@@ -168,7 +184,15 @@ const resources = {
       "shipping": "الشحن",
       "payment": "الدفع",
       "discussion": "مناقشة",
-      "online": "متصل"
+      "online": "متصل",
+      "settings": "الإعدادات",
+      "logout": "تسجيل الخروج",
+      "find_discussions": "تجد جميع مناقشاتك مع البائعين والمشترين.",
+      "click_messages": "انقر لرؤية الرسائل",
+      "client_account": "حساب عميل",
+      "seller_account": "حساب بائع",
+      "admin_account": "حساب مسؤول",
+      "empty_cart": "سلة التسوق فارغة"
     }
   }
 };
