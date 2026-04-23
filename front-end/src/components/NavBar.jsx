@@ -67,13 +67,13 @@ export default function NavBar({ user, setUser, loading, theme, setTheme }) {
                   <i className="bi bi-search"></i>
                 </span>
                 <input
-                  className="form-control bg-secondary border-0 text-white placeholder-light py-2"
+                  className="form-control search-input py-2"
                   type="search"
-                  placeholder="Rechercher un produit..."
+                  placeholder="Rechercher par nom, prix..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <button className="btn btn-primary px-4 rounded-end-pill fw-bold" type="submit">
+                <button className="btn btn-primary px-4 rounded-end-pill fw-bold border-0" type="submit" style={{ background: 'linear-gradient(45deg, #0d6efd, #00d2ff)' }}>
                   Chercher
                 </button>
               </div>
@@ -206,6 +206,9 @@ export default function NavBar({ user, setUser, loading, theme, setTheme }) {
         .form-control { color: var(--text-color) !important; }
         .dropdown-menu { background-color: var(--card-bg); border: 1px solid var(--border-color); }
         .dropdown-item { color: var(--text-color) !important; }
+        .input-group-text { background-color: rgba(255, 255, 255, 0.1) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: rgba(255, 255, 255, 0.7) !important; }
+        .search-input { background-color: rgba(255, 255, 255, 0.05) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: white !important; }
+        .search-input::placeholder { color: rgba(255, 255, 255, 0.4) !important; }
         .btn-icon-nav { background: transparent; border: none; padding: 8px; color: var(--text-color); opacity: 0.7; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .btn-icon-nav:hover { transform: translateY(-2px); color: #fff; }
         .notification-badge { font-size: 10px; padding: 4.5px 6.5px; top: 8px !important; right: 0px !important; }

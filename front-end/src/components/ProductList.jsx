@@ -61,15 +61,60 @@ function ProductList({ onAddToCart , user , handleEdit , handleDelete, isFullWid
 
   return (
     <div className="container-fluid px-2 overflow-hidden">
-      <div className="d-flex justify-content-between align-items-center mb-4 mt-4">
-        <h4 className="fw-bold m-0 text-dark">
-            {queryLabel ? `🔍 Résultats pour "${queryLabel}"` : ""}
-        </h4>
+      <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 mt-4 gap-3">
         <div className="d-flex align-items-center gap-3">
-            {location.search && !location.search.startsWith('?page') && <Link to="/products" className="btn btn-sm btn-outline-secondary rounded-pill">Effacer les filtres</Link>}
-            <span className="badge bg-light text-dark border p-2 px-3 rounded-pill" style={{ fontSize: '14px' }}>
+            <h4 className="fw-bold m-0 text-dark">
+                {queryLabel ? `🔍 "${queryLabel}"` : "Nos Produits"}
+            </h4>
+            <span className="badge bg-light text-dark border p-2 px-3 rounded-pill d-none d-sm-inline-block" style={{ fontSize: '14px' }}>
                 {pagination ? pagination.total : products.length} produits
             </span>
+        </div>
+
+        <div className="d-flex flex-wrap align-items-center gap-2">
+            {/* Sorting */}
+            <select 
+                className="form-select form-select-sm rounded-pill px-3 py-2 border-0 shadow-sm"
+                style={{ width: 'auto', backgroundColor: '#f8fafc' }}
+                value={searchParams.get('sort_by') || 'latest'}
+                onChange={(e) => {
+                    const params = new URLSearchParams(location.search);
+                    params.set('sort_by', e.target.value);
+                    navigate(`/products?${params.toString()}`);
+                }}
+            >
+                <option value="latest">Nouveautés</option>
+                <option value="price_asc">Prix croissant</option>
+                <option value="price_desc">Prix décroissant</option>
+                <option value="rating_desc">Mieux notés</option>
+            </select>
+
+            {/* Rating Filter */}
+            <select 
+                className="form-select form-select-sm rounded-pill px-3 py-2 border-0 shadow-sm"
+                style={{ width: 'auto', backgroundColor: '#f8fafc' }}
+                value={searchParams.get('rating') || ''}
+                onChange={(e) => {
+                    const params = new URLSearchParams(location.search);
+                    if (e.target.value) params.set('rating', e.target.value);
+                    else params.delete('rating');
+                    navigate(`/products?${params.toString()}`);
+                }}
+            >
+                <option value="">Toutes les notes</option>
+                <option value="4">4+ étoiles</option>
+                <option value="3">3+ étoiles</option>
+                <option value="2">2+ étoiles</option>
+            </select>
+
+            {location.search && !location.search.startsWith('?page') && (
+                <button 
+                  onClick={() => navigate('/products')}
+                  className="btn btn-sm btn-outline-danger rounded-pill px-3"
+                >
+                  <i className="bi bi-x-circle me-1"></i> Effacer
+                </button>
+            )}
         </div>
       </div>
 

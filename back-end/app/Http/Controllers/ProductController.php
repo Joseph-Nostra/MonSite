@@ -11,9 +11,11 @@ class ProductController extends Controller
     // 🔹 Liste tous les produits
     public function index(Request $request)
     {
-        $query = Product::with('user:id,name,email')->where('is_active', true);
+        $query = Product::with('user:id,name,email')
+            ->withAvg('reviews', 'rating') // 🔥 Add average rating for filtering/sorting
+            ->where('is_active', true);
 
-        // Search engine (covers title, description, brand, specs)
+        // Search engine (covers title, description, brand, specs, and price if numeric)
         if ($request->filled('q')) {
             $searchTerm = $request->q;
             $query->where(function($q) use ($searchTerm) {
@@ -22,7 +24,16 @@ class ProductController extends Controller
                   ->orWhere('brand', 'like', '%' . $searchTerm . '%')
                   ->orWhere('cpu', 'like', '%' . $searchTerm . '%')
                   ->orWhere('gpu', 'like', '%' . $searchTerm . '%');
+                
+                if (is_numeric($searchTerm)) {
+                    $q->orWhere('price', '<=', (float)$searchTerm);
+                }
             });
+        }
+
+        // Rating Filter (Minimum average stars)
+        if ($request->filled('rating')) {
+            $query->having('reviews_avg_rating', '>=', (float)$request->rating);
         }
 
         // Technical Filters
@@ -38,11 +49,8 @@ class ProductController extends Controller
         if ($request->filled('ram')) {
             $query->where('ram', 'like', '%' . $request->ram . '%');
         }
-        if ($request->filled('cpu_type')) { // e.g. i7, Ryzen
+        if ($request->filled('cpu_type')) {
             $query->where('cpu', 'like', '%' . $request->cpu_type . '%');
-        }
-        if ($request->filled('gpu_type')) {
-            $query->where('gpu', 'like', '%' . $request->gpu_type . '%');
         }
         
         // Pricing Filters
@@ -53,19 +61,25 @@ class ProductController extends Controller
             $query->where('price', '<=', (float)$request->max_price);
         }
 
-        // Legacy/Special Filters
-        if ($request->has('promo')) {
-            $query->where('discount_rate', '>', 0);
-        }
-        if ($request->has('new')) {
-            $query->where('is_new', $request->new === 'true');
+        // Sorting
+        $sortBy = $request->get('sort_by', 'latest');
+        switch ($sortBy) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'rating_desc':
+                $query->orderByDesc('reviews_avg_rating');
+                break;
+            case 'latest':
+            default:
+                $query->latest();
+                break;
         }
 
-        if ($request->filled('seller_id')) {
-            $query->where('user_id', $request->seller_id);
-        }
-
-        return $query->latest()->paginate(35);
+        return $query->paginate(35);
     }
 
     // 🔹 Recherche

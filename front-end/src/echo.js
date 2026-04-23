@@ -11,6 +11,13 @@ const echo = new Echo({
     wssPort: 9000,
     forceTLS: false,
     enabledTransports: ["ws", "wss"],
+    authEndpoint: "http://127.0.0.1:8000/api/broadcasting/auth",
+    auth: {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Accept: "application/json",
+        },
+    },
 });
 
 export default echo;
