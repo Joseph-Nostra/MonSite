@@ -42,7 +42,12 @@ const resources = {
       "secure_payment": "Paiement Sécurisé",
       "secure_payment_desc": "Vos transactions sont protégées par les meilleurs protocoles de sécurité.",
       "quality_guarantee": "Qualité Garantie",
-      "quality_guarantee_desc": "Nous ne proposons que des produits testés et approuvés par nos experts."
+      "quality_guarantee_desc": "Nous ne proposons que des produits testés et approuvés par nos experts.",
+      "product": "produit",
+      "products": "produits",
+      "empty_wishlist_title": "Votre liste est vide",
+      "empty_wishlist_desc": "Vous n'avez pas encore ajouté de produits à vos favoris.",
+      "soon_available": "Bientôt disponible..."
     }
   },
   en: {
@@ -84,7 +89,12 @@ const resources = {
       "secure_payment": "Secure Payment",
       "secure_payment_desc": "Your transactions are protected by the best security protocols.",
       "quality_guarantee": "Guaranteed Quality",
-      "quality_guarantee_desc": "We only offer products tested and approved by our experts."
+      "quality_guarantee_desc": "We only offer products tested and approved by our experts.",
+      "product": "product",
+      "products": "products",
+      "empty_wishlist_title": "Your list is empty",
+      "empty_wishlist_desc": "You haven't added any products to your favorites yet.",
+      "soon_available": "Soon available..."
     }
   },
   ar: {
@@ -126,7 +136,12 @@ const resources = {
       "secure_payment": "دفع آمن",
       "secure_payment_desc": "معاملاتك محمية بأفضل بروتوكولات الأمان.",
       "quality_guarantee": "جودة مضمونة",
-      "quality_guarantee_desc": "نحن نقدم فقط المنتجات التي تم اختبارها واعتمادها من قبل خبرائنا."
+      "quality_guarantee_desc": "نحن نقدم فقط المنتجات التي تم اختبارها واعتمادها من قبل خبرائنا.",
+      "product": "منتج",
+      "products": "منتجات",
+      "empty_wishlist_title": "قائمتك فارغة",
+      "empty_wishlist_desc": "لم تضف أي منتجات إلى مفضلاتك بعد.",
+      "soon_available": "قريباً..."
     }
   }
 };

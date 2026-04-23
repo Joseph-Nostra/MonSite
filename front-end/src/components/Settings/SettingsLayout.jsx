@@ -10,7 +10,8 @@ import NotificationsSettings from './NotificationsSettings';
 import SellerOrders from './SellerOrders';
 import SellerProducts from './SellerProducts';
 import SellerCustomers from './SellerCustomers';
-import { LayoutDashboard, ShoppingBag, Package, Users } from 'lucide-react';
+import FavoritesSettings from './FavoritesSettings';
+import { LayoutDashboard, ShoppingBag, Package, Users, Heart } from 'lucide-react';
 import useDocTitle from '../../hooks/useDocTitle';
 
 const SettingsLayout = ({ setUser, user }) => {
@@ -26,12 +27,14 @@ const SettingsLayout = ({ setUser, user }) => {
         { id: 'customers', label: 'Mes Clients', icon: <Users size={20} />, color: '#8b5cf6' },
         { id: 'profile', label: 'Profil', icon: <User size={20} />, color: '#6366f1' },
         { id: 'addresses', label: 'Adresses', icon: <MapPin size={20} />, color: '#10b981' },
+        { id: 'favorites', label: 'Favoris', icon: <Heart size={20} />, color: '#ef4444' },
         { id: 'notifications', label: 'Notifications', icon: <Bell size={20} />, color: '#3b82f6' },
         { id: 'security', label: 'Sécurité', icon: <Shield size={20} />, color: '#ef4444' },
     ] : [
         { id: 'profile', label: 'Profil', icon: <User size={20} />, color: '#4f46e5' },
         { id: 'security', label: 'Sécurité', icon: <Shield size={20} />, color: '#ef4444' },
         { id: 'addresses', label: 'Adresses', icon: <MapPin size={20} />, color: '#10b981' },
+        { id: 'favorites', label: 'Favoris', icon: <Heart size={20} />, color: '#ef4444' },
         { id: 'payments', label: 'Paiements', icon: <CreditCard size={20} />, color: '#f59e0b' },
         { id: 'notifications', label: 'Notifications', icon: <Bell size={20} />, color: '#3b82f6' },
     ];
@@ -45,9 +48,10 @@ const SettingsLayout = ({ setUser, user }) => {
             case 'profile': return <ProfileSettings setUser={setUser} />;
             case 'security': return <SecuritySettings />;
             case 'addresses': return <AddressSettings />;
+            case 'favorites': return <FavoritesSettings />;
             case 'payments': return <PaymentSettings />;
             case 'notifications': return <NotificationsSettings user={user} />;
-            default: return <div className="p-5 text-center text-muted">Bientôt disponible...</div>;
+            default: return <div className="p-5 text-center text-muted">{t('soon_available')}</div>;
         }
     };
 
