@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../axios";
 import { useTranslation } from "react-i18next";
-import { Send, ArrowLeft, MoreVertical, CheckCheck, Check, Mic, Square, Trash2, Phone, Video } from "lucide-react";
+import { Send, ArrowLeft, MoreVertical, CheckCheck, Check, Mic, Square, Trash2, Phone, Video, Smile } from "lucide-react";
 import echo from "../echo";
 import UserAvatar from "./Common/UserAvatar";
 import LoadingSpinner from "./Common/LoadingSpinner";
@@ -20,6 +20,7 @@ export default function Chat({ user }) {
   const [activeCall, setActiveCall] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [showPickerId, setShowPickerId] = useState(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const timerRef = useRef(null);
@@ -328,7 +329,12 @@ export default function Chat({ user }) {
                   )}
                   {m.file_path && m.file_type === 'audio' && (
                     <div className="mb-2">
-                        <VoicePlayer src={`http://127.0.0.1:8000/storage/${m.file_path}`} isMe={isMe} />
+                        <VoicePlayer 
+                            src={`http://127.0.0.1:8000/storage/${m.file_path}`} 
+                            isMe={isMe} 
+                            userAvatar={isMe ? user.avatar : otherUser?.avatar}
+                            userName={isMe ? user.name : otherUser?.name}
+                        />
                     </div>
                   )}
                   {m.content && <p className="mb-1" style={{ fontSize: '15px', lineHeight: '1.5' }}>{m.content}</p>}
@@ -352,14 +358,43 @@ export default function Chat({ user }) {
                     {isMe && <span className={checkColor}>{checkIcon}</span>}
                   </div>
 
-                  {/* Reaction Picker on Hover */}
-                  <div className="reaction-picker position-absolute bottom-100 mb-2 bg-white shadow-lg rounded-pill p-1 d-none gap-1" style={{ left: isMe ? 'auto' : '0', right: isMe ? '0' : 'auto', border: '1px solid #e2e8f0' }}>
-                      {['❤️', '😂', '😮', '😢', '👍', '🔥'].map(emoji => (
-                          <button key={emoji} className="btn btn-sm btn-light rounded-circle p-1 border-0" style={{ fontSize: '18px' }} onClick={() => handleReact(m.id, emoji)}>
-                              {emoji}
-                          </button>
-                      ))}
+                  {/* Reaction Picker Trigger (Smile Icon on Hover) */}
+                  <div className={`reaction-trigger position-absolute top-0 ${isMe ? 'end-100 me-2' : 'start-100 ms-2'} d-none`}>
+                      <button 
+                        className="btn btn-sm btn-light rounded-circle shadow-sm p-1 border-0 bg-white" 
+                        onClick={() => setShowPickerId(showPickerId === m.id ? null : m.id)}
+                        style={{ width: '32px', height: '32px' }}
+                      >
+                          <Smile size={18} className="text-muted" />
+                      </button>
                   </div>
+
+                  {/* Reaction Picker Content */}
+                  <AnimatePresence>
+                    {showPickerId === m.id && (
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                            className="reaction-picker position-absolute bottom-100 mb-2 bg-white shadow-lg rounded-pill p-1 d-flex gap-1" 
+                            style={{ left: isMe ? 'auto' : '0', right: isMe ? '0' : 'auto', border: '1px solid #e2e8f0', zIndex: 100 }}
+                        >
+                            {['❤️', '😂', '😮', '😢', '👍', '🔥'].map(emoji => (
+                                <button 
+                                    key={emoji} 
+                                    className="btn btn-sm btn-light rounded-circle p-1 border-0 transition-transform hover-scale" 
+                                    style={{ fontSize: '18px' }} 
+                                    onClick={() => {
+                                        handleReact(m.id, emoji);
+                                        setShowPickerId(null);
+                                    }}
+                                >
+                                    {emoji}
+                                </button>
+                            ))}
+                        </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             );
@@ -471,7 +506,9 @@ export default function Chat({ user }) {
         }
         .chat-bubble { position: relative; transition: all 0.2s; }
         .chat-bubble:hover { transform: scale(1.01); }
-        .chat-bubble:hover .reaction-picker { display: flex !important; }
+        .chat-bubble:hover .reaction-trigger { display: flex !important; }
+        .hover-scale:hover { transform: scale(1.2); }
+        .reaction-trigger { transition: all 0.2s; }
         .animate-pulse { animation: pulse 1.5s infinite; }
         @keyframes pulse {
             0% { opacity: 1; transform: scale(1); }
