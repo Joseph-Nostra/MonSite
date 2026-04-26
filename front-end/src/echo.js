@@ -12,14 +12,36 @@ const echo = new Echo({
     forceTLS: false,
     enabledTransports: ["ws", "wss"],
     authEndpoint: "http://127.0.0.1:8000/api/broadcasting/auth",
-    auth: {
-        headers: {
-            get Authorization() {
+    authorizer: (channel, options) => {
+        return {
+            authorize: (socketId, callback) => {
                 const token = localStorage.getItem("token");
-                return token ? `Bearer ${token}` : "";
-            },
-            Accept: "application/json",
-        },
+                fetch("http://127.0.0.1:8000/api/broadcasting/auth", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: token ? `Bearer ${token}` : "",
+                        Accept: "application/json",
+                    },
+                    body: JSON.stringify({
+                        socket_id: socketId,
+                        channel_name: channel.name,
+                    }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Authorization failed');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    callback(false, data);
+                })
+                .catch(error => {
+                    callback(true, error);
+                });
+            }
+        };
     },
 });
 

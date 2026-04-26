@@ -285,120 +285,123 @@ export default function Chat({ user }) {
                 {!isMe && (
                      <UserAvatar name={otherUser?.name || "User"} size={28} className="me-2 mt-auto d-none d-sm-flex" />
                 )}
-                <div 
-                  className={`chat-bubble p-3 shadow-sm ${isMe ? "bg-primary text-white bubble-me" : "bg-white text-dark bubble-other"}`}
-                  style={{ maxWidth: "75%", borderRadius: '18px' }}
-                >
-                  {m.product && (
-                    <Link 
-                        to={`/product/${m.product.id}`}
-                        className={`mb-2 p-2 rounded-3 small border d-flex gap-2 align-items-center text-decoration-none shadow-sm transition-all hover-translate-y-px ${isMe ? 'bg-white bg-opacity-10 border-white border-opacity-20 text-white' : 'bg-light border-secondary border-opacity-10 text-dark'}`}
-                    >
-                        <div className="rounded overflow-hidden" style={{ width: '40px', height: '40px', flexShrink: 0 }}>
-                            <img src={m.product.image ? `http://127.0.0.1:8000/storage/${m.product.image}` : "https://via.placeholder.com/40"} alt="" className="w-100 h-100 object-fit-cover" />
-                        </div>
-                        <div className="flex-grow-1 overflow-hidden">
-                            <strong className="d-block text-truncate" style={{ fontSize: '11px' }}>{m.product.title}</strong>
-                            <span className="fw-bold" style={{ fontSize: '10px' }}>{m.product.price}€</span>
-                        </div>
-                    </Link>
-                  )}
-                  {m.file_path && (
-                    <div className="mb-2">
-                        {m.file_type === 'image' ? (
-                            <img 
-                                src={`http://127.0.0.1:8000/storage/${m.file_path}`} 
-                                alt="Shared" 
-                                className="img-fluid rounded-3 shadow-sm"
-                                style={{ maxHeight: '250px', cursor: 'zoom-in' }}
-                                onClick={() => window.open(`http://127.0.0.1:8000/storage/${m.file_path}`, '_blank')}
-                            />
-                        ) : (
-                            <div className={`p-2 rounded-3 d-flex align-items-center gap-2 border ${isMe ? 'bg-white bg-opacity-10 border-white border-opacity-20 text-white' : 'bg-light border-secondary border-opacity-10'}`}>
-                                <i className="bi bi-file-earmark-arrow-down fs-4"></i>
-                                <div className="flex-grow-1 overflow-hidden">
-                                    <div className="text-truncate small fw-bold">{m.file_path.split('/').pop()}</div>
-                                    <a 
-                                        href={`http://127.0.0.1:8000/storage/${m.file_path}`} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className={`small text-decoration-none ${isMe ? 'text-white text-opacity-75' : 'text-primary'}`}
-                                    >
-                                        Télécharger
-                                    </a>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                  )}
-                  {m.file_path && m.file_type === 'audio' && (
-                    <div className="mb-2">
-                        <VoicePlayer 
-                            src={`http://127.0.0.1:8000/storage/${m.file_path}`} 
-                            isMe={isMe} 
-                            userAvatar={isMe ? user.avatar : otherUser?.avatar}
-                            userName={isMe ? user.name : otherUser?.name}
-                        />
-                    </div>
-                  )}
-                  {m.content && <p className="mb-1" style={{ fontSize: '15px', lineHeight: '1.5' }}>{m.content}</p>}
-                  
-                  {/* Reactions Display */}
-                  {m.reactions && Object.keys(m.reactions).length > 0 && (
-                      <div className="d-flex flex-wrap gap-1 mt-2">
-                          {Object.entries(m.reactions).map(([emoji, userIds]) => (
-                              <div key={emoji} className={`rounded-pill px-2 py-1 small border d-flex align-items-center gap-1 ${isMe ? 'bg-white bg-opacity-20 border-white border-opacity-25' : 'bg-light border-secondary border-opacity-10'}`} style={{ fontSize: '12px', cursor: 'pointer' }} onClick={() => handleReact(m.id, emoji)}>
-                                  <span>{emoji}</span>
-                                  <span>{userIds.length}</span>
+                
+                <div className={`bubble-wrapper position-relative d-flex align-items-center ${isMe ? "flex-row-reverse" : "flex-row"}`} style={{ maxWidth: "85%" }}>
+                  <div 
+                    className={`chat-bubble p-3 shadow-sm ${isMe ? "bg-primary text-white bubble-me" : "bg-white text-dark bubble-other"}`}
+                    style={{ borderRadius: '18px', position: 'relative' }}
+                  >
+                    {m.product && (
+                      <Link 
+                          to={`/product/${m.product.id}`}
+                          className={`mb-2 p-2 rounded-3 small border d-flex gap-2 align-items-center text-decoration-none shadow-sm transition-all hover-translate-y-px ${isMe ? 'bg-white bg-opacity-10 border-white border-opacity-20 text-white' : 'bg-light border-secondary border-opacity-10 text-dark'}`}
+                      >
+                          <div className="rounded overflow-hidden" style={{ width: '40px', height: '40px', flexShrink: 0 }}>
+                              <img src={m.product.image ? `http://127.0.0.1:8000/storage/${m.product.image}` : "https://via.placeholder.com/40"} alt="" className="w-100 h-100 object-fit-cover" />
+                          </div>
+                          <div className="flex-grow-1 overflow-hidden">
+                              <strong className="d-block text-truncate" style={{ fontSize: '11px' }}>{m.product.title}</strong>
+                              <span className="fw-bold" style={{ fontSize: '10px' }}>{m.product.price}€</span>
+                          </div>
+                      </Link>
+                    )}
+                    {m.file_path && (
+                      <div className="mb-2">
+                          {m.file_type === 'image' ? (
+                              <img 
+                                  src={`http://127.0.0.1:8000/storage/${m.file_path}`} 
+                                  alt="Shared" 
+                                  className="img-fluid rounded-3 shadow-sm"
+                                  style={{ maxHeight: '250px', cursor: 'zoom-in' }}
+                                  onClick={() => window.open(`http://127.0.0.1:8000/storage/${m.file_path}`, '_blank')}
+                              />
+                          ) : (
+                              <div className={`p-2 rounded-3 d-flex align-items-center gap-2 border ${isMe ? 'bg-white bg-opacity-10 border-white border-opacity-20 text-white' : 'bg-light border-secondary border-opacity-10'}`}>
+                                  <i className="bi bi-file-earmark-arrow-down fs-4"></i>
+                                  <div className="flex-grow-1 overflow-hidden">
+                                      <div className="text-truncate small fw-bold">{m.file_path.split('/').pop()}</div>
+                                      <a 
+                                          href={`http://127.0.0.1:8000/storage/${m.file_path}`} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className={`small text-decoration-none ${isMe ? 'text-white text-opacity-75' : 'text-primary'}`}
+                                      >
+                                          Télécharger
+                                      </a>
+                                  </div>
                               </div>
-                          ))}
+                          )}
                       </div>
-                  )}
-
-                  <div className="d-flex align-items-center justify-content-end gap-1 opacity-75" style={{ fontSize: "10px" }}>
-                    <span title={fullDate} style={{ cursor: 'help' }}>
-                        {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                    {isMe && <span className={checkColor}>{checkIcon}</span>}
+                    )}
+                    {m.file_path && m.file_type === 'audio' && (
+                      <div className="mb-2">
+                          <VoicePlayer 
+                              src={`http://127.0.0.1:8000/storage/${m.file_path}`} 
+                              isMe={isMe} 
+                              userAvatar={isMe ? user.avatar : otherUser?.avatar}
+                              userName={isMe ? user.name : otherUser?.name}
+                          />
+                      </div>
+                    )}
+                    {m.content && <p className="mb-1" style={{ fontSize: '15px', lineHeight: '1.5' }}>{m.content}</p>}
+                    
+                    {/* Reactions Display */}
+                    {m.reactions && Object.keys(m.reactions).length > 0 && (
+                        <div className="d-flex flex-wrap gap-1 mt-2">
+                            {Object.entries(m.reactions).map(([emoji, userIds]) => (
+                                <div key={emoji} className={`rounded-pill px-2 py-1 small border d-flex align-items-center gap-1 ${isMe ? 'bg-white bg-opacity-20 border-white border-opacity-25' : 'bg-light border-secondary border-opacity-10'}`} style={{ fontSize: '12px', cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); handleReact(m.id, emoji); }}>
+                                    <span>{emoji}</span>
+                                    <span>{userIds.length}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+  
+                    <div className="d-flex align-items-center justify-content-end gap-1 opacity-75" style={{ fontSize: "10px" }}>
+                      <span title={fullDate} style={{ cursor: 'help' }}>
+                          {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      {isMe && <span className={checkColor}>{checkIcon}</span>}
+                    </div>
+  
+                    {/* Reaction Picker Content */}
+                    <AnimatePresence>
+                      {showPickerId === m.id && (
+                          <motion.div 
+                              initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                              animate={{ opacity: 1, scale: 1, y: 0 }}
+                              exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                              className="reaction-picker position-absolute bottom-100 mb-2 bg-white shadow-lg rounded-pill p-1 d-flex gap-1" 
+                              style={{ left: isMe ? 'auto' : '0', right: isMe ? '0' : 'auto', border: '1px solid #e2e8f0', zIndex: 100 }}
+                          >
+                              {['❤️', '😂', '😮', '😢', '👍', '🔥'].map(emoji => (
+                                  <button 
+                                      key={emoji} 
+                                      className="btn btn-sm btn-light rounded-circle p-1 border-0 transition-transform hover-scale" 
+                                      style={{ fontSize: '18px' }} 
+                                      onClick={() => {
+                                          handleReact(m.id, emoji);
+                                          setShowPickerId(null);
+                                      }}
+                                  >
+                                      {emoji}
+                                  </button>
+                              ))}
+                          </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-
+  
                   {/* Reaction Picker Trigger (Smile Icon on Hover) */}
-                  <div className={`reaction-trigger position-absolute top-0 ${isMe ? 'end-100 me-2' : 'start-100 ms-2'} d-none`}>
+                  <div className={`reaction-trigger px-2 d-none`}>
                       <button 
-                        className="btn btn-sm btn-light rounded-circle shadow-sm p-1 border-0 bg-white" 
-                        onClick={() => setShowPickerId(showPickerId === m.id ? null : m.id)}
+                        className="btn btn-sm btn-light rounded-circle shadow-sm p-1 border-0 bg-white hover-scale" 
+                        onClick={(e) => { e.stopPropagation(); setShowPickerId(showPickerId === m.id ? null : m.id); }}
                         style={{ width: '32px', height: '32px' }}
                       >
                           <Smile size={18} className="text-muted" />
                       </button>
                   </div>
-
-                  {/* Reaction Picker Content */}
-                  <AnimatePresence>
-                    {showPickerId === m.id && (
-                        <motion.div 
-                            initial={{ opacity: 0, scale: 0.8, y: 10 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.8, y: 10 }}
-                            className="reaction-picker position-absolute bottom-100 mb-2 bg-white shadow-lg rounded-pill p-1 d-flex gap-1" 
-                            style={{ left: isMe ? 'auto' : '0', right: isMe ? '0' : 'auto', border: '1px solid #e2e8f0', zIndex: 100 }}
-                        >
-                            {['❤️', '😂', '😮', '😢', '👍', '🔥'].map(emoji => (
-                                <button 
-                                    key={emoji} 
-                                    className="btn btn-sm btn-light rounded-circle p-1 border-0 transition-transform hover-scale" 
-                                    style={{ fontSize: '18px' }} 
-                                    onClick={() => {
-                                        handleReact(m.id, emoji);
-                                        setShowPickerId(null);
-                                    }}
-                                >
-                                    {emoji}
-                                </button>
-                            ))}
-                        </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
               </div>
             );
@@ -509,8 +512,7 @@ export default function Chat({ user }) {
             background-size: 20px 20px;
         }
         .chat-bubble { position: relative; transition: all 0.2s; }
-        .chat-bubble:hover { transform: scale(1.01); }
-        .chat-bubble:hover .reaction-trigger { display: flex !important; }
+        .bubble-wrapper:hover .reaction-trigger { display: flex !important; }
         .hover-scale:hover { transform: scale(1.2); }
         .reaction-trigger { transition: all 0.2s; }
         .hover-translate-y-px:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05) !important; }
