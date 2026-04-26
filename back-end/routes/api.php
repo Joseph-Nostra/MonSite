@@ -92,6 +92,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/messages/call/action', [MessageController::class, 'handleCallAction']);
     Route::post('/messages/{message}/react', [MessageController::class, 'react']);
     Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead']);
+    Route::put('/messages/{message}', [MessageController::class, 'update']);
+    Route::delete('/messages/{message}', [MessageController::class, 'destroy']);
 
     /*
     |---------------- PAYMENTS ----------------

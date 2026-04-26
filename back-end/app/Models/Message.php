@@ -19,11 +19,19 @@ class Message extends Model
         'file_path',
         'file_type',
         'reactions',
+        'is_edited',
+        'edit_history',
+        'deleted_for',
+        'is_deleted_for_everyone',
     ];
 
     protected $casts = [
         'reactions' => 'array',
         'read_at' => 'datetime',
+        'edit_history' => 'array',
+        'deleted_for' => 'array',
+        'is_deleted_for_everyone' => 'boolean',
+        'is_edited' => 'boolean',
     ];
 
     public function sender()

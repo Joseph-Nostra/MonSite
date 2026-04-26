@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use App\Events\CallInitiated;
 use App\Events\CallAction;
 use App\Events\MessageReactionUpdated;
+use App\Events\MessageUpdated;
+use App\Events\MessageDeleted;
 
 class MessageController extends Controller
 {
@@ -216,5 +218,66 @@ class MessageController extends Controller
         broadcast(new MessageReactionUpdated($message->id, $reactions, $otherUserId))->toOthers();
 
         return response()->json($reactions);
+    }
+
+    // 🔹 Modifier un message
+    public function update(Request $request, Message $message)
+    {
+        if ($message->sender_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'content' => 'required|string',
+        ]);
+
+        $history = $message->edit_history ?? [];
+        $history[] = [
+            'content' => $message->content,
+            'edited_at' => now(),
+        ];
+
+        $message->update([
+            'content' => $request->content,
+            'is_edited' => true,
+            'edit_history' => $history,
+        ]);
+
+        broadcast(new MessageUpdated($message))->toOthers();
+
+        return response()->json($message);
+    }
+
+    // 🔹 Supprimer un message
+    public function destroy(Request $request, Message $message)
+    {
+        $request->validate([
+            'delete_type' => 'required|in:for_me,for_everyone',
+        ]);
+
+        $userId = $request->user()->id;
+
+        if ($request->delete_type === 'for_everyone') {
+            if ($message->sender_id !== $userId) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+
+            $message->update([
+                'content' => 'Ce message a été supprimé',
+                'file_path' => null,
+                'file_type' => null,
+                'is_deleted_for_everyone' => true,
+            ]);
+        } else {
+            $deletedFor = $message->deleted_for ?? [];
+            if (!in_array($userId, $deletedFor)) {
+                $deletedFor[] = $userId;
+                $message->update(['deleted_for' => $deletedFor]);
+            }
+        }
+
+        broadcast(new MessageDeleted($message))->toOthers();
+
+        return response()->json(['success' => true, 'message' => $message]);
     }
 }

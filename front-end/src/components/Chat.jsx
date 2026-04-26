@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../axios";
 import { useTranslation } from "react-i18next";
-import { Send, ArrowLeft, MoreVertical, CheckCheck, Check, Mic, Square, Trash2, Phone, Video, Smile } from "lucide-react";
+import { Send, ArrowLeft, MoreVertical, CheckCheck, Check, Mic, Square, Trash2, Phone, Video, Smile, Edit2, X } from "lucide-react";
 import echo from "../echo";
 import UserAvatar from "./Common/UserAvatar";
 import LoadingSpinner from "./Common/LoadingSpinner";
@@ -22,6 +22,11 @@ export default function Chat({ user }) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [showPickerId, setShowPickerId] = useState(null);
+  const [showActionsId, setShowActionsId] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editContent, setEditContent] = useState("");
+  const [deleteModal, setDeleteModal] = useState(null); // { id, isMe }
+  const [showHistoryId, setShowHistoryId] = useState(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const timerRef = useRef(null);
@@ -79,6 +84,16 @@ export default function Chat({ user }) {
       .listen('MessageReactionUpdated', (e) => {
         setMessages(prev => prev.map(m => 
             m.id === e.messageId ? { ...m, reactions: e.reactions } : m
+        ));
+      })
+      .listen('MessageUpdated', (e) => {
+        setMessages(prev => prev.map(m => 
+            m.id === e.message.id ? e.message : m
+        ));
+      })
+      .listen('MessageDeleted', (e) => {
+        setMessages(prev => prev.map(m => 
+            m.id === e.message.id ? e.message : m
         ));
       });
 
@@ -222,6 +237,32 @@ export default function Chat({ user }) {
     }
   };
 
+  const handleUpdate = async (messageId) => {
+    if (!editContent.trim()) return;
+    try {
+        const res = await api.put(`/messages/${messageId}`, { content: editContent });
+        setMessages(prev => prev.map(m => m.id === messageId ? res.data : m));
+        setEditingId(null);
+        setEditContent("");
+    } catch (err) {
+        console.error("Update error:", err);
+    }
+  };
+
+  const handleDelete = async (messageId, type) => {
+    try {
+        const res = await api.delete(`/messages/${messageId}`, { data: { delete_type: type } });
+        if (type === 'for_me') {
+            setMessages(prev => prev.filter(m => m.id !== messageId));
+        } else {
+            setMessages(prev => prev.map(m => m.id === messageId ? res.data.message : m));
+        }
+        setDeleteModal(null);
+    } catch (err) {
+        console.error("Delete error:", err);
+    }
+  };
+
   if (loading) return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
       <LoadingSpinner size="lg" />
@@ -263,9 +304,12 @@ export default function Chat({ user }) {
         
         {/* Chat Body */}
         <div className="card-body overflow-auto p-4 bg-chat-pattern" style={{ flex: 1, backgroundColor: '#f8fafc' }}>
-          {messages.map((m) => {
+          {messages
+            .filter(m => !m.deleted_for?.includes(user.id))
+            .map((m) => {
             const isMe = m.sender_id === user.id;
             const fullDate = new Date(m.created_at).toLocaleString([], { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const isEditing = editingId === m.id;
             
             // Checkmark logic
             let checkIcon = <Check size={12} />;
@@ -274,7 +318,7 @@ export default function Chat({ user }) {
                 checkIcon = <CheckCheck size={12} />;
             } else if (m.status === 'seen' || m.read_at) {
                 checkIcon = <CheckCheck size={12} />;
-                checkColor = isMe ? "text-info" : "text-primary"; // Light blue for dark bg, primary for light bg
+                checkColor = isMe ? "text-info" : "text-primary";
             }
 
             return (
@@ -288,81 +332,144 @@ export default function Chat({ user }) {
                 
                 <div className={`bubble-wrapper position-relative d-flex align-items-center ${isMe ? "flex-row-reverse" : "flex-row"}`} style={{ maxWidth: "85%" }}>
                   <div 
-                    className={`chat-bubble p-3 shadow-sm ${isMe ? "bg-primary text-white bubble-me" : "bg-white text-dark bubble-other"}`}
-                    style={{ borderRadius: '18px', position: 'relative' }}
+                    className={`chat-bubble p-3 shadow-sm ${m.is_deleted_for_everyone ? 'bg-light text-muted italic border' : (isMe ? "bg-primary text-white bubble-me" : "bg-white text-dark bubble-other")}`}
+                    style={{ borderRadius: '18px', position: 'relative', border: m.is_deleted_for_everyone ? '1px dashed #cbd5e1' : 'none' }}
                   >
-                    {m.product && (
-                      <Link 
-                          to={`/product/${m.product.id}`}
-                          className={`mb-2 p-2 rounded-3 small border d-flex gap-2 align-items-center text-decoration-none shadow-sm transition-all hover-translate-y-px ${isMe ? 'bg-white bg-opacity-10 border-white border-opacity-20 text-white' : 'bg-light border-secondary border-opacity-10 text-dark'}`}
-                      >
-                          <div className="rounded overflow-hidden" style={{ width: '40px', height: '40px', flexShrink: 0 }}>
-                              <img src={m.product.image ? `http://127.0.0.1:8000/storage/${m.product.image}` : "https://via.placeholder.com/40"} alt="" className="w-100 h-100 object-fit-cover" />
-                          </div>
-                          <div className="flex-grow-1 overflow-hidden">
-                              <strong className="d-block text-truncate" style={{ fontSize: '11px' }}>{m.product.title}</strong>
-                              <span className="fw-bold" style={{ fontSize: '10px' }}>{m.product.price}€</span>
-                          </div>
-                      </Link>
-                    )}
-                    {m.file_path && (
-                      <div className="mb-2">
-                          {m.file_type === 'image' ? (
-                              <img 
-                                  src={`http://127.0.0.1:8000/storage/${m.file_path}`} 
-                                  alt="Shared" 
-                                  className="img-fluid rounded-3 shadow-sm"
-                                  style={{ maxHeight: '250px', cursor: 'zoom-in' }}
-                                  onClick={() => window.open(`http://127.0.0.1:8000/storage/${m.file_path}`, '_blank')}
-                              />
-                          ) : (
-                              <div className={`p-2 rounded-3 d-flex align-items-center gap-2 border ${isMe ? 'bg-white bg-opacity-10 border-white border-opacity-20 text-white' : 'bg-light border-secondary border-opacity-10'}`}>
-                                  <i className="bi bi-file-earmark-arrow-down fs-4"></i>
-                                  <div className="flex-grow-1 overflow-hidden">
-                                      <div className="text-truncate small fw-bold">{m.file_path.split('/').pop()}</div>
-                                      <a 
-                                          href={`http://127.0.0.1:8000/storage/${m.file_path}`} 
-                                          target="_blank" 
-                                          rel="noopener noreferrer"
-                                          className={`small text-decoration-none ${isMe ? 'text-white text-opacity-75' : 'text-primary'}`}
-                                      >
-                                          Télécharger
-                                      </a>
-                                  </div>
-                              </div>
-                          )}
-                      </div>
-                    )}
-                    {m.file_path && m.file_type === 'audio' && (
-                      <div className="mb-2">
-                          <VoicePlayer 
-                              src={`http://127.0.0.1:8000/storage/${m.file_path}`} 
-                              isMe={isMe} 
-                              userAvatar={isMe ? user.avatar : otherUser?.avatar}
-                              userName={isMe ? user.name : otherUser?.name}
-                          />
-                      </div>
-                    )}
-                    {m.content && <p className="mb-1" style={{ fontSize: '15px', lineHeight: '1.5' }}>{m.content}</p>}
-                    
-                    {/* Reactions Display */}
-                    {m.reactions && Object.keys(m.reactions).length > 0 && (
-                        <div className="d-flex flex-wrap gap-1 mt-2">
-                            {Object.entries(m.reactions).map(([emoji, userIds]) => (
-                                <div key={emoji} className={`rounded-pill px-2 py-1 small border d-flex align-items-center gap-1 ${isMe ? 'bg-white bg-opacity-20 border-white border-opacity-25' : 'bg-light border-secondary border-opacity-10'}`} style={{ fontSize: '12px', cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); handleReact(m.id, emoji); }}>
-                                    <span>{emoji}</span>
-                                    <span>{userIds.length}</span>
+                    {m.is_deleted_for_everyone ? (
+                        <p className="mb-0 small d-flex align-items-center gap-1 opacity-75">
+                            <Trash2 size={14} /> <i>Ce message a été supprimé</i>
+                        </p>
+                    ) : (
+                        <>
+                        {m.product && !isEditing && (
+                            <Link 
+                                to={`/product/${m.product.id}`}
+                                className={`mb-2 p-2 rounded-3 small border d-flex gap-2 align-items-center text-decoration-none shadow-sm transition-all hover-translate-y-px ${isMe ? 'bg-white bg-opacity-10 border-white border-opacity-20 text-white' : 'bg-light border-secondary border-opacity-10 text-dark'}`}
+                            >
+                                <div className="rounded overflow-hidden" style={{ width: '40px', height: '40px', flexShrink: 0 }}>
+                                    <img src={m.product.image ? `http://127.0.0.1:8000/storage/${m.product.image}` : "https://via.placeholder.com/40"} alt="" className="w-100 h-100 object-fit-cover" />
                                 </div>
-                            ))}
+                                <div className="flex-grow-1 overflow-hidden">
+                                    <strong className="d-block text-truncate" style={{ fontSize: '11px' }}>{m.product.title}</strong>
+                                    <span className="fw-bold" style={{ fontSize: '10px' }}>{m.product.price}€</span>
+                                </div>
+                            </Link>
+                        )}
+                        {m.file_path && !isEditing && (
+                            <div className="mb-2">
+                                {m.file_type === 'image' ? (
+                                    <img 
+                                        src={`http://127.0.0.1:8000/storage/${m.file_path}`} 
+                                        alt="Shared" 
+                                        className="img-fluid rounded-3 shadow-sm"
+                                        style={{ maxHeight: '250px', cursor: 'zoom-in' }}
+                                        onClick={() => window.open(`http://127.0.0.1:8000/storage/${m.file_path}`, '_blank')}
+                                    />
+                                ) : m.file_type === 'audio' ? (
+                                    <VoicePlayer 
+                                        src={`http://127.0.0.1:8000/storage/${m.file_path}`} 
+                                        isMe={isMe} 
+                                        userAvatar={isMe ? user.avatar : otherUser?.avatar}
+                                        userName={isMe ? user.name : otherUser?.name}
+                                    />
+                                ) : (
+                                    <div className={`p-2 rounded-3 d-flex align-items-center gap-2 border ${isMe ? 'bg-white bg-opacity-10 border-white border-opacity-20 text-white' : 'bg-light border-secondary border-opacity-10'}`}>
+                                        <i className="bi bi-file-earmark-arrow-down fs-4"></i>
+                                        <div className="flex-grow-1 overflow-hidden">
+                                            <div className="text-truncate small fw-bold">{m.file_path.split('/').pop()}</div>
+                                            <a 
+                                                href={`http://127.0.0.1:8000/storage/${m.file_path}`} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className={`small text-decoration-none ${isMe ? 'text-white text-opacity-75' : 'text-primary'}`}
+                                            >
+                                                Télécharger
+                                            </a>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        
+                        {isEditing ? (
+                            <div className="edit-container">
+                                <textarea 
+                                    className="form-control form-control-sm border-0 shadow-none bg-transparent text-inherit"
+                                    value={editContent}
+                                    onChange={(e) => setEditContent(e.target.value)}
+                                    autoFocus
+                                    style={{ color: isMe ? 'white' : 'inherit', minWidth: '200px' }}
+                                />
+                                <div className="d-flex justify-content-end gap-1 mt-2">
+                                    <button className="btn btn-sm btn-link text-white p-0 opacity-75 hover-opacity-100" onClick={() => setEditingId(null)}>
+                                        <X size={16} />
+                                    </button>
+                                    <button className="btn btn-sm btn-link text-white p-0" onClick={() => handleUpdate(m.id)}>
+                                        <Check size={18} />
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                {m.content && <p className="mb-1" style={{ fontSize: '15px', lineHeight: '1.5' }}>{m.content}</p>}
+                                
+                                {m.is_edited && (
+                                    <div className="mt-1">
+                                        <button 
+                                            className={`btn btn-link p-0 small text-decoration-underline border-0 bg-transparent ${isMe ? 'text-white-50' : 'text-muted'}`}
+                                            style={{ fontSize: '11px' }}
+                                            onClick={() => setShowHistoryId(showHistoryId === m.id ? null : m.id)}
+                                        >
+                                            message modifié
+                                        </button>
+                                        
+                                        <AnimatePresence>
+                                            {showHistoryId === m.id && (
+                                                <motion.div 
+                                                    initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
+                                                    className="position-absolute bg-white shadow-lg rounded-3 p-2 text-dark"
+                                                    style={{ zIndex: 110, width: '250px', top: '100%', left: isMe ? 'auto' : '0', right: isMe ? '0' : 'auto' }}
+                                                >
+                                                    <div className="d-flex justify-content-between align-items-center mb-2 px-1">
+                                                        <span className="fw-bold extra-small uppercase text-muted">Historique</span>
+                                                        <X size={14} className="cursor-pointer" onClick={() => setShowHistoryId(null)} />
+                                                    </div>
+                                                    <div className="overflow-auto" style={{ maxHeight: '150px' }}>
+                                                        {m.edit_history?.map((h, i) => (
+                                                            <div key={i} className="mb-2 p-2 rounded bg-light border-start border-primary border-3">
+                                                                <p className="mb-1 small text-dark" style={{ whiteSpace: 'pre-wrap' }}>{h.content}</p>
+                                                                <span className="text-muted" style={{ fontSize: '9px' }}>{new Date(h.edited_at).toLocaleString()}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                        
+                        {/* Reactions Display */}
+                        {m.reactions && Object.keys(m.reactions).length > 0 && (
+                            <div className="d-flex flex-wrap gap-1 mt-2">
+                                {Object.entries(m.reactions).map(([emoji, userIds]) => (
+                                    <div key={emoji} className={`rounded-pill px-2 py-1 small border d-flex align-items-center gap-1 ${isMe ? 'bg-white bg-opacity-20 border-white border-opacity-25' : 'bg-light border-secondary border-opacity-10'}`} style={{ fontSize: '12px', cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); handleReact(m.id, emoji); }}>
+                                        <span>{emoji}</span>
+                                        <span>{userIds.length}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+      
+                        <div className="d-flex align-items-center justify-content-end gap-1 opacity-75" style={{ fontSize: "10px" }}>
+                          <span title={fullDate} style={{ cursor: 'help' }}>
+                              {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          {isMe && <span className={checkColor}>{checkIcon}</span>}
                         </div>
+                        </>
                     )}
-  
-                    <div className="d-flex align-items-center justify-content-end gap-1 opacity-75" style={{ fontSize: "10px" }}>
-                      <span title={fullDate} style={{ cursor: 'help' }}>
-                          {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                      {isMe && <span className={checkColor}>{checkIcon}</span>}
-                    </div>
   
                     {/* Reaction Picker Content */}
                     <AnimatePresence>
@@ -390,18 +497,47 @@ export default function Chat({ user }) {
                           </motion.div>
                       )}
                     </AnimatePresence>
+
+                    {/* Actions Menu Content */}
+                    <AnimatePresence>
+                        {showActionsId === m.id && (
+                            <motion.div 
+                                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
+                                className="position-absolute bottom-100 mb-2 bg-white shadow-lg rounded-3 py-1 overflow-hidden" 
+                                style={{ right: isMe ? '0' : 'auto', left: isMe ? 'auto' : '0', border: '1px solid #e2e8f0', zIndex: 100, minWidth: '130px' }}
+                            >
+                                {isMe && !m.is_deleted_for_everyone && (
+                                    <button className="dropdown-item d-flex align-items-center gap-2 py-2 text-dark hover-bg-light small" onClick={() => { setEditingId(m.id); setEditContent(m.content); setShowActionsId(null); }}>
+                                        <Edit2 size={14} className="text-muted" /> Modifier
+                                    </button>
+                                )}
+                                <button className="dropdown-item d-flex align-items-center gap-2 py-2 text-danger hover-bg-light small" onClick={() => { setDeleteModal({ id: m.id, isMe }); setShowActionsId(null); }}>
+                                    <Trash2 size={14} /> Supprimer
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                   </div>
   
-                  {/* Reaction Picker Trigger (Smile Icon on Hover) */}
-                  <div className={`reaction-trigger px-2 d-none`}>
-                      <button 
-                        className="btn btn-sm btn-light rounded-circle shadow-sm p-1 border-0 bg-white hover-scale" 
-                        onClick={(e) => { e.stopPropagation(); setShowPickerId(showPickerId === m.id ? null : m.id); }}
-                        style={{ width: '32px', height: '32px' }}
-                      >
-                          <Smile size={18} className="text-muted" />
-                      </button>
-                  </div>
+                  {/* Triggers (Smile & Actions) */}
+                  {!m.is_deleted_for_everyone && (
+                    <div className={`reaction-trigger px-2 d-none items-center gap-1`}>
+                        <button 
+                            className="btn btn-sm btn-light rounded-circle shadow-sm p-1 border-0 bg-white hover-scale" 
+                            onClick={(e) => { e.stopPropagation(); setShowPickerId(showPickerId === m.id ? null : m.id); setShowActionsId(null); }}
+                            style={{ width: '32px', height: '32px' }}
+                        >
+                            <Smile size={18} className="text-muted" />
+                        </button>
+                        <button 
+                            className="btn btn-sm btn-light rounded-circle shadow-sm p-1 border-0 bg-white hover-scale" 
+                            onClick={(e) => { e.stopPropagation(); setShowActionsId(showActionsId === m.id ? null : m.id); setShowPickerId(null); }}
+                            style={{ width: '32px', height: '32px' }}
+                        >
+                            <MoreVertical size={18} className="text-muted" />
+                        </button>
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -479,6 +615,36 @@ export default function Chat({ user }) {
         </div>
       )}
 
+      {/* 🗑️ DELETE CONFIRMATION MODAL */}
+      {deleteModal && (
+          <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ zIndex: 10001, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(3px)' }}>
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                className="bg-white p-4 rounded-4 shadow-xl text-center" style={{ width: '350px' }}
+              >
+                  <div className="bg-danger bg-opacity-10 text-danger rounded-circle p-3 mx-auto mb-3" style={{ width: '60px' }}>
+                    <Trash2 size={24} />
+                  </div>
+                  <h5 className="fw-bold mb-2">Supprimer le message ?</h5>
+                  <p className="text-muted small mb-4">Cette action peut être permanente selon votre choix.</p>
+                  
+                  <div className="d-grid gap-2">
+                    <button className="btn btn-outline-secondary rounded-pill py-2 small fw-bold" onClick={() => handleDelete(deleteModal.id, 'for_me')}>
+                        Supprimer pour moi
+                    </button>
+                    {deleteModal.isMe && (
+                        <button className="btn btn-danger rounded-pill py-2 small fw-bold" onClick={() => handleDelete(deleteModal.id, 'for_everyone')}>
+                            Supprimer pour tout le monde
+                        </button>
+                    )}
+                    <button className="btn btn-light rounded-pill py-2 small fw-bold mt-2" onClick={() => setDeleteModal(null)}>
+                        Annuler
+                    </button>
+                  </div>
+              </motion.div>
+          </div>
+      )}
+
       {/* 📱 ACTIVE CALL OVERLAY */}
       {activeCall && activeCall.otherUser && (
         <div className="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white" style={{ zIndex: 10000, background: '#0f172a' }}>
@@ -515,6 +681,17 @@ export default function Chat({ user }) {
         .bubble-wrapper:hover .reaction-trigger { display: flex !important; }
         .hover-scale:hover { transform: scale(1.2); }
         .reaction-trigger { transition: all 0.2s; }
+        .reaction-trigger.d-none { display: none !important; }
+        .items-center { align-items: center; }
+        .hover-bg-light:hover { background-color: #f8fafc; }
+        .extra-small { font-size: 10px; }
+        .uppercase { text-transform: uppercase; }
+        .cursor-pointer { cursor: pointer; }
+        .hover-opacity-100:hover { opacity: 1 !important; }
+        .text-inherit { color: inherit; }
+        .bubble-me textarea { color: white !important; }
+        .bubble-other textarea { color: #1e293b !important; }
+        .edit-container textarea { resize: none; overflow: hidden; background: rgba(0,0,0,0.05) !important; border-radius: 8px; padding: 5px; }
         .hover-translate-y-px:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05) !important; }
         .animate-pulse { animation: pulse 1.5s infinite; }
         @keyframes pulse {
