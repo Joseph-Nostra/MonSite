@@ -7,8 +7,26 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Events\CallInitiated;
+use App\Events\CallAction;
+use App\Events\MessageReactionUpdated;
+
 class MessageController extends Controller
 {
+    // 🔹 Gérer les actions d'appel (accepter, rejeter, raccrocher)
+    public function handleCallAction(Request $request)
+    {
+        $request->validate([
+            'receiver_id' => 'required|exists:users,id',
+            'action' => 'required|in:accepted,rejected,ended',
+            'call_id' => 'required|string',
+        ]);
+
+        broadcast(new CallAction($request->receiver_id, $request->action, $request->call_id))->toOthers();
+
+        return response()->json(['success' => true]);
+    }
+
     // 🔹 Liste des conversations uniques
     public function index(Request $request)
     {
@@ -68,16 +86,36 @@ class MessageController extends Controller
     {
         $request->validate([
             'receiver_id' => 'required|exists:users,id',
-            'content' => 'required|string',
+            'content' => 'required_without:file|nullable|string',
             'product_id' => 'nullable|exists:products,id',
+            'file' => 'nullable|file|max:10240', // 10MB max
         ]);
+
+        $filePath = null;
+        $fileType = null;
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filePath = $file->store('chat_attachments', 'public');
+            
+            $mime = $file->getMimeType();
+            if (str_starts_with($mime, 'image/')) {
+                $fileType = 'image';
+            } elseif (str_starts_with($mime, 'audio/')) {
+                $fileType = 'audio';
+            } else {
+                $fileType = 'file';
+            }
+        }
 
         $message = Message::create([
             'sender_id' => $request->user()->id,
             'receiver_id' => $request->receiver_id,
             'product_id' => $request->product_id,
-            'content' => $request->content,
+            'content' => $request->content ?? '',
             'status' => 'sent',
+            'file_path' => $filePath,
+            'file_type' => $fileType,
         ]);
 
         // 🔥 Diffuser l'événement en temps réel
@@ -126,5 +164,57 @@ class MessageController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    // 🔹 Initier un appel
+    public function initiateCall(Request $request)
+    {
+        $request->validate([
+            'receiver_id' => 'required|exists:users,id',
+            'type' => 'required|in:audio,video',
+        ]);
+
+        $caller = $request->user();
+        
+        $event = new CallInitiated([
+            'id' => $caller->id,
+            'name' => $caller->name
+        ], $request->receiver_id, $request->type);
+        
+        broadcast($event)->toOthers();
+
+        return response()->json([
+            'success' => true, 
+            'message' => 'Call initiated',
+            'callId' => $event->callId
+        ]);
+    }
+
+    // 🔹 Réagir à un message
+    public function react(Request $request, Message $message)
+    {
+        $request->validate([
+            'reaction' => 'required|string', // emoji
+        ]);
+
+        $userId = $request->user()->id;
+        $reactions = $message->reactions ?? [];
+
+        // Si l'utilisateur a déjà réagi avec cet emoji, on le retire, sinon on l'ajoute
+        if (isset($reactions[$request->reaction]) && in_array($userId, $reactions[$request->reaction])) {
+            $reactions[$request->reaction] = array_values(array_diff($reactions[$request->reaction], [$userId]));
+            if (empty($reactions[$request->reaction])) {
+                unset($reactions[$request->reaction]);
+            }
+        } else {
+            $reactions[$request->reaction][] = $userId;
+        }
+
+        $message->update(['reactions' => $reactions]);
+
+        $otherUserId = ($message->sender_id == $userId) ? $message->receiver_id : $message->sender_id;
+        broadcast(new MessageReactionUpdated($message->id, $reactions, $otherUserId))->toOthers();
+
+        return response()->json($reactions);
     }
 }

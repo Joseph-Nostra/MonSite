@@ -35,13 +35,32 @@ function ProductCard({ product, onAddToCart, user, handleEdit, handleDelete }) {
 
       {/* ❤️ Wishlist Heart */}
       {(!user || user.role === "client") && (
-        <button 
-          className={`position-absolute top-0 end-0 m-2 btn-wishlist border-0 shadow-sm ${isWishlisted ? 'active' : ''}`}
-          onClick={toggleWishlist}
-          style={{ zIndex: 10 }}
-        >
-          <i className={`bi bi-heart${isWishlisted ? '-fill text-danger' : ''}`}></i>
-        </button>
+        <div className="position-absolute top-0 end-0 m-2 d-flex flex-column gap-2" style={{ zIndex: 10 }}>
+            <button 
+                className={`btn-action border-0 shadow-sm ${isWishlisted ? 'active' : ''}`}
+                onClick={toggleWishlist}
+            >
+                <i className={`bi bi-heart${isWishlisted ? '-fill text-danger' : ''}`}></i>
+            </button>
+            <button 
+                className="btn-action border-0 shadow-sm"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    const current = JSON.parse(localStorage.getItem('compare_ids') || '[]');
+                    if (current.includes(product.id)) {
+                        const next = current.filter(id => id !== product.id);
+                        localStorage.setItem('compare_ids', JSON.stringify(next));
+                    } else {
+                        if (current.length >= 4) return alert("Vous ne pouvez comparer que 4 produits maximum.");
+                        localStorage.setItem('compare_ids', JSON.stringify([...current, product.id]));
+                        window.dispatchEvent(new Event('compare-updated'));
+                    }
+                }}
+                title={t('compare') || "Comparer"}
+            >
+                <i className="bi bi-arrow-left-right"></i>
+            </button>
+        </div>
       )}
 
       <div style={{ height: "180px", overflow: "hidden" }} className="position-relative">
@@ -85,7 +104,11 @@ function ProductCard({ product, onAddToCart, user, handleEdit, handleDelete }) {
             <span className="fw-bold fs-5 text-primary m-0">${product.price}</span>
             <div className="d-flex gap-1">
                 {(!user || user.role === "client") ? (
-                    <button className="btn btn-primary btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center" onClick={() => onAddToCart(product)} style={{ width: '34px', height: '34px' }}>
+                    <button 
+                        className="btn btn-primary btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center" 
+                        onClick={() => onAddToCart && onAddToCart(product)} 
+                        style={{ width: '34px', height: '34px' }}
+                    >
                         <i className="bi bi-cart-plus"></i>
                     </button>
                 ) : (
@@ -101,9 +124,9 @@ function ProductCard({ product, onAddToCart, user, handleEdit, handleDelete }) {
       <style>{`
         .product-card-premium { transition: all 0.3s; border-radius: 12px !important; overflow: hidden; }
         .product-card-premium:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
-        .btn-wishlist { background: rgba(255,255,255,0.9); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .btn-wishlist:hover { transform: scale(1.1); background: #fff; }
-        .btn-wishlist.active { background: #fff; }
+        .btn-action { background: rgba(255,255,255,0.9); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-action:hover { transform: scale(1.1); background: #fff; }
+        .btn-action.active { background: #fff; }
       `}</style>
     </div>
   );

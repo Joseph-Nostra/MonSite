@@ -25,8 +25,10 @@ import Chat from "./components/Chat";
 import OrderDetails from "./components/OrderDetails";
 import InfoPage from "./components/InfoPage";
 import CookieBanner from "./components/Common/CookieBanner";
+import MobileBottomNav from "./components/Common/BottomNav";
 
 import LandingPage from "./components/LandingPage";
+import ComparisonPage from "./components/ComparisonPage";
 import NotFound from "./components/NotFound";
 import LoadingSpinner from "./components/Common/LoadingSpinner";
 
@@ -94,7 +96,7 @@ function App() {
     
     
     <Router>
-      <CookieBanner />
+      <CookieBanner user={user} />
       <AppContent
         user={user}
         setUser={setUser}
@@ -175,7 +177,8 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
 
       <main className="flex-grow-1 container-fluid mt-5 pt-3">
         <Routes>
-          <Route path="/" element={<LandingPage user={user} />} />
+          <Route path="/" element={<LandingPage user={user} onAddToCart={handleAddToCart} />} />
+          <Route path="/compare" element={<ComparisonPage />} />
           {/* AUTH */}
           <Route path="/login" element={<LoginForm setUser={setUser} />} />
           <Route path="/register" element={<RegisterForm setUser={setUser} />} />
@@ -272,7 +275,13 @@ function AppContent({ user, setUser, cart, setCart, loading , notification, setN
       </main>
 
       <Footer />
+      <MobileBottomNav user={user} />
       <Toast message={notification.message} type={notification.type} onClose={() => setNotification({ message: "", type: "" })} />
+      <style>{`
+        @media (max-width: 767px) {
+          main { padding-bottom: 80px !important; }
+        }
+      `}</style>
     </div>
   );
 }

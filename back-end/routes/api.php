@@ -14,6 +14,9 @@ use App\Http\Controllers\InformationController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\SimulatorController;
+use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\ComparisonController;
+use App\Http\Controllers\InvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +29,9 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/search', [ProductController::class, 'search']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::get('/products/{id}/reviews', [ReviewController::class, 'index']);
+Route::post('/products/{id}/view', [RecommendationController::class, 'logView']);
+Route::get('/recommendations', [RecommendationController::class, 'index']);
+Route::get('/comparison', [ComparisonController::class, 'index']);
 
 // Simulator
 Route::post('/simulator/recommend', [SimulatorController::class, 'recommend']);
@@ -64,6 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
     */
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
+    Route::get('/orders/{id}/invoice', [InvoiceController::class, 'download']);
     Route::post('/orders/checkout', [OrderController::class, 'checkout']);
 
     /*
@@ -81,6 +88,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/messages/unread-count', [MessageController::class, 'unreadCount']);
     Route::get('/messages/{otherUserId}', [MessageController::class, 'show']);
     Route::post('/messages', [MessageController::class, 'store']);
+    Route::post('/messages/call', [MessageController::class, 'initiateCall']);
+    Route::post('/messages/call/action', [MessageController::class, 'handleCallAction']);
+    Route::post('/messages/{message}/react', [MessageController::class, 'react']);
     Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead']);
 
     /*

@@ -2,8 +2,9 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useDocTitle from "../hooks/useDocTitle";
 import { useTranslation } from "react-i18next";
+import RecommendationCarousel from "./RecommendationCarousel";
 
-export default function LandingPage({ user }) {
+export default function LandingPage({ user, onAddToCart }) {
   const { t } = useTranslation();
   useDocTitle(t('welcome'));
   const navigate = useNavigate();
@@ -70,6 +71,13 @@ export default function LandingPage({ user }) {
           </div>
         </div>
       </div>
+
+      {/* Recommendations */}
+      <RecommendationCarousel 
+        title={t('our_best_products') || "Nos meilleurs produits"} 
+        user={user}
+        onAddToCart={onAddToCart}
+      />
 
       <style>{`
         .transition-hover {

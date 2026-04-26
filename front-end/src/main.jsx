@@ -15,6 +15,13 @@ import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 // À remplacer par les vraies clés en prod
 const stripePromise = loadStripe('pk_test_51O7...placeholder');
 
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+  });
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <PayPalScriptProvider options={{ "client-id": "test" }}>

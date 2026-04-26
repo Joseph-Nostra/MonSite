@@ -5,6 +5,7 @@ import Logo from "./Common/Logo";
 import LoadingSpinner from "./Common/LoadingSpinner";
 import { useTranslation } from "react-i18next";
 import UserAvatar from "./Common/UserAvatar";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function NavBar({ user, setUser, loading, theme, setTheme }) {
   const { t, i18n } = useTranslation();
@@ -13,8 +14,15 @@ export default function NavBar({ user, setUser, loading, theme, setTheme }) {
   const [unread, setUnread] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const showSearch = location.pathname === "/products";
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -30,6 +38,7 @@ export default function NavBar({ user, setUser, loading, theme, setTheme }) {
     };
     fetchStats();
     const interval = setInterval(fetchStats, 10000);
+    
     return () => clearInterval(interval);
   }, [user]);
 
@@ -46,191 +55,302 @@ export default function NavBar({ user, setUser, loading, theme, setTheme }) {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    navigate(`/products?q=${searchTerm}`);
+    if (searchTerm.trim()) {
+        navigate(`/products?q=${searchTerm}`);
+    }
   };
 
   return (
-    <header className="fixed-top shadow-lg navbar-custom" style={{ height: '70px', zIndex: 1050, backgroundColor: '#0f172a', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-      <div className="h-100 px-4 d-grid align-items-center" style={{ gridTemplateColumns: '1fr auto 1fr', gap: '20px' }}>
+    <header 
+        className={`fixed-top transition-all duration-300 ${isScrolled ? 'nav-scrolled shadow-2xl' : 'nav-initial'}`} 
+        style={{ 
+            height: '80px', 
+            zIndex: 1050, 
+            backgroundColor: isScrolled ? 'rgba(15, 23, 42, 0.95)' : '#0f172a',
+            backdropFilter: isScrolled ? 'blur(12px)' : 'none',
+            borderBottom: '1px solid rgba(255,255,255,0.08)'
+        }}
+    >
+      <div className="h-100 px-4 px-xl-5 d-flex align-items-center justify-content-between gap-4">
         
-        {/* 🧱 1. LOGO (GAUCHE) */}
-        <div className="d-flex align-items-center justify-content-start">
+        {/* 🧱 1. LOGO */}
+        <motion.div 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="d-flex align-items-center flex-shrink-0"
+        >
           <Logo />
-        </div>
+        </motion.div>
 
-        {/* 🔍 2. BARRE DE RECHERCHE (CENTRE - Conditional) */}
-        <div className="d-flex justify-content-center align-items-center" style={{ minWidth: '350px' }}>
-          {showSearch ? (
-            <form className="w-100" style={{ maxWidth: '450px' }} onSubmit={handleSearch}>
-              <div className="input-group input-group-sm">
-                <span className="input-group-text bg-secondary border-0 text-white-50 px-3 rounded-start-pill">
-                  <i className="bi bi-search"></i>
+        {/* 🔍 2. SEARCH (CENTERED) */}
+        <div className="flex-grow-1 d-none d-md-flex justify-content-center" style={{ maxWidth: '600px' }}>
+          {showSearch && (
+            <motion.form 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-100" 
+                onSubmit={handleSearch}
+            >
+              <div className="input-group search-group-premium overflow-hidden rounded-pill border border-white border-opacity-10 shadow-inner" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                <span className="input-group-text bg-transparent border-0 text-slate-500 ps-4">
+                  <i className="bi bi-search fs-6"></i>
                 </span>
                 <input
-                  className="form-control search-input py-2"
+                  className="form-control bg-transparent border-0 text-white py-2 ps-2"
                   type="search"
-                  placeholder="Rechercher par nom, prix..."
+                  placeholder="Rechercher un produit, une référence..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{ fontSize: '14px', boxShadow: 'none' }}
                 />
-                <button className="btn btn-primary px-4 rounded-end-pill fw-bold border-0" type="submit" style={{ background: 'linear-gradient(45deg, #0d6efd, #00d2ff)' }}>
-                  Chercher
+                <button className="btn btn-primary px-4 py-2 fw-bold border-0 transition-all hover-glow" type="submit" style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
+                  {t('search')}
                 </button>
               </div>
-            </form>
-          ) : (
-            <div style={{ height: '38px', width: '350px' }}></div>
+            </motion.form>
           )}
         </div>
 
-        {/* 👤 3. ACTIONS (DROITE) */}
-        <div className="d-flex align-items-center justify-content-end gap-3 text-nowrap">
+        {/* 👤 3. ACTIONS */}
+        <div className="d-flex align-items-center gap-2 gap-xl-3 text-nowrap">
           
-          {/* THEME TOGGLE */}
-          <button className="btn-icon-nav" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} title={t('dark_mode')}>
-            {theme === 'light' ? <i className="bi bi-moon-stars fs-5"></i> : <i className="bi bi-sun fs-5 text-warning"></i>}
-          </button>
-
-          {/* LANGUAGE DROPDOWN */}
-          <div className="dropdown">
-            <button className="btn-icon-nav dropdown-toggle border-0" data-bs-toggle="dropdown">
-              <i className="bi bi-translate fs-5"></i>
+          {/* THEME & LANG (DESKTOP) */}
+          <div className="d-none d-lg-flex align-items-center gap-2 me-2 border-end border-white border-opacity-10 pe-3">
+            <button className="nav-action-btn" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} title={t('dark_mode')}>
+                {theme === 'light' ? <i className="bi bi-moon-stars"></i> : <i className="bi bi-sun text-warning"></i>}
             </button>
-            <ul className="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
-               <li><button className="dropdown-item py-1" onClick={() => i18n.changeLanguage('fr')}>🇫🇷 Français</button></li>
-               <li><button className="dropdown-item py-1" onClick={() => i18n.changeLanguage('en')}>🇺🇸 English</button></li>
-               <li><button className="dropdown-item py-1" onClick={() => i18n.changeLanguage('ar')}>🇲🇦 العربية</button></li>
-            </ul>
-          </div>
-          {!loading && user ? (
-            <>
-              {/* AJOUTER PRODUIT */}
-              {(user.role === "vendeur" || user.role === "admin") && (
-                <button 
-                  className="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2 btn-main-action border-0"
-                  onClick={() => navigate("/add-product")}
-                  style={{ fontSize: '14px', background: 'linear-gradient(45deg, #0d6efd, #00d2ff)' }}
-                >
-                  <i className="bi bi-plus-circle-fill"></i> Vendre
+
+            <div className="dropdown">
+                <button className="nav-action-btn dropdown-toggle border-0" data-bs-toggle="dropdown">
+                    <i className="bi bi-translate"></i>
                 </button>
+                <ul className="dropdown-menu dropdown-menu-end shadow-2xl border-0 rounded-4 mt-2 p-2 glass-dropdown">
+                    <li><button className="dropdown-item rounded-3 py-2" onClick={() => i18n.changeLanguage('fr')}>🇫🇷 Français</button></li>
+                    <li><button className="dropdown-item rounded-3 py-2" onClick={() => i18n.changeLanguage('en')}>🇺🇸 English</button></li>
+                    <li><button className="dropdown-item rounded-3 py-2" onClick={() => i18n.changeLanguage('ar')}>🇲🇦 العربية</button></li>
+                </ul>
+            </div>
+          </div>
+
+          {!loading && user ? (
+            <div className="d-flex align-items-center gap-2 gap-xl-3">
+              {/* SELLER SPECIFIC ACTION */}
+              {(user.role === "vendeur" || user.role === "admin") && (
+                <motion.button 
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-lg border-0 d-none d-md-flex align-items-center gap-2 btn-vendre"
+                  onClick={() => navigate("/add-product")}
+                  style={{ background: 'linear-gradient(135deg, #10b981, #3b82f6)', fontSize: '14px' }}
+                >
+                  <i className="bi bi-plus-circle"></i> Vendre
+                </motion.button>
               )}
 
-              {/* MESSAGES */}
-              <button className="btn-icon-nav position-relative" onClick={() => navigate("/messages")} title="Messages">
-                <i className="bi bi-chat-dots fs-5"></i>
-                {unreadMessages > 0 && <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-dark border-2 notification-badge">{unreadMessages}</span>}
-              </button>
+              {/* MESSAGES & NOTIFS */}
+              <div className="d-flex align-items-center gap-1">
+                <button className="nav-action-btn position-relative" onClick={() => navigate("/messages")} title="Messages">
+                    <i className="bi bi-chat-left-dots"></i>
+                    {unreadMessages > 0 && <span className="badge-notification">{unreadMessages}</span>}
+                </button>
 
-              {/* DROPDOWN MENU */}
-              <div className="dropdown ms-1">
-                <button className="user-profile-btn dropdown-toggle border-0" data-bs-toggle="dropdown" aria-expanded="false" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                  <div className="d-flex align-items-center gap-2">
-                    <UserAvatar name={user.name} src={user.avatar} size={34} />
-                    <div className="flex-grow-1 overflow-hidden d-none d-xl-block text-start">
-                        <div className="fw-bold text-truncate text-white" style={{ fontSize: '14px' }}>{user.name}</div>
-                        <div className="small text-muted d-flex align-items-center gap-1" style={{ fontSize: '11px' }}>
-                            <span className="dot bg-success rounded-circle" style={{ width: '6px', height: '6px' }}></span> {t('online')}
+                <button className="nav-action-btn position-relative d-none d-sm-flex" onClick={() => navigate("/compare")} title="Comparer">
+                    <i className="bi bi-arrow-left-right"></i>
+                    {JSON.parse(localStorage.getItem('compare_ids') || '[]').length > 0 && (
+                        <span className="badge-notification bg-cyan">{JSON.parse(localStorage.getItem('compare_ids') || '[]').length}</span>
+                    )}
+                </button>
+              </div>
+
+              {/* USER PROFILE */}
+              <div className="dropdown ms-1 ms-xl-2">
+                <button className="profile-trigger dropdown-toggle border-0" data-bs-toggle="dropdown">
+                  <div className="d-flex align-items-center gap-2 gap-xl-3">
+                    <div className="avatar-wrapper">
+                        <UserAvatar name={user.name} src={user.avatar} size={38} />
+                        <span className="status-indicator online"></span>
+                    </div>
+                    <div className="d-none d-lg-block text-start leading-none">
+                        <div className="fw-bold text-white mb-0.5" style={{ fontSize: '13.5px', letterSpacing: '-0.01em' }}>{user.name}</div>
+                        <div className="text-slate-400 font-medium d-flex align-items-center gap-1" style={{ fontSize: '10.5px' }}>
+                            <span className="opacity-60">{user.role === 'vendeur' ? 'VENDEUR' : 'CLIENT'}</span>
                         </div>
                     </div>
-                    <i className="bi bi-chevron-down small ms-1 text-muted"></i>
+                    <div className="chevron-icon-wrapper d-none d-sm-flex align-items-center justify-content-center">
+                        <i className="bi bi-chevron-down text-slate-500" style={{ fontSize: '12px' }}></i>
+                    </div>
                   </div>
                 </button>
-                <ul className="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-3 py-2 animate-dropdown" style={{ minWidth: '240px' }}>
-                  <div className="px-4 py-3 mb-1 bg-light rounded-top-4 mx-2 mt-2">
+                <ul className="dropdown-menu dropdown-menu-end shadow-2xl border-0 rounded-4 mt-3 p-2 glass-dropdown animate-slide-in" style={{ minWidth: '260px' }}>
+                  <div className="px-3 py-3 mb-2 bg-white bg-opacity-5 rounded-4 mx-1">
                       <div className="d-flex align-items-center gap-3">
                         <UserAvatar name={user.name} src={user.avatar} size={45} />
                         <div className="overflow-hidden">
                             <p className="mb-0 fw-bold text-white text-truncate">{user.name}</p>
-                            <p className="mb-0 text-muted" style={{ fontSize: '11px' }}>{t('account')} {user.role.toUpperCase()}</p>
+                            <p className="mb-0 text-slate-500" style={{ fontSize: '11px' }}>{user.email}</p>
                         </div>
                       </div>
                   </div>
-                  <li><hr className="dropdown-divider opacity-50 mx-2" /></li>
                   
-                  {/* Mes commandes */}
-                  <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/orders")}>
-                    <i className="bi bi-bag-check text-primary"></i> {t('my_orders')}
-                  </button></li>
-
-                  {/* Favoris */}
-                  <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/settings", { state: { tab: 'favorites' } })}>
-                    <i className="bi bi-heart text-danger"></i> {t('favorites')}
-                  </button></li>
-
-                  {/* Mes produits (if vendor) */}
+                  <li><Link className="dropdown-item py-2" to="/orders"><i className="bi bi-bag me-3 text-primary"></i> {t('my_orders')}</Link></li>
+                  <li><Link className="dropdown-item py-2" to="/settings" state={{ tab: 'favorites' }}><i className="bi bi-heart me-3 text-danger"></i> {t('favorites')}</Link></li>
+                  
+                  {/* Vendor Links */}
                   {(user.role === 'vendeur' || user.role === 'admin') && (
-                    <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/my-products")}>
-                      <i className="bi bi-box-seam text-primary"></i> {t('my_products')}
-                    </button></li>
+                    <>
+                        <div className="dropdown-divider opacity-10 mx-2"></div>
+                        <li><Link className="dropdown-item py-2" to="/my-products"><i className="bi bi-box-seam me-3 text-emerald"></i> {t('my_products')}</Link></li>
+                        <li><Link className="dropdown-item py-2" to="/stats"><i className="bi bi-graph-up-arrow me-3 text-emerald"></i> Statistiques</Link></li>
+                    </>
                   )}
 
-                  {/* Statistiques (if vendor) */}
-                  {(user.role === 'vendeur' || user.role === 'admin') && (
-                    <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/stats")}>
-                      <i className="bi bi-graph-up-arrow text-primary"></i> Statistiques
-                    </button></li>
-                  )}
-
-                  <div className="dropdown-divider opacity-50 mx-2"></div>
-
-                  {/* Paramètres */}
-                  <li><button className="dropdown-item py-2 px-3 d-flex align-items-center gap-3" onClick={() => navigate("/settings")}>
-                    <i className="bi bi-gear text-secondary"></i> Paramètres
-                  </button></li>
-
-                  <li><hr className="dropdown-divider opacity-50 mx-2" /></li>
-
-                  {/* Déconnexion */}
-                  <li><button className="dropdown-item py-2 px-3 text-danger fw-bold d-flex align-items-center gap-3" onClick={handleLogout}>
-                    <i className="bi bi-box-arrow-right"></i> Déconnexion
-                  </button></li>
+                  <div className="dropdown-divider opacity-10 mx-2"></div>
+                  <li><Link className="dropdown-item py-2" to="/settings"><i className="bi bi-gear me-3 text-slate-400"></i> {t('settings')}</Link></li>
+                  <li><button className="dropdown-item py-2 text-danger fw-bold" onClick={handleLogout}><i className="bi bi-box-arrow-right me-3"></i> {t('logout')}</button></li>
                 </ul>
               </div>
-            </>
+            </div>
           ) : !loading && (
             <div className="d-flex gap-2">
-              <Link className="btn text-white fw-semibold" to="/login">Connexion</Link>
-              <Link className="btn btn-primary rounded-pill px-4 fw-bold" to="/register">S'inscrire</Link>
+              <Link className="btn btn-outline-light rounded-pill px-4 fw-semibold border-0 hover-bg-light" to="/login">Connexion</Link>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link className="btn btn-primary rounded-pill px-4 fw-bold shadow-lg border-0" to="/register" style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>S'inscrire</Link>
+              </motion.div>
             </div>
           )}
         </div>
 
       </div>
       <style>{`
-        .navbar-custom {
-            background-color: var(--card-bg);
-            border-color: var(--border-color) !important;
-            color: var(--text-color);
-        }
-        .bg-secondary { background-color: rgba(128, 128, 128, 0.1) !important; }
-        .form-control { color: var(--text-color) !important; }
-        .dropdown-menu { background-color: var(--card-bg); border: 1px solid var(--border-color); }
-        .dropdown-item { color: var(--text-color) !important; }
-        .input-group-text { background-color: rgba(255, 255, 255, 0.1) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: rgba(255, 255, 255, 0.7) !important; }
-        .search-input { background-color: rgba(255, 255, 255, 0.05) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: white !important; }
-        .search-input::placeholder { color: rgba(255, 255, 255, 0.4) !important; }
-        .btn-icon-nav { background: transparent; border: none; padding: 8px; color: var(--text-color); opacity: 0.7; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-        .btn-icon-nav:hover { transform: translateY(-2px); color: #fff; }
-        .notification-badge { font-size: 10px; padding: 4.5px 6.5px; top: 8px !important; right: 0px !important; }
+        .nav-scrolled { transition: all 0.3s; }
+        .nav-initial { transition: all 0.3s; }
         
-        .user-profile-btn { 
-            display: flex; 
-            align-items: center; 
-            padding: 4px 12px;
+        .nav-action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+            padding: 0;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .nav-action-btn i { font-size: 1.25rem; }
+        .nav-action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .badge-notification {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #0f172a;
+        }
+        .bg-cyan { background: #06b6d4; }
+        
+        .profile-trigger {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06) !important;
+            padding: 4px 10px 4px 4px;
             border-radius: 50px;
-            transition: background 0.2s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .user-profile-btn:hover { background: rgba(255, 255, 255, 0.1); }
-        .user-profile-btn::after { display: none; }
+        .profile-trigger:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            transform: translateY(-1px);
+        }
         
-        .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(45deg, #0d6efd, #00d2ff); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 15px; }
-        .user-name { font-size: 14px; }
-        .dropdown-item { font-size: 14px; border-radius: 8px; margin: 0 8px; width: calc(100% - 16px); transition: all 0.2s; }
-        .dropdown-item:hover { background: #f8f9fa; transform: translateX(3px); }
-        .animate-dropdown { animation: slideDown 0.2s ease-out; transform-origin: top right; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        .btn-main-action { transition: all 0.3s; }
-        .btn-main-action:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4); }
+        .chevron-icon-wrapper {
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+            margin-left: 4px;
+            transition: all 0.2s;
+        }
+        .profile-trigger:hover .chevron-icon-wrapper {
+            background: rgba(255, 255, 255, 0.08);
+            transform: rotate(180deg);
+        }
+        
+        .avatar-wrapper { position: relative; }
+        .status-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid #0f172a;
+        }
+        .status-indicator.online { background: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+        
+        .glass-dropdown {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+        .dropdown-item {
+            color: #94a3b8 !important;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.08) !important;
+            color: #fff !important;
+            transform: translateX(4px);
+        }
+        
+        .hover-bg-light:hover { background: rgba(255, 255, 255, 0.05) !important; }
+        .hover-glow:hover { box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+        
+        .animate-slide-in {
+            animation: navSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-origin: top right;
+        }
+        @keyframes navSlideIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .text-emerald { color: #10b981 !important; }
+        
+        .btn-vendre {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-vendre::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 4s infinite;
+        }
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 100%; }
+            100% { left: 100%; }
+        }
       `}</style>
     </header>
   );

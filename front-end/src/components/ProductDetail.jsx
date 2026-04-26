@@ -3,8 +3,11 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../axios";
 import LoadingSpinner from "./Common/LoadingSpinner";
 import useDocTitle from "../hooks/useDocTitle";
+import RecommendationCarousel from "./RecommendationCarousel";
+import { useTranslation } from "react-i18next";
 
 function ProductDetail({ onAddToCart, user }) {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -189,6 +192,12 @@ function ProductDetail({ onAddToCart, user }) {
            </div>
         </div>
       </div>
+
+      <RecommendationCarousel 
+        title={t('you_might_also_like') || "Vous pourriez aussi aimer..."} 
+        user={user} 
+        onAddToCart={onAddToCart} 
+      />
     </div>
   );
 }

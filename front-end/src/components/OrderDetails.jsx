@@ -110,9 +110,14 @@ export default function OrderDetails() {
         </div>
 
         <div className="card-footer bg-white border-0 p-4 text-center">
-          <button className="btn btn-outline-dark me-2 rounded-pill px-4" onClick={() => window.print()}>
-            🖨 Imprimer / PDF
-          </button>
+          <a 
+            href={`http://127.0.0.1:8000/api/orders/${order.id}/invoice?token=${localStorage.getItem('token')}`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="btn btn-outline-primary me-2 rounded-pill px-4 fw-bold"
+          >
+            📄 Télécharger Facture PDF
+          </a>
           <button className="btn btn-primary rounded-pill px-4" onClick={() => navigate("/orders")}>
             Retour aux commandes
           </button>

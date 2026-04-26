@@ -101,6 +101,13 @@ class ProductController extends Controller
             return response()->json(['message' => 'Produit non trouvé'], 404);
         }
 
+        // Log view (AI Recommendation System)
+        try {
+            app(RecommendationController::class)->logView(request(), $id);
+        } catch (\Exception $e) {
+            // Silently fail if logView fails to avoid breaking product details
+        }
+
         return response()->json($product);
     }
 

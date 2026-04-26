@@ -16,6 +16,14 @@ class Message extends Model
         'content',
         'read_at',
         'status',
+        'file_path',
+        'file_type',
+        'reactions',
+    ];
+
+    protected $casts = [
+        'reactions' => 'array',
+        'read_at' => 'datetime',
     ];
 
     public function sender()
