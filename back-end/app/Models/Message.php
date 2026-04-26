@@ -23,6 +23,7 @@ class Message extends Model
         'edit_history',
         'deleted_for',
         'is_deleted_for_everyone',
+        'parent_id',
     ];
 
     protected $casts = [
@@ -33,6 +34,11 @@ class Message extends Model
         'is_deleted_for_everyone' => 'boolean',
         'is_edited' => 'boolean',
     ];
+
+    public function parent()
+    {
+        return $this->belongsTo(Message::class, 'parent_id');
+    }
 
     public function sender()
     {

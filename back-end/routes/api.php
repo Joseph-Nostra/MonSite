@@ -120,6 +120,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reviews', [ReviewController::class, 'store']);
     Route::get('/wishlist', [WishlistController::class, 'index']);
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle']);
+
+    // Reports
+    Route::post('/reports', [ReportController::class, 'store']);
 });
 
 // Public payment routes (Webhooks)

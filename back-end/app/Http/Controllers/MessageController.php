@@ -41,7 +41,15 @@ class MessageController extends Controller
             ->get()
             ->map(function ($message) use ($userId) {
                 // Déterminer l'autre personne dans la conversation
-                return $message->sender_id == $userId ? $message->receiver : $message->sender;
+                $otherUser = $message->sender_id == $userId ? $message->receiver : $message->sender;
+                
+                // Compter les messages non lus envoyés par cet "autre utilisateur" à l'utilisateur actuel
+                $otherUser->unread_count = Message::where('sender_id', $otherUser->id)
+                    ->where('receiver_id', $userId)
+                    ->whereNull('read_at')
+                    ->count();
+
+                return $otherUser;
             })
             ->unique('id')
             ->values();
@@ -59,7 +67,7 @@ class MessageController extends Controller
         })->orWhere(function ($query) use ($userId, $otherUserId) {
             $query->where('sender_id', $otherUserId)->where('receiver_id', $userId);
         })
-        ->with('product:id,title,price')
+        ->with(['product:id,title,price', 'parent.sender:id,name'])
         ->oldest()
         ->get();
 
@@ -90,6 +98,7 @@ class MessageController extends Controller
             'receiver_id' => 'required|exists:users,id',
             'content' => 'required_without:file|nullable|string',
             'product_id' => 'nullable|exists:products,id',
+            'parent_id' => 'nullable|exists:messages,id',
             'file' => 'nullable|file|max:10240', // 10MB max
         ]);
 
@@ -118,7 +127,10 @@ class MessageController extends Controller
             'status' => 'sent',
             'file_path' => $filePath,
             'file_type' => $fileType,
+            'parent_id' => $request->parent_id,
         ]);
+
+        $message->load(['sender', 'receiver', 'parent.sender']);
 
         // 🔥 Diffuser l'événement en temps réel
         broadcast(new \App\Events\MessageSent($message))->toOthers();

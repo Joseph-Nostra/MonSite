@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../axios";
 import { useTranslation } from "react-i18next";
-import { Send, ArrowLeft, MoreVertical, CheckCheck, Check, Mic, Square, Trash2, Phone, Video, Smile, Edit2, X } from "lucide-react";
+import { Send, ArrowLeft, MoreVertical, CheckCheck, Check, Mic, Square, Trash2, Phone, Video, Smile, Edit2, X, CornerUpLeft, ShieldAlert } from "lucide-react";
 import echo from "../echo";
 import UserAvatar from "./Common/UserAvatar";
 import LoadingSpinner from "./Common/LoadingSpinner";
@@ -27,6 +27,10 @@ export default function Chat({ user }) {
   const [editContent, setEditContent] = useState("");
   const [deleteModal, setDeleteModal] = useState(null); // { id, isMe }
   const [showHistoryId, setShowHistoryId] = useState(null);
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reporting, setReporting] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const timerRef = useRef(null);
@@ -224,6 +228,7 @@ export default function Chat({ user }) {
     formData.append("receiver_id", otherUserId);
     if (content.trim()) formData.append("content", content);
     if (file) formData.append("file", file);
+    if (replyingTo) formData.append("parent_id", replyingTo.id);
 
     try {
       const res = await api.post("/messages", formData, {
@@ -231,6 +236,7 @@ export default function Chat({ user }) {
       });
       setMessages(prev => [...prev, res.data]);
       setContent("");
+      setReplyingTo(null);
     } catch (err) {
       console.error("Erreur send message:", err);
       alert("Erreur lors de l'envoi du message.");
@@ -260,6 +266,21 @@ export default function Chat({ user }) {
         setDeleteModal(null);
     } catch (err) {
         console.error("Delete error:", err);
+    }
+  };
+
+  const handleReport = async () => {
+    if (!reportReason.trim()) return;
+    setReporting(true);
+    try {
+        await api.post("/reports", { reported_id: otherUserId, reason: reportReason });
+        setShowReportModal(false);
+        setReportReason("");
+        alert("Signalement envoyé avec succès.");
+    } catch (err) {
+        console.error("Report error:", err);
+    } finally {
+        setReporting(false);
     }
   };
 
@@ -295,6 +316,9 @@ export default function Chat({ user }) {
             </button>
             <button className="btn btn-icon-light rounded-circle text-primary" title="Appel Vidéo" onClick={() => initiateCall('video')}>
               <Video size={20} />
+            </button>
+            <button className="btn btn-icon-light rounded-circle text-danger" title="Signaler" onClick={() => setShowReportModal(true)}>
+              <ShieldAlert size={20} />
             </button>
             <button className="btn btn-icon-light rounded-circle">
               <MoreVertical size={20} className="text-muted" />
@@ -341,6 +365,12 @@ export default function Chat({ user }) {
                         </p>
                     ) : (
                         <>
+                        {m.parent && (
+                            <div className={`mb-2 p-2 rounded-3 border-start border-4 small ${isMe ? 'bg-white bg-opacity-10 border-white border-opacity-50' : 'bg-light border-primary'}`} style={{ backgroundColor: 'rgba(0,0,0,0.03)' }}>
+                                <strong className="d-block mb-1 opacity-75">{m.parent.sender_id === user.id ? 'Moi' : m.parent.sender?.name}</strong>
+                                <div className="text-truncate opacity-75">{m.parent.content}</div>
+                            </div>
+                        )}
                         {m.product && !isEditing && (
                             <Link 
                                 to={`/product/${m.product.id}`}
@@ -511,6 +541,9 @@ export default function Chat({ user }) {
                                         <Edit2 size={14} className="text-muted" /> Modifier
                                     </button>
                                 )}
+                                <button className="dropdown-item d-flex align-items-center gap-2 py-2 text-dark hover-bg-light small" onClick={() => { setReplyingTo(m); setShowActionsId(null); }}>
+                                    <CornerUpLeft size={14} className="text-muted" /> Répondre
+                                </button>
                                 <button className="dropdown-item d-flex align-items-center gap-2 py-2 text-danger hover-bg-light small" onClick={() => { setDeleteModal({ id: m.id, isMe }); setShowActionsId(null); }}>
                                     <Trash2 size={14} /> Supprimer
                                 </button>
@@ -522,6 +555,14 @@ export default function Chat({ user }) {
                   {/* Triggers (Smile & Actions) */}
                   {!m.is_deleted_for_everyone && (
                     <div className={`reaction-trigger px-2 d-none items-center gap-1`}>
+                        <button 
+                            className="btn btn-sm btn-light rounded-circle shadow-sm p-1 border-0 bg-white hover-scale" 
+                            onClick={(e) => { e.stopPropagation(); setReplyingTo(m); }}
+                            title="Répondre"
+                            style={{ width: '32px', height: '32px' }}
+                        >
+                            <CornerUpLeft size={18} className="text-muted" />
+                        </button>
                         <button 
                             className="btn btn-sm btn-light rounded-circle shadow-sm p-1 border-0 bg-white hover-scale" 
                             onClick={(e) => { e.stopPropagation(); setShowPickerId(showPickerId === m.id ? null : m.id); setShowActionsId(null); }}
@@ -547,6 +588,17 @@ export default function Chat({ user }) {
 
         {/* Chat Footer */}
         <div className="card-footer bg-white border-top-0 p-3 px-4">
+          {replyingTo && (
+              <div className="reply-preview bg-light border-start border-4 border-primary rounded-3 p-2 mb-2 d-flex justify-content-between align-items-center animate-slide-up">
+                  <div className="overflow-hidden">
+                      <small className="fw-bold d-block text-primary">{replyingTo.sender_id === user.id ? 'Moi' : replyingTo.sender?.name || otherUser?.name}</small>
+                      <div className="small text-muted text-truncate">{replyingTo.content}</div>
+                  </div>
+                  <button className="btn btn-link text-muted p-0 ms-2" onClick={() => setReplyingTo(null)}>
+                      <X size={16} />
+                  </button>
+              </div>
+          )}
           {isRecording ? (
             <div className="d-flex align-items-center gap-3 bg-light p-2 rounded-pill shadow-sm px-4">
                 <div className="d-flex align-items-center gap-2 text-danger">
@@ -645,6 +697,37 @@ export default function Chat({ user }) {
           </div>
       )}
 
+      {/* ⚠️ REPORT MODAL */}
+      {showReportModal && (
+          <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ zIndex: 10002, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(3px)' }}>
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white p-4 rounded-4 shadow-xl" style={{ width: '400px' }}>
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                      <h5 className="fw-bold mb-0">Signaler l'utilisateur</h5>
+                      <X className="cursor-pointer" onClick={() => setShowReportModal(false)} />
+                  </div>
+                  <div className="mb-4">
+                      <label className="form-label small fw-bold text-muted">Raison du signalement</label>
+                      <select className="form-select border-0 bg-light rounded-3 p-3 shadow-none focus-ring" value={reportReason} onChange={(e) => setReportReason(e.target.value)}>
+                          <option value="">Sélectionnez une raison</option>
+                          <option value="Spam">Spam / Messages indésirables</option>
+                          <option value="Harcèlement">Harcèlement</option>
+                          <option value="Arnaque">Tentative d'arnaque</option>
+                          <option value="Contenu inapproprié">Contenu inapproprié</option>
+                          <option value="Autre">Autre</option>
+                      </select>
+                      {reportReason === 'Autre' && (
+                          <textarea className="form-control border-0 bg-light rounded-3 p-3 mt-3 shadow-none" placeholder="Détails supplémentaires..." rows="3" onChange={(e) => setReportReason(e.target.value)}></textarea>
+                      )}
+                  </div>
+                  <div className="d-grid">
+                      <button className="btn btn-danger rounded-pill py-2 fw-bold" disabled={!reportReason || reporting} onClick={handleReport}>
+                          {reporting ? <LoadingSpinner size="sm" /> : 'Envoyer le signalement'}
+                      </button>
+                  </div>
+              </motion.div>
+          </div>
+      )}
+
       {/* 📱 ACTIVE CALL OVERLAY */}
       {activeCall && activeCall.otherUser && (
         <div className="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white" style={{ zIndex: 10000, background: '#0f172a' }}>
@@ -693,6 +776,23 @@ export default function Chat({ user }) {
         .bubble-other textarea { color: #1e293b !important; }
         .edit-container textarea { resize: none; overflow: hidden; background: rgba(0,0,0,0.05) !important; border-radius: 8px; padding: 5px; }
         .hover-translate-y-px:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05) !important; }
+        .animate-slide-up {
+            animation: slide-up 0.3s ease-out;
+        }
+        @keyframes slide-up {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .reply-preview {
+            border-left-width: 4px !important;
+            transition: all 0.3s ease;
+        }
+        .focus-ring:focus {
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+        }
+        .shadow-xl {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
         .animate-pulse { animation: pulse 1.5s infinite; }
         @keyframes pulse {
             0% { opacity: 1; transform: scale(1); }

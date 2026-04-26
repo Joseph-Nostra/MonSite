@@ -105,7 +105,14 @@ export default function Messages({ user }) {
                             {conv.is_online ? t('online') : t('offline') || "Hors ligne"}
                         </small>
                     </div>
-                    <p className="mb-0 text-muted small text-truncate pe-4">Cliquez pour voir les messages...</p>
+                    <div className="d-flex justify-content-between align-items-center">
+                        <p className="mb-0 text-muted small text-truncate pe-4">Cliquez pour voir les messages...</p>
+                        {conv.unread_count > 0 && (
+                            <span className="badge rounded-pill bg-danger animate-pulse-slow px-2 py-1" style={{ fontSize: '10px' }}>
+                                {conv.unread_count}
+                            </span>
+                        )}
+                    </div>
                 </div>
                 <ChevronRight size={20} className="text-muted opacity-50" />
               </button>
@@ -120,6 +127,14 @@ export default function Messages({ user }) {
             transform: translateX(5px);
         }
         .transition-all { transition: all 0.3s ease; }
+        .animate-pulse-slow {
+            animation: pulse-slow 2s infinite;
+        }
+        @keyframes pulse-slow {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
       `}</style>
     </div>
   );
