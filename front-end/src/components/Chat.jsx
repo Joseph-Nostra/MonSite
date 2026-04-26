@@ -7,6 +7,7 @@ import echo from "../echo";
 import UserAvatar from "./Common/UserAvatar";
 import LoadingSpinner from "./Common/LoadingSpinner";
 import VoicePlayer from "./Common/VoicePlayer";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Chat({ user }) {
   const { t } = useTranslation();
@@ -289,7 +290,10 @@ export default function Chat({ user }) {
                   style={{ maxWidth: "75%", borderRadius: '18px' }}
                 >
                   {m.product && (
-                    <div className={`mb-2 p-2 rounded-3 small border d-flex gap-2 align-items-center ${isMe ? 'bg-white bg-opacity-10 border-white border-opacity-20 text-white' : 'bg-light border-secondary border-opacity-10'}`} onClick={() => navigate(`/product/${m.product.id}`)} style={{ cursor: 'pointer' }}>
+                    <Link 
+                        to={`/product/${m.product.id}`}
+                        className={`mb-2 p-2 rounded-3 small border d-flex gap-2 align-items-center text-decoration-none shadow-sm transition-all hover-translate-y-px ${isMe ? 'bg-white bg-opacity-10 border-white border-opacity-20 text-white' : 'bg-light border-secondary border-opacity-10 text-dark'}`}
+                    >
                         <div className="rounded overflow-hidden" style={{ width: '40px', height: '40px', flexShrink: 0 }}>
                             <img src={m.product.image ? `http://127.0.0.1:8000/storage/${m.product.image}` : "https://via.placeholder.com/40"} alt="" className="w-100 h-100 object-fit-cover" />
                         </div>
@@ -297,7 +301,7 @@ export default function Chat({ user }) {
                             <strong className="d-block text-truncate" style={{ fontSize: '11px' }}>{m.product.title}</strong>
                             <span className="fw-bold" style={{ fontSize: '10px' }}>{m.product.price}€</span>
                         </div>
-                    </div>
+                    </Link>
                   )}
                   {m.file_path && (
                     <div className="mb-2">
@@ -509,6 +513,7 @@ export default function Chat({ user }) {
         .chat-bubble:hover .reaction-trigger { display: flex !important; }
         .hover-scale:hover { transform: scale(1.2); }
         .reaction-trigger { transition: all 0.2s; }
+        .hover-translate-y-px:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05) !important; }
         .animate-pulse { animation: pulse 1.5s infinite; }
         @keyframes pulse {
             0% { opacity: 1; transform: scale(1); }
