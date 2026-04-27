@@ -214,13 +214,20 @@ class MessageController extends Controller
         $userId = $request->user()->id;
         $reactions = $message->reactions ?? [];
 
-        // Si l'utilisateur a déjà réagi avec cet emoji, on le retire, sinon on l'ajoute
-        if (isset($reactions[$request->reaction]) && in_array($userId, $reactions[$request->reaction])) {
-            $reactions[$request->reaction] = array_values(array_diff($reactions[$request->reaction], [$userId]));
-            if (empty($reactions[$request->reaction])) {
-                unset($reactions[$request->reaction]);
+        $previousReaction = null;
+        foreach ($reactions as $emoji => $users) {
+            if (in_array($userId, $users)) {
+                $previousReaction = $emoji;
+                $reactions[$emoji] = array_values(array_diff($users, [$userId]));
+                if (empty($reactions[$emoji])) {
+                    unset($reactions[$emoji]);
+                }
+                break;
             }
-        } else {
+        }
+
+        // Si la nouvelle réaction est différente de la précédente, on l'ajoute
+        if ($previousReaction !== $request->reaction) {
             $reactions[$request->reaction][] = $userId;
         }
 
