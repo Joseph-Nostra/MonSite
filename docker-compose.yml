@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Base de données MySQL
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: password
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - fullstack
+
+  # Backend Laravel (API)
+  backend:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile
+    container_name: laravel_backend
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./back-end:/var/www/html
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - fullstack
+    command: >
+      sh -c "composer install &&
+             php artisan serve --host=0.0.0.0 --port=8000"
+
+  # Frontend React (Vite / CRA)
+  frontend:
+    image: node:20-alpine
+    container_name: react_frontend
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./front-end:/app
+    ports:
+      - "5173:5173"
+      - "3000:3000"
+    networks:
+      - fullstack
+    command: >
+      sh -c "npm install && npm run dev -- --host 0.0.0.0"
+
+networks:
+  fullstack:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
