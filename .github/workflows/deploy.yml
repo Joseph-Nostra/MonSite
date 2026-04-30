@@ -1,0 +1,74 @@
+name: CI/CD Pipeline - React + Laravel + Docker
+
+on:
+  push:
+    branches:
+      - main # À modifier si ta branche principale s'appelle "master"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # 1. Job pour le Build / Test de React
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies & Build
+        working-directory: ./front-end
+        run: |
+          npm install
+          npm run build
+
+  # 2. Job pour le Test / Vérification de Laravel
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, bcmath, pdo_mysql, zip, gd
+
+      - name: Install Composer Dependencies
+        working-directory: ./back-end
+        run: composer install -q --no-interaction --prefer-dist
+
+      # Décommente cette partie si tu as des tests PHPUnit / PEST fonctionnels
+      # - name: Run PHPUnit Tests
+      #   working-directory: ./back-end
+      #   run: php artisan test
+
+  # 3. Job pour le Déploiement via Serveur / Docker
+  deploy:
+    needs: [build-frontend, test-backend] # Dépend du succès des deux jobs précédents
+    if: github.ref == 'refs/heads/main' # Ne s'exécute que lors d'un push/merge sur "main"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          passphrase: ${{ secrets.SERVER_SSH_PASSPHRASE }} # Optionnel, si ta clé en a une
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            # Chemin d'accès au projet sur le serveur de production
+            cd /var/www/mon-projet
+            
+            # Récupération de la dernière version du code
+            git pull origin main
+            
+            # Builder / Lancer l'environnement Docker
+            docker-compose up -d --build
