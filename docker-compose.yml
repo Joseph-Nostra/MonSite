@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    restart: always
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+
+    ports:
+      - "3306:3306"
+
+  laravel:
+    build:
+      context: ./back-end
+
+    container_name: laravel
+
+    ports:
+      - "8000:80"
+
+    depends_on:
+      - mysql
+
+    volumes:
+      - ./back-end:/var/www/html
+
+    working_dir:  /var/www/html
+
+  react:
+    build:
+      context: ./front-end
+
+    container_name: react
+
+    ports:
+      - "5173:5173"
+
+    volumes:
+      - ./front-end:/app
+      - /app/node_modules
+
+    working_dir: /app
+
+    command: npm run dev -- --host 0.0.0.0
+
+    stdin_open: true
