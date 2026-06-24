@@ -62,3 +62,13 @@ services:
     command: npm run dev -- --host 0.0.0.0
 
     stdin_open: true
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+    depends_on:
+      - mysql
