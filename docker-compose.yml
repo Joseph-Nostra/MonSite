@@ -31,6 +31,19 @@ services:
 
     working_dir:  /var/www/html
 
+  reverb:
+    build:
+      context: ./back-end
+    container_name: reverb
+    command: php artisan reverb:start --host=0.0.0.0 --port=9000
+    ports:
+      - "9000:9000"
+    depends_on:
+      - laravel
+    volumes:
+      - ./back-end:/var/www/html
+    working_dir: /var/www/html
+
   react:
     build:
       context: ./front-end
