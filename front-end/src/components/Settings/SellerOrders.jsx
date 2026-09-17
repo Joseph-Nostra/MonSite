@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import api from '../../axios';
-import { ShoppingBag, Search, Filter, Eye, CheckCircle, Truck, XCircle, Phone, MapPin, Clock } from 'lucide-react';
+import {  Search, Eye, CheckCircle, Truck, XCircle, Phone, MapPin, Clock } from 'lucide-react';
 
 const SellerOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -33,7 +33,7 @@ const SellerOrders = () => {
             if (selectedOrder && selectedOrder.id === orderId) {
                 setSelectedOrder({ ...selectedOrder, status: newStatus });
             }
-        } catch (err) {
+        } catch {
             alert("Erreur lors de la mise à jour du statut");
         }
     };

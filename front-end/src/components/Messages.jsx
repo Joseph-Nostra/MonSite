@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../axios";
 import LoadingSpinner from "./Common/LoadingSpinner";
@@ -34,15 +34,15 @@ export default function Messages({ user }) {
     fetchConversations();
 
     // 🔥 Real-time Listeners
-    const channel = echo.channel('presence-status')
+    echo.channel('presence-status')
         .listen('UserStatusUpdated', (e) => {
             setConversations(prev => prev.map(c => 
                 c.id === e.userId ? { ...c, is_online: e.isOnline, last_seen_at: e.lastSeen } : c
             ));
         });
 
-    const msgChannel = echo.private(`messages.${user.id}`)
-        .listen('MessageSent', (e) => {
+    echo.private(`messages.${user.id}`)
+        .listen('MessageSent', () => {
             fetchConversations(); // Simpler to refetch for complexity here
         });
 

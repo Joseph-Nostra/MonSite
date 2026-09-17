@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../axios";
 import { useTranslation } from "react-i18next";
@@ -13,7 +13,7 @@ export default function Chat({ user }) {
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
-  const [otherUser, setOtherUser] = useState(null);
+  const [otherUser, _setOtherUser] = useState(null);
   const [isOtherOnline, setIsOtherOnline] = useState(false);
   const messageEndRef = useRef(null);
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export default function Chat({ user }) {
     fetchMessages();
 
     // 🔥 Real-time Listeners
-    const channel = echo.private(`messages.${user.id}`)
+      echo.private(`messages.${user.id}`)
       .listen('MessageSent', (e) => {
         if (e.message.sender_id == otherUserId) {
             setMessages(prev => [...prev, e.message]);
@@ -57,7 +57,7 @@ export default function Chat({ user }) {
       });
 
     // Presence listener
-    const presenceChannel = echo.channel('presence-status')
+    echo.channel('presence-status')
         .listen('UserStatusUpdated', (e) => {
             if (e.userId == otherUserId) {
                 setIsOtherOnline(e.isOnline);

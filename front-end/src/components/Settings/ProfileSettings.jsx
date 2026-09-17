@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useCallback,useState, useEffect } from 'react';
 import axios from '../../axios';
 import LoadingSpinner from '../Common/LoadingSpinner';
 import { Camera, Save, CheckCircle, Trash2 } from 'lucide-react';
@@ -18,9 +18,9 @@ const ProfileSettings = ({ setUser }) => {
 
     useEffect(() => {
         fetchProfile();
-    }, []);
+    }, [fetchProfile]);
 
-    const fetchProfile = async () => {
+    const fetchProfile = useCallback(async () => {
         try {
             const res = await axios.get('/user');
             setUser(res.data);
@@ -36,7 +36,7 @@ const ProfileSettings = ({ setUser }) => {
         } finally {
             setLoading(false);
         }
-    };
+    } , [setUser]);
 
     const handleAvatarChange = (e) => {
         const file = e.target.files[0];

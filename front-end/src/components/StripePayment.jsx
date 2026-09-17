@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
-import api from "../axios";
 import LoadingSpinner from "./Common/LoadingSpinner";
 
-const StripePayment = ({ clientSecret, orderId, onPaymentSuccess, onPaymentError }) => {
+const StripePayment = ({ clientSecret,  onPaymentSuccess, onPaymentError }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);

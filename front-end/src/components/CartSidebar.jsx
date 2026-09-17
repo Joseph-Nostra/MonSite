@@ -118,7 +118,7 @@ export default function CartSidebar({ cart, setCart, user }) {
       setNotification({ message: "Paiement PayPal réussi !", type: "success" });
       setCart([]);
       setTimeout(() => navigate("/orders"), 2000);
-    } catch (err) {
+    } catch  {
       setNotification({ message: "Erreur lors de la capture PayPal", type: "error" });
     }
   };
@@ -284,7 +284,7 @@ export default function CartSidebar({ cart, setCart, user }) {
                       purchase_units: [{ amount: { value: totalPrice.toFixed(2) } }]
                     });
                   }}
-                  onApprove={(data, actions) => handlePayPalCapture(data)}
+                  onApprove={(data) => handlePayPalCapture(data)}
                 />
               </div>
             )}

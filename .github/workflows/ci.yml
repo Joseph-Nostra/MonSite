@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - "fix/**"
 
   pull_request:
     branches:
@@ -64,12 +65,15 @@ jobs:
       - name: Configure test database
         run: |
           sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env
-          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
-          sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env
-          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=monsite_test/' .env
-          sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
-          sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
+          sed -i 's/^# DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/^# DB_PORT=.*/DB_PORT=3306/' .env
+          sed -i 's/^# DB_DATABASE=.*/DB_DATABASE=monsite_test/' .env
+          sed -i 's/^# DB_USERNAME=.*/DB_USERNAME=root/' .env
+          sed -i 's/^# DB_PASSWORD=.*/DB_PASSWORD=root/' .env
+          grep '^DB_' .env
 
+      - name: Clear Laravel configuration cache
+        run: php artisan config:clear
       - name: Run migrations
         run: php artisan migrate --force
 
