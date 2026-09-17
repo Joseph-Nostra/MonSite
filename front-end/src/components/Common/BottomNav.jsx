@@ -2,10 +2,10 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-const BottomNav = ({ user }) => {
+const BottomNav = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { t } = useTranslation();
+    const { _t } = useTranslation();
 
     const isActive = (path) => location.pathname === path;
 

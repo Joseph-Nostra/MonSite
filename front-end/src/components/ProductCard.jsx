@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../axios";
 
-function ProductCard({ product, onAddToCart, user, handleEdit, handleDelete }) {
+function ProductCard({ product, onAddToCart, user, handleEdit }) {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { _t } = useTranslation();
   const [isWishlisted, setIsWishlisted] = useState(false); // Should ideally come from prop or global state
 
   const imageUrl = product.image
@@ -109,4 +109,4 @@ function ProductCard({ product, onAddToCart, user, handleEdit, handleDelete }) {
   );
 }
 
-export default ProductCard;
+export default ProductCard;

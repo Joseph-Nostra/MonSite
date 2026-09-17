@@ -33,7 +33,6 @@ import LoadingSpinner from "./components/Common/LoadingSpinner";
 import api from "./axios";
 import Toast from "./components/Toast";
 import { useTranslation } from 'react-i18next';
-import i18n from './i18n';
 import "./App.css";
 
 function App() {
@@ -42,8 +41,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState({ message: "", type: "" });
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
-  const { t, i18n: i18nInstance } = useTranslation();
-
+  const { i18n: i18nInstance } = useTranslation();
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);

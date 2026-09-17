@@ -10,7 +10,7 @@ export default function NavBar({ user, setUser, loading, theme, setTheme }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [unread, setUnread] = useState(0);
+  const [_unread, setUnread] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
 

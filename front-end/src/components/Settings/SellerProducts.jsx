@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../axios';
-import { Package, Plus, Search, Edit2, Trash2, Power, Eye, AlertCircle } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2,  Eye, AlertCircle } from 'lucide-react';
 
 const SellerProducts = () => {
     const [products, setProducts] = useState([]);
@@ -38,7 +38,7 @@ const SellerProducts = () => {
         try {
             await api.delete(`/products/${id}`);
             setProducts(products.filter(p => p.id !== id));
-        } catch (err) {
+        } catch  {
             alert("Erreur lors de la suppression");
         }
     };

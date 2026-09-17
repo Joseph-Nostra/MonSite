@@ -1,17 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Shield, X, Check } from 'lucide-react';
 import { useTranslation } from "react-i18next";
 
 const CookieBanner = () => {
     const { t } = useTranslation();
-    const [visible, setVisible] = useState(false);
-
-    useEffect(() => {
-        const consent = localStorage.getItem('cookie-consent');
-        if (!consent) {
-            setVisible(true);
-        }
-    }, []);
+    const [visible, setVisible] = useState(
+        () => !localStorage.getItem('cookie-consent')
+    );
 
     const handleConsent = (choice) => {
         localStorage.setItem('cookie-consent', choice);

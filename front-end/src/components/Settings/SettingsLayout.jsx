@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import  { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { User, Shield, MapPin, Bell, CreditCard, ChevronRight } from 'lucide-react';
 import ProfileSettings from './ProfileSettings';
 import SecuritySettings from './SecuritySettings';
@@ -16,6 +17,7 @@ import useDocTitle from '../../hooks/useDocTitle';
 
 const SettingsLayout = ({ setUser, user }) => {
     useDocTitle('Tableau de bord');
+    const { t } = useTranslation();
     const location = useLocation();
     const isSeller = user?.role === 'vendeur' || user?.role === 'admin';
     const [activeTab, setActiveTab] = useState(location.state?.tab || (isSeller ? 'dash' : 'profile'));

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from '../../axios';
 import { MapPin, Plus, Trash2, Edit2, CheckCircle, Home } from 'lucide-react';
 
@@ -51,7 +51,7 @@ const AddressSettings = () => {
             await axios.delete(`/settings/addresses/${id}`);
             setAddresses(addresses.filter(a => a.id !== id));
             setMessage({ type: 'success', text: 'Adresse supprimée' });
-        } catch (err) {
+        } catch  {
             setMessage({ type: 'error', text: 'Erreur lors de la suppression' });
         }
     };
@@ -71,7 +71,7 @@ const AddressSettings = () => {
             setShowForm(false);
             setEditingId(null);
             setFormData({ full_name: '', address: '', city: '', zip_code: '', phone: '', is_default: false });
-        } catch (err) {
+        } catch  {
             setMessage({ type: 'error', text: 'Erreur lors de l\'enregistrement' });
         }
     };
