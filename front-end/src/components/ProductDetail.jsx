@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import  { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../axios";
 import LoadingSpinner from "./Common/LoadingSpinner";
 import useDocTitle from "../hooks/useDocTitle";
+import { IdCard } from "lucide-react";
 
 function ProductDetail({ onAddToCart, user }) {
   const { id } = useParams();
@@ -18,7 +19,7 @@ function ProductDetail({ onAddToCart, user }) {
 
   useDocTitle(product ? product.title : "Chargement...");
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [prodRes, revRes] = await Promise.all([
         api.get(`/products/${id}`),
@@ -32,11 +33,11 @@ function ProductDetail({ onAddToCart, user }) {
     } finally {
       setLoading(false);
     }
-  };
+  },[id])
 
   useEffect(() => {
     fetchData();
-  }, [id]);
+  }, [fetchData]);
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -193,4 +194,4 @@ function ProductDetail({ onAddToCart, user }) {
   );
 }
 
-export default ProductDetail;
+export default ProductDetail;
